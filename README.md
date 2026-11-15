@@ -36,7 +36,7 @@ PDF, Word, OCR and smart search download their helper libraries the first time y
 3. In the app, open **⚙ Answer engine**, choose Ollama, then click **Test engine**.
 
 ## Releasing an update
-Bump `VERSION` in `index.html` and `version` in `version.json`, then push to `main` (the web version is served from `gh-pages`, so push there too). Push a tag such as `v1.2.0` to build new Windows `.exe` files automatically.
+Bump `VERSION` in `index.html` and `version` in `version.json`, then push to `main`. The web version updates automatically, and the Windows `.exe` files are built and published as a release automatically.
 
 ## Support
 Procédure is free and open source. If it saves you time, please consider [sponsoring me on GitHub](https://github.com/sponsors/kefirman9000) ♥
