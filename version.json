@@ -1,1 +1,1 @@
-{"version":"1.3.0","notes":"New: one-click local AI setup. Answer engine → Install local AI installs Ollama and a model sized for your PC, then connects by itself. Everything stays on your computer."}
+{"version":"1.3.1","notes":"Fixed links to the web version (kefirman9000.github.io/Procedure)."}

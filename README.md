@@ -2,8 +2,8 @@
 
 Ask questions of your **SOPs** (Standard Operating Procedures) and **MOPs** (Methods of Procedure) and get answers from your own documents, with links to the exact section each answer came from.
 
-**Use it on the web:** https://kefirman9000.github.io/procedure/
-**Windows desktop app:** [latest release](https://github.com/kefirman9000/procedure/releases/latest) (installer or portable .exe)
+**Use it on the web:** https://kefirman9000.github.io/Procedure/
+**Windows desktop app:** [latest release](https://github.com/kefirman9000/Procedure/releases/latest) (installer or portable .exe)
 
 ## Screenshots
 **Ask a question:** answers point to the exact section of the procedure

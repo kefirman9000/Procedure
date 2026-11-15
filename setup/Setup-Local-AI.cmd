@@ -5,7 +5,7 @@ if "%PROC_MODEL%"=="" set "PROC_MODEL=auto"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllText('%~f0'))"
 exit /b
 #>
-# Procedure - local AI setup (source: https://github.com/kefirman9000/procedure/blob/main/setup/Setup-Local-AI.cmd)
+# Procedure - local AI setup (source: https://github.com/kefirman9000/Procedure/blob/main/setup/Setup-Local-AI.cmd)
 $ErrorActionPreference = "Continue"
 $Model = $env:PROC_MODEL
 if (-not $Model) { $Model = "auto" }

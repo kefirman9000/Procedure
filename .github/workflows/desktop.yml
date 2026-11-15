@@ -46,5 +46,5 @@ jobs:
           files: desktop/dist/*.exe
           body: |
             **Procedure-${{ steps.build.outputs.v }}-setup.exe** installs Procédure. **Procedure-${{ steps.build.outputs.v }}-portable.exe** runs without installing.
-            Web version: https://kefirman9000.github.io/procedure/
+            Web version: https://kefirman9000.github.io/Procedure/
             If Procédure helps you, please consider [sponsoring on GitHub](https://github.com/sponsors/kefirman9000) ♥
