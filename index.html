@@ -174,6 +174,50 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 .easy b{color:var(--accent)}
 .netlog{font:12px Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;max-height:180px;overflow:auto;white-space:pre-wrap}
 .sentnote{font-size:11px;color:var(--accent2);margin-left:6px;text-transform:none;letter-spacing:0}
+.libsw{display:flex;gap:4px;margin-top:8px}
+.libsw select{flex:1;font-size:12px;padding:4px 8px}
+.reviewwarn{margin:0 12px 6px;font-size:12px;color:var(--err);cursor:pointer}
+.reviewwarn:hover{text-decoration:underline}
+.rvdot{font-size:10px}.rvdot.over{color:var(--err)}.rvdot.soon{color:var(--accent2)}
+.rv.over{color:var(--err);font-weight:600}.rv.soon{color:var(--accent2)}.rv.ok{color:var(--muted)}
+.oldterm{color:var(--err);font-size:11px;border:1px solid rgba(224,107,107,.4);border-radius:4px;padding:0 4px}
+.pdflink{color:var(--accent);cursor:pointer;font-size:11px;border:1px solid rgba(79,179,169,.4);border-radius:4px;padding:0 5px}
+.pdflink:hover{background:rgba(79,179,169,.15)}
+.pdfwrap{position:relative;display:inline-block;box-shadow:0 2px 14px rgba(0,0,0,.5);background:#fff}
+#pdfOverlay{position:absolute;left:0;top:0;pointer-events:none;mix-blend-mode:multiply}
+#micBtn{font-size:16px}
+#micBtn.on,#ckVoice.on{color:var(--err);border-color:var(--err)}
+.qr svg{width:260px;height:260px;background:#fff;border-radius:8px;padding:6px}
+.cmp{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+.cmp td,.cmp th{border:1px solid var(--line);padding:8px;vertical-align:top;white-space:pre-wrap;text-align:left}
+.cmp th{background:var(--panel2);font-size:12px}
+.cmp td.sec{font-weight:600;color:var(--accent2);white-space:normal}
+.cmp td.none{color:var(--muted);font-style:italic;background:rgba(224,107,107,.06)}
+.qzq{font-size:15px;font-weight:600;white-space:pre-wrap;margin-bottom:12px}
+.qzopt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px}
+.qzopt.right{border-color:var(--ok);background:rgba(95,191,122,.15)}
+.qzopt.wrong{border-color:var(--err);background:rgba(224,107,107,.15)}
+.lockscreen{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.lockbox{text-align:center;width:min(360px,90vw)}
+.lockbox input{width:100%;margin:10px 0;text-align:center;font-size:18px}
+.lockbox h2{margin:6px 0}
+@media (max-width:700px){
+  html,body{overflow-x:hidden;max-width:100%}
+  .app,main,aside{min-width:0;max-width:100vw}
+  .topbar{flex-wrap:wrap;gap:6px}
+  .askbar .inner{flex-wrap:wrap}
+  .askbar select{max-width:none;width:100%}
+  .askbar textarea{min-width:0}
+  .modal .box,.box.wide{width:100%;max-width:100%;max-height:100%;height:100%;border-radius:0;border:none}
+  .box header{gap:6px}
+  #ckModal .ck{grid-template-columns:38px 1fr;font-size:16px;padding:12px 6px}
+  #ckModal .ck > div:last-of-type{grid-column:2}
+  #ckModal .ck .note{grid-column:1 / 3}
+  #ckModal .ck input[type=checkbox]{transform:scale(1.7);margin:6px 0 0 8px}
+  #ckModal header h3{white-space:normal;font-size:14px;flex-basis:100%}
+  #ckModal header button{padding:6px 8px;font-size:12px}
+  .ckprog{position:sticky;top:-16px;z-index:2}
+}
 @media (max-width:800px){.app{grid-template-columns:1fr}aside{max-height:42vh}.ckmeta,.row2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -183,6 +227,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
     <div class="brand">
       <h1>Procédure</h1>
       <p>Ask questions of your SOPs &amp; MOPs</p>
+      <div class="libsw"><select id="libSel" title="Switch library"></select><button class="ghost" id="libManage" title="Manage libraries">⚙</button></div>
     </div>
     <div class="drop" id="drop">
       <b>Drop files here</b> or click to add<br>
@@ -196,11 +241,14 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
     </div>
     <div class="libhead"><span id="libcount">Library</span><button class="ghost" id="pasteBtn" title="Paste text as a document">+ Paste text</button></div>
     <input class="libfilter" id="libFilter" placeholder="Filter documents…">
+    <div class="reviewwarn" id="reviewWarn" style="display:none"></div>
     <div class="lib" id="lib"></div>
     <div class="foot">
       <button id="settingsBtn">⚙ Answer engine</button>
       <button id="teamBtn" title="Sync a shared folder or GitHub repo">👥 Team library</button>
-      <button id="auditBtn" title="Find missing sections">🔍 Audit</button>
+      <button id="auditBtn" title="Find missing sections, overdue reviews and outdated terms">🔍 Audit</button>
+      <button id="draftBtn" title="Turn notes from a past change into a draft MOP or SOP">✍ Draft</button>
+      <button id="cmpBtn" title="Compare two procedures">⇆ Compare</button>
       <button id="exportBtn" title="Save library to a .json file">Export</button>
       <button id="importBtn" title="Load a library .json file">Import</button>
       <button id="updateBtn">Check for updates</button>
@@ -216,6 +264,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
       <span class="status" id="status"></span>
       <div class="grow"></div>
       <a id="desktopLink" href="https://github.com/kefirman9000/Procedure/releases/latest" target="_blank" rel="noopener" style="font-size:12px">⬇ Desktop app</a>
+      <button class="ghost" id="lockNow" style="display:none" title="Lock now">🔐 Lock</button>
       <button class="ghost" id="clearChat">Clear chat</button>
     </div>
     <div class="chat" id="chat"><div class="inner" id="chatInner"></div></div>
@@ -224,6 +273,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
       <div class="inner">
         <select id="scope" title="Which documents to search"></select>
         <textarea id="q" rows="1" placeholder="Ask a question about your procedures…  (Enter to ask, Shift+Enter for new line)"></textarea>
+        <button class="ghost" id="micBtn" title="Ask by voice">🎤</button>
         <button class="primary" id="askBtn">Ask</button>
       </div>
     </div>
@@ -293,6 +343,11 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
       <textarea id="glossary" rows="6" placeholder="MW = maintenance window&#10;CAB = change advisory board&#10;FW = firmware&#10;DC1 = Ashburn data center"></textarea>
       <div class="hint">Questions using either side will find the other. The AI also gets this list.</div>
     </div>
+    <div class="field">
+      <label>Outdated terms — flag procedures that still mention these (one per line, optionally <code>old → new</code>)</label>
+      <textarea id="outdated" rows="4" placeholder="firmware 9.2 → 10.1&#10;core-sw-old&#10;Jane Doe → John Lee"></textarea>
+    </div>
+    <div class="field"><label>Procedures need review every (months)</label><input id="reviewMonths" type="number" min="1" max="120" style="width:100px"><div class="hint">Used when a document has an effective, revision or approval date but no "next review" date.</div></div>
     <div style="display:flex;gap:8px;justify-content:flex-end"><button id="testEngine">Test engine</button><button class="primary" id="saveSettings">Save</button></div>
     <div id="testOut" class="hint"></div>
   </div>
@@ -324,13 +379,13 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 
 <!-- Viewer -->
 <div class="modal" id="viewModal"><div class="box wide">
-  <header><span class="tag" id="vTag"></span><h3 id="vTitle"></h3><span class="rev" id="vRev"></span><input id="vFind" placeholder="Find in document" style="width:180px"><button id="vCheck">☑ Checklist</button><button id="vHist">⟲ History</button><button class="ghost" data-close>✕</button></header>
+  <header><span class="tag" id="vTag"></span><h3 id="vTitle"></h3><span class="rev" id="vRev"></span><input id="vFind" placeholder="Find in document" style="width:180px"><button id="vOrig" style="display:none" title="Open the original file">📄 Original</button><button id="vQuiz" title="Quiz yourself on this procedure">🎓 Quiz</button><button id="vCheck">☑ Checklist</button><button id="vHist">⟲ History</button><button class="ghost" data-close>✕</button></header>
   <div class="body" id="vBody"></div>
 </div></div>
 
 <!-- Checklist -->
 <div class="modal" id="ckModal"><div class="box wide">
-  <header><span class="tag" id="ckTag"></span><h3 id="ckTitle"></h3><span id="ckCount" class="hint" style="margin:0"></span><button id="ckPrint">🖨 Print / PDF</button><button id="ckCsv">CSV</button><button id="ckReset">Reset</button><button class="ghost" data-close>✕</button></header>
+  <header><span class="tag" id="ckTag"></span><h3 id="ckTitle"></h3><span id="ckCount" class="hint" style="margin:0"></span><button id="ckVoice" title="Read each step aloud, hands-free">🔊 Read steps</button><button id="ckPhone" title="Open this checklist on a phone">📱 Phone</button><button id="ckPrint">🖨 Print / PDF</button><button id="ckCsv">CSV</button><button id="ckReset">Reset</button><button class="ghost" data-close>✕</button></header>
   <div class="body">
     <div class="ckmeta">
       <input id="ckOp" placeholder="Performed by">
@@ -358,7 +413,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 
 <!-- Audit -->
 <div class="modal" id="auditModal"><div class="box wide">
-  <header><h3>Procedure audit — missing sections</h3><select id="auFilter"><option value="ALL">All</option><option value="SOP">SOPs</option><option value="MOP">MOPs</option><option value="GAPS">Only with required gaps</option></select><button id="auCsv">CSV</button><button class="ghost" data-close>✕</button></header>
+  <header><h3>Procedure audit</h3><select id="auFilter"><option value="ALL">All</option><option value="SOP">SOPs</option><option value="MOP">MOPs</option><option value="GAPS">Only with required gaps</option><option value="REVIEW">Review overdue / due soon</option><option value="OLD">Mentions outdated terms</option></select><button id="auCsv">CSV</button><button class="ghost" data-close>✕</button></header>
   <div class="body">
     <div class="hint" style="margin:0 0 10px"><span class="audit"><span class="miss">required</span><span class="miss rec">recommended</span></span> — checks look for the section or its usual wording anywhere in the document. Click a row to open it.</div>
     <table class="audit" id="auTable"></table>
@@ -376,6 +431,80 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
   </div>
 </div></div>
 
+<!-- PDF / original viewer -->
+<div class="modal" id="pdfModal"><div class="box wide" style="height:92vh">
+  <header><span class="tag" id="pvTag"></span><h3 id="pvTitle"></h3><button id="pvPrev" title="Previous page">‹</button><span id="pdfPage" class="hint" style="margin:0"></span><button id="pvNext" title="Next page">›</button><button id="pvOut" title="Zoom out">−</button><button id="pvIn" title="Zoom in">+</button><button class="ghost" data-close>✕</button></header>
+  <div class="body" id="pdfBody" style="background:#2b3038;text-align:center;flex:1"><div class="pdfwrap"><canvas id="pdfCanvas"></canvas><canvas id="pdfOverlay"></canvas></div><img id="pvImg" alt="" style="display:none;max-width:100%;background:#fff"></div>
+</div></div>
+
+<!-- Draft from notes -->
+<div class="modal" id="draftModal"><div class="box wide">
+  <header><h3>✍ Draft a procedure from notes</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <div class="row2"><div class="field"><label>Title</label><input id="dTitle" placeholder="MOP-0150 Replace UPS battery string B"></div><div class="field"><label>Type</label><select id="dType"><option>MOP</option><option>SOP</option></select></div></div>
+    <div class="field"><label>Paste notes from a past change or task (what you did, in order)</label><textarea id="dNotes" rows="8" placeholder="02:00 took config backup&#10;02:05 notified NOC on the bridge&#10;02:10 copied new image to flash&#10;02:20 reloaded switch&#10;02:30 checked BGP is up, all uplinks green"></textarea></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="primary" id="dGo">Draft it</button><span class="hint" id="dHow" style="margin:0"></span></div>
+    <div class="field" style="margin-top:14px"><label>Draft. Edit freely, and fill in anything marked [fill in].</label><textarea id="dOut" rows="16" style="font-family:Consolas,monospace;font-size:12.5px"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button id="dDownload">Download .md</button><button class="primary" id="dSave">Save to library</button></div>
+  </div>
+</div></div>
+
+<!-- Compare -->
+<div class="modal" id="cmpModal"><div class="box wide">
+  <header><h3>⇆ Compare two procedures</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+      <select id="cmpA" style="flex:1;min-width:200px"></select><span class="hint" style="margin:0">vs</span><select id="cmpB" style="flex:1;min-width:200px"></select>
+      <select id="cmpMode"><option value="side">Side by side, by section</option><option value="diff">Line by line</option><option value="ai">AI summary of differences</option></select>
+    </div>
+    <div id="cmpOut"></div>
+  </div>
+</div></div>
+
+<!-- Quiz -->
+<div class="modal" id="quizModal"><div class="box">
+  <header><span class="tag" id="qzTag"></span><h3 id="qzTitle"></h3><span class="hint" id="qzCount" style="margin:0"></span><button class="ghost" data-close>✕</button></header>
+  <div class="body" id="qzBody"></div>
+</div></div>
+
+<!-- Phone checklist -->
+<div class="modal" id="phoneModal"><div class="box">
+  <header><h3>📱 Open this checklist on a phone</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body" style="text-align:center">
+    <div id="phoneQR" class="qr"></div>
+    <p class="hint">Scan with the phone's camera. The checklist opens in the phone's browser, and ticks, times and notes are saved on the phone. Use CSV or Print there to keep a record.</p>
+    <div style="display:flex;gap:8px"><input id="phoneLink" readonly style="flex:1"><button id="phoneCopy">Copy link</button></div>
+    <p class="hint">🔒 The steps travel inside the link itself, after the <b>#</b>. Browsers never send that part to any server, GitHub included. Anyone you give the link to can read the steps, so share it like you'd share the document.</p>
+  </div>
+</div></div>
+
+<!-- Libraries -->
+<div class="modal" id="libsModal"><div class="box">
+  <header><h3>Libraries</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body"><p class="hint" style="margin-top:0">Keep separate sets of procedures, like Network, Facilities and Security. Each library has its own documents, revisions and team sync. Settings, glossary and saved questions are shared between them.</p>
+  <table class="revlist" id="libsList"></table><button id="libsNew">＋ New library</button></div>
+</div></div>
+
+<!-- PIN entry -->
+<div class="modal" id="pinModal"><div class="box" style="width:min(420px,94vw);height:auto">
+  <header><h3 id="pinTitle">PIN</h3><button class="ghost" id="pinCancel">✕</button></header>
+  <div class="body">
+    <div id="pinNote" class="hint" style="margin:0 0 10px"></div>
+    <div class="field"><input id="pin1" type="password" placeholder="PIN or passphrase" autocomplete="new-password"></div>
+    <div class="field" id="pin2row"><input id="pin2" type="password" placeholder="Type it again" autocomplete="new-password"></div>
+    <div id="pinErr" class="err" style="font-size:12px;margin-bottom:8px"></div>
+    <div style="text-align:right"><button class="primary" id="pinOk">OK</button></div>
+  </div>
+</div></div>
+
+<!-- Lock screen -->
+<div id="lockScreen" class="lockscreen" style="display:none"><div class="lockbox">
+  <div style="font-size:40px">🔐</div><h2>Procédure is locked</h2><p class="hint">Enter your PIN to open your procedures.</p>
+  <input id="unlockPin" type="password" placeholder="PIN" autocomplete="current-password"><button class="primary" id="unlockBtn" style="width:100%">Unlock</button>
+  <div id="unlockErr" class="err" style="font-size:12px;min-height:18px;margin-top:8px"></div>
+  <button class="ghost" id="unlockForgot" style="margin-top:14px;font-size:12px">Forgot PIN?</button>
+</div></div>
+
 <!-- Privacy -->
 <div class="modal" id="privModal"><div class="box wide">
   <header><h3>🔒 Privacy &amp; safety — where your information goes</h3><button class="ghost" data-close>✕</button></header>
@@ -383,7 +512,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
     <p style="margin-top:0"><b style="color:var(--ok)">Your documents are never uploaded.</b> Procédure is just one page of code that runs inside your own browser (or the desktop app). Even when you use it from the GitHub web address, GitHub only sends you the app. It never receives your files, your questions or your answers. There is no server, no account, no tracking and no analytics.</p>
     <h5>What stays on this computer</h5>
     <ul>
-      <li>Every document you add, and the text read from it (including OCR of scanned pages)</li>
+      <li>Every document you add, the text read from it (including OCR of scanned pages), and the original PDF or image so you can view the real pages</li>
       <li>Your questions, answers, saved questions, feedback, checklists and notes</li>
       <li>Settings, glossary, and any API key or GitHub token you enter</li>
     </ul>
@@ -398,12 +527,20 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
       <tr><td>Ollama or LM Studio engine (optional)</td><td>Your own computer (localhost)</td><td>Your question and the matching passages go to the AI program on your own machine. Nothing leaves it.</td></tr>
       <tr><td>Install local AI (only if you click it)</td><td>ollama.com</td><td>The setup downloads Ollama and the AI model. Nothing is sent. It lets only Procédure connect to Ollama, not other websites. The setup file is <a href="https://github.com/kefirman9000/Procedure/blob/main/setup/Setup-Local-AI.cmd" target="_blank" rel="noopener">public to read</a>.</td></tr>
       <tr><td><b>Claude API engine (optional, off by default)</b></td><td>api.anthropic.com</td><td class="warnrow"><b style="color:var(--accent2)">Your question and the matching passages from your documents ARE sent to Anthropic</b> to write the answer. Whole documents are not sent. Only choose this if your organization allows it.</td></tr>
+      <tr><td>Voice questions 🎤 (optional, asks first)</td><td>Your browser's speech service (Google in Chrome, Microsoft in Edge)</td><td><b style="color:var(--accent2)">The sound of your spoken question is sent to that service</b> to turn it into text. Your documents are not sent. Reading aloud 🔊 uses voices installed on this computer.</td></tr>
+      <tr><td>📱 Phone checklist link (only if you make one)</td><td>GitHub Pages, to load the app on the phone</td><td>The steps are packed into the link after the <code>#</code>, and browsers never send that part to any server. Anyone you give the link to can read the steps.</td></tr>
+      <tr><td>Draft ✍, Compare ⇆ and Quiz 🎓 with AI (optional)</td><td>Your answer engine</td><td>Same as answers: they stay on this computer with Ollama or LM Studio, and go to Anthropic with the Claude API (it asks first). Without AI these features run entirely on this computer.</td></tr>
       <tr><td>Team library from GitHub (optional)</td><td>api.github.com, raw.githubusercontent.com</td><td>Downloads files from the repo you choose. Your token, if you add one, only goes to GitHub.</td></tr>
     </table>
     <p class="hint">With the default settings (search only), the only connections are downloading the app and its helper programs. Your information stays on your computer.</p>
     <h5>Check it yourself — connections made since this window opened</h5>
     <div class="netlog" id="netLog"></div>
     <p class="hint">You can confirm this with your browser's developer tools (F12 → Network). The full source code is public at <a href="https://github.com/kefirman9000/Procedure" target="_blank" rel="noopener">github.com/kefirman9000/Procedure</a>.</p>
+    <h5>🔐 Lock with a PIN (for shared or work computers)</h5>
+    <div id="lockState" class="hint" style="margin-bottom:8px"></div>
+    <button id="lockOn">Turn on PIN lock</button> <button id="lockChange">Change PIN</button> <button id="lockOff">Turn off</button>
+    <label class="hint" style="margin-left:8px">Auto-lock after <select id="autoLock"><option value="0">never</option><option value="5">5 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hour</option></select> idle</label>
+    <p class="hint">With a PIN lock, your documents, original files, checklist notes and API keys are encrypted on this computer (AES-256, with a key made from your PIN). Without the PIN they can't be read, and a forgotten PIN can't be recovered. Saved questions, feedback and the glossary aren't encrypted.</p>
     <h5>Remove everything</h5>
     <button id="wipeBtn" style="border-color:var(--err);color:var(--err)">Delete all Procédure data on this computer</button>
     <span class="hint">Deletes documents, settings, keys, checklists and history from this browser. This can't be undone.</span>
@@ -414,7 +551,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 
 <script>
 "use strict";
-const VERSION = "1.3.1";
+const VERSION = "1.4.0";
 const REPO = "kefirman9000/Procedure";
 const DESKTOP = window.procedureDesktop || null;
 const $ = s => document.querySelector(s);
@@ -441,27 +578,70 @@ function setStatus(msg) { $("#status").innerHTML = msg ? '<span class="spin"></s
 function lsGet(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
-/* ================= Storage (IndexedDB) ================= */
+/* ================= Libraries, storage & encryption ================= */
+let LIBS = lsGet("procedure.libs", [{ id: "default", name: "My library" }]);
+let CURLIB = lsGet("procedure.curlib", "default"); if (!LIBS.some(l => l.id === CURLIB)) CURLIB = LIBS[0].id;
+const dbName = id => id === "default" ? "procedure" : "procedure-" + id;
 const DB = {
   db: null,
-  open() { return new Promise((res, rej) => { const r = indexedDB.open("procedure", 2);
-    r.onupgradeneeded = () => { const db = r.result; if (!db.objectStoreNames.contains("docs")) db.createObjectStore("docs", { keyPath: "id" }); if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta"); };
-    r.onsuccess = () => { this.db = r.result; res(); }; r.onerror = () => rej(r.error); }); },
+  open(name) {
+    if (this.db) { try { this.db.close(); } catch (e) {} this.db = null; }
+    return new Promise((res, rej) => { const r = indexedDB.open(name || dbName(CURLIB), 3);
+      r.onupgradeneeded = () => { const db = r.result; if (!db.objectStoreNames.contains("docs")) db.createObjectStore("docs", { keyPath: "id" }); if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta"); if (!db.objectStoreNames.contains("files")) db.createObjectStore("files"); };
+      r.onsuccess = () => { this.db = r.result; res(); }; r.onerror = () => rej(r.error); r.onblocked = () => rej(new Error("storage is busy in another tab")); });
+  },
   req(store, mode, fn) { return new Promise((res, rej) => { const r = fn(this.db.transaction(store, mode).objectStore(store)); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 };
 let useMem = false; const memDocs = new Map(), memMeta = new Map();
-const storeAll = () => useMem ? Promise.resolve([...memDocs.values()]) : DB.req("docs", "readonly", s => s.getAll());
-const storePut = d => useMem ? (memDocs.set(d.id, d), Promise.resolve()) : DB.req("docs", "readwrite", s => s.put(d));
+/* PIN lock: AES-GCM key derived from the PIN with PBKDF2; only kept in memory while unlocked */
+let KEY = null;
+const LOCK = () => lsGet("procedure.lock", null);
+function b64(buf) { const u = buf instanceof Uint8Array ? buf : new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function deriveKey(pin, salt, iter) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function encBytes(bytes) { const iv = crypto.getRandomValues(new Uint8Array(12)); return { iv, data: await crypto.subtle.encrypt({ name: "AES-GCM", iv }, KEY, bytes) }; }
+async function decBytes(o) { return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: o.iv }, KEY, o.data)); }
+const jsonRep = (k, v) => v instanceof Float32Array ? { __f32: Array.from(v) } : v;
+const jsonRev = (k, v) => v && v.__f32 ? Float32Array.from(v.__f32) : v;
+async function encJSON(o) { return encBytes(new TextEncoder().encode(JSON.stringify(o, jsonRep))); }
+async function decJSON(e) { return JSON.parse(new TextDecoder().decode(await decBytes(e)), jsonRev); }
+const rawAll = () => useMem ? Promise.resolve([...memDocs.values()]) : DB.req("docs", "readonly", s => s.getAll());
+async function storeAll() {
+  const recs = await rawAll(); const out = []; let bad = 0;
+  for (const r of recs) { if (!r.enc) { out.push(r); continue; } if (!KEY) { bad++; continue; } try { out.push(await decJSON(r.enc)); } catch (e) { bad++; } }
+  if (bad) toast(bad + " document(s) are encrypted with a PIN that isn't set here, so they couldn't be opened", 7000);
+  return out;
+}
+async function storePut(d) { const rec = KEY ? { id: d.id, enc: await encJSON(d) } : d; if (useMem) { memDocs.set(d.id, rec); return; } return DB.req("docs", "readwrite", s => s.put(rec)); }
 const storeDel = id => useMem ? (memDocs.delete(id), Promise.resolve()) : DB.req("docs", "readwrite", s => s.delete(id));
 const metaGet = k => useMem ? Promise.resolve(memMeta.get(k)) : DB.req("meta", "readonly", s => s.get(k));
 const metaPut = (k, v) => useMem ? (memMeta.set(k, v), Promise.resolve()) : DB.req("meta", "readwrite", s => s.put(v, k));
 const metaDel = k => useMem ? (memMeta.delete(k), Promise.resolve()) : DB.req("meta", "readwrite", s => s.delete(k));
+/* original files (PDFs, images) */
+async function filePut(id, bytes) { if (useMem) return; const rec = KEY ? { enc: await encBytes(bytes) } : { bytes: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) }; return DB.req("files", "readwrite", s => s.put(rec, id)); }
+async function fileGet(id) { if (useMem) return null; const r = await DB.req("files", "readonly", s => s.get(id)); if (!r) return null; if (r.enc) { if (!KEY) return null; return decBytes(r.enc); } return new Uint8Array(r.bytes); }
+const fileDel = id => useMem ? Promise.resolve() : DB.req("files", "readwrite", s => s.delete(id)).catch(() => {});
+/* small private values (checklist runs, API keys): plain in localStorage, or encrypted when the PIN lock is on */
+async function vaultGet(k, d) {
+  const raw = lsGet("procedure." + k, undefined); if (raw === undefined) return d;
+  if (raw && raw.__enc) { if (!KEY) return d; try { return await decJSON({ iv: unb64(raw.iv), data: unb64(raw.data) }); } catch (e) { return d; } }
+  return raw;
+}
+async function vaultSet(k, v) { if (!KEY) return lsSet("procedure." + k, v); const e = await encJSON(v); lsSet("procedure." + k, { __enc: 1, iv: b64(e.iv), data: b64(e.data) }); }
 
 /* ================= Settings ================= */
 const defaults = { engine: "search", ollamaUrl: "http://localhost:11434", ollamaModel: "llama3.1", oaUrl: "http://localhost:1234/v1", oaModel: "local-model", oaKey: "", anKey: "", anModel: "claude-sonnet-5-5", topK: 8,
-  smart: false, glossary: "", ghRepo: "", ghBranch: "main", ghPath: "", ghToken: "", ghAuto: false };
+  smart: false, glossary: "", ghRepo: "", ghBranch: "main", ghPath: "", ghToken: "", ghAuto: false, outdated: "", reviewMonths: 12, autoLock: 15 };
 let S = { ...defaults, ...lsGet("procedure.settings", {}) };
-const saveS = () => lsSet("procedure.settings", S);
+const SECRET_KEYS = ["anKey", "oaKey", "ghToken"];
+function saveS() {
+  const plain = { ...S };
+  if (LOCK() && KEY) { for (const k of SECRET_KEYS) delete plain[k]; vaultSet("secrets", Object.fromEntries(SECRET_KEYS.map(k => [k, S[k]]))); }
+  lsSet("procedure.settings", plain);
+}
 let PINS = lsGet("procedure.pins", []);
 let FB = lsGet("procedure.fb", []);
 
@@ -506,7 +686,7 @@ function chunkBlocks(blocks) {
   const flush = () => { if (!buf.length) return; const text = buf.join("\n").trim(); if (text) chunks.push({ sec, page, text }); buf = []; bufLen = 0; };
   for (const b of blocks) {
     const t = (b.text || "").replace(/[ \t]+\n/g, "\n").trim(); if (!t) continue;
-    if (b.heading || isHeading(t)) { flush(); sec = t.replace(/^#+\s*/, ""); page = b.page ?? page; continue; }
+    if (!b.table && (b.heading || isHeading(t))) { flush(); sec = t.replace(/^#+\s*/, ""); page = b.page ?? page; continue; }
     if (bufLen && bufLen + t.length > MAX) flush();
     if (!buf.length) page = b.page ?? page;
     if (t.length > MAX * 1.6) {
@@ -519,17 +699,46 @@ function chunkBlocks(blocks) {
   return chunks;
 }
 const LIST_RE = /^([-*•▪◦●]|\(?\d+(\.\d+)*[.)]|\(?[a-z][.)]|step\s+\d+[a-z]?\b)\s*/i;
+function splitRow(l) {
+  let cells = null;
+  if (/^\|.+\|$/.test(l)) cells = l.slice(1, -1).split("|");
+  else if (/\S \| \S/.test(l)) cells = l.split(" | ");
+  else if (l.split("\t").length >= 3) cells = l.split("\t");
+  return cells && cells.length >= 2 ? cells.map(c => c.trim()) : null;
+}
+function rowText(head, cells) { return cells.map((c, i) => c ? (head[i] && head[i] !== c ? head[i] + ": " + c : c) : "").filter(Boolean).join(" · "); }
 function textToBlocks(text, page) {
-  const lines = String(text).replace(/\r/g, "").split("\n"); const blocks = []; let para = "";
+  const lines = String(text).replace(/\r/g, "").split("\n"); const blocks = []; let para = ""; let thead = null;
   const push = () => { if (para.trim()) blocks.push({ text: para.trim(), page }); para = ""; };
-  for (const raw of lines) {
-    const l = raw.trim();
-    if (!l) { push(); continue; }
+  for (let li = 0; li < lines.length; li++) {
+    const l = lines[li].trim();
+    if (!l) { push(); thead = null; continue; }
+    const cells = splitRow(l);
+    if (cells && (thead ? Math.abs(cells.length - thead.length) <= 1 : !!splitRow((lines[li + 1] || "").trim()))) {
+      if (!thead && para && para.length < 70 && !/[.;:,]$/.test(para)) { blocks.push({ text: para, heading: true, page }); para = ""; }
+      push(); if (/^[\s|:\-+]+$/.test(l)) continue;
+      if (!thead) { thead = cells; blocks.push({ text: cells.filter(Boolean).join(" | "), page, table: true }); }
+      else blocks.push({ text: rowText(thead, cells), page, table: true });
+      continue;
+    }
+    thead = null;
     if (isHeading(l)) { push(); blocks.push({ text: l, heading: true, page }); continue; }
     if (LIST_RE.test(l) || /^(warning|caution|note|danger|important)\b/i.test(l)) { push(); para = l; continue; }
     para += (para ? " " : "") + l;
   }
   push(); return blocks;
+}
+function csvToBlocks(text) {
+  const sep = text.slice(0, 3000).includes(",") ? "," : text.includes(";") ? ";" : "\t";
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) { const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if (ch === '"') q = true; else if (ch === sep) { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += ch; }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const good = rows.map(r => r.map(c => c.trim())).filter(r => r.some(Boolean)); if (!good.length) return [];
+  const head = good[0]; return [{ text: head.join(" | "), table: true }, ...good.slice(1).map(r => ({ text: rowText(head, r), table: true }))];
 }
 function hashStr(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
 
@@ -550,15 +759,19 @@ async function getOCR() {
 }
 async function ocr(src) { const w = await getOCR(); const r = await w.recognize(src); return r.data.text || ""; }
 async function parsePDF(buf, name) {
-  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
-  const pdfjs = window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const pdfjs = await pdfLib();
   const pdf = await pdfjs.getDocument({ data: buf }).promise; const blocks = []; let ocrPages = 0;
   for (let p = 1; p <= pdf.numPages; p++) {
-    const page = await pdf.getPage(p); const tc = await page.getTextContent(); let text = ""; let lastY = null;
+    const page = await pdf.getPage(p); const tc = await page.getTextContent(); let text = ""; let lastY = null, lastEnd = null;
     for (const it of tc.items) {
-      const y = it.transform ? it.transform[5] : null;
-      if (lastY !== null && y !== null && Math.abs(y - lastY) > 2 && !text.endsWith("\n")) text += "\n";
-      text += it.str; if (it.hasEOL) text += "\n"; lastY = y;
+      const y = it.transform ? it.transform[5] : null, x = it.transform ? it.transform[4] : null;
+      if (!it.str.trim()) { if (it.hasEOL) { if (!text.endsWith("\n")) text += "\n"; lastEnd = null; } continue; } // spacer items hide column gaps
+      if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) { if (!text.endsWith("\n")) text += "\n"; lastEnd = null; }
+      else if (lastEnd !== null && x !== null && it.str) { const fs = Math.abs(it.transform[3]) || 10, gap = x - lastEnd;
+        if (gap > fs * 1.8) text = text.replace(/\s+$/, "") + " | "; else if (gap > fs * 0.15 && !/\s$/.test(text) && !/^\s/.test(it.str)) text += " "; }
+      text += it.str;
+      if (it.hasEOL) { text += "\n"; lastEnd = null; } else if (it.str) lastEnd = x !== null ? x + (it.width || 0) : null;
+      if (y !== null) lastY = y;
     }
     if (text.replace(/\s/g, "").length < 25) { // scanned page → OCR
       toast(`Reading scanned page ${p}/${pdf.numPages} of ${name}…`, 0);
@@ -570,6 +783,10 @@ async function parsePDF(buf, name) {
   }
   return { blocks, pages: pdf.numPages, ocr: ocrPages };
 }
+async function pdfLib() {
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+  const p = window.pdfjsLib; p.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; return p;
+}
 async function parseDOCX(buf) {
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js");
   const r = await window.mammoth.convertToHtml({ arrayBuffer: buf });
@@ -578,9 +795,18 @@ async function parseDOCX(buf) {
 function htmlToBlocks(html) {
   const doc = new DOMParser().parseFromString(html, "text/html"); doc.querySelectorAll("script,style").forEach(e => e.remove());
   const blocks = [];
-  doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,pre,td,th,dt,dd,blockquote").forEach(el => {
+  doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,pre,dt,dd,blockquote,table").forEach(el => {
+    if (el.tagName === "TABLE") {
+      if (el.parentElement && el.parentElement.closest("table")) return;
+      const rows = [...el.querySelectorAll("tr")].filter(tr => tr.closest("table") === el).map(tr => [...tr.children].filter(c => /^T[DH]$/.test(c.tagName)).map(c => c.textContent.replace(/\s+/g, " ").trim()));
+      const good = rows.filter(r => r.some(Boolean)); if (!good.length) return;
+      if (good.length === 1 || good[0].length === 1) { for (const r of good) blocks.push({ text: r.filter(Boolean).join(" | ") }); return; }
+      const head = good[0]; blocks.push({ text: head.filter(Boolean).join(" | "), table: true });
+      for (const r of good.slice(1)) blocks.push({ text: rowText(head, r), table: true });
+      return;
+    }
+    if (el.closest("table")) return;
     if (el.tagName !== "LI" && el.closest("li")) return;
-    if ((el.tagName === "TD" || el.tagName === "TH") && el.querySelector("p")) return;
     if (el.tagName === "LI") {
       const own = [...el.childNodes].filter(n => !(n.nodeType === 1 && /^(UL|OL)$/.test(n.tagName))).map(n => n.textContent).join(" ").replace(/\s+/g, " ").trim();
       if (own) { const ol = el.parentElement && el.parentElement.tagName === "OL"; const idx = ol ? [...el.parentElement.children].indexOf(el) + 1 : 0; blocks.push({ text: (ol ? idx + ". " : "• ") + own }); }
@@ -594,10 +820,11 @@ function htmlToBlocks(html) {
 }
 async function parseFile(f) {
   const ext = (f.name.split(".").pop() || "").toLowerCase();
-  if (ext === "pdf") return parsePDF(await f.arrayBuffer(), f.name);
+  if (ext === "pdf") { const buf = await f.arrayBuffer(); const orig = new Uint8Array(buf.slice(0)); const r = await parsePDF(buf, f.name); return { ...r, orig, origType: "pdf" }; }
+  if (ext === "csv") return { blocks: csvToBlocks(await f.text()) };
   if (ext === "docx") return parseDOCX(await f.arrayBuffer());
   if (ext === "html" || ext === "htm") return { blocks: htmlToBlocks(await f.text()) };
-  if (/^(png|jpe?g|bmp|webp)$/.test(ext)) { toast("Reading text from image " + f.name + "…", 0); return { blocks: textToBlocks(await ocr(f)), ocr: 1 }; }
+  if (/^(png|jpe?g|bmp|webp)$/.test(ext)) { toast("Reading text from image " + f.name + "…", 0); const orig = new Uint8Array(await f.arrayBuffer()); return { blocks: textToBlocks(await ocr(f)), ocr: 1, orig, origType: "img" }; }
   if (ext === "rtf") return { blocks: textToBlocks((await f.text()).replace(/\\par[d]?/g, "\n").replace(/\{\*?\\[^{}]+}|[{}]|\\[a-z]+-?\d* ?/gi, "")) };
   return { blocks: textToBlocks(await f.text()) };
 }
@@ -630,8 +857,11 @@ async function ingest(f, { type, srcKey, srcModified, quiet } = {}) {
   if (!chunks.length) { if (!quiet) toast("No readable text in " + f.name, 5000); return null; }
   const full = chunks.map(c => c.text).join("\n");
   const doc = { id: uid(), name: f.name.replace(/\.[^.]+$/, ""), file: f.name, type: type && type !== "AUTO" ? type : guessType(f.name, full),
-    added: Date.now(), pages: parsed.pages || null, ocr: parsed.ocr || 0, chunks, hash: hashStr(full), srcKey: srcKey || null, srcModified: srcModified ?? null };
-  return addDoc(doc, { quiet, typeGiven: type && type !== "AUTO" });
+    added: Date.now(), pages: parsed.pages || null, ocr: parsed.ocr || 0, chunks, hash: hashStr(full), srcKey: srcKey || null, srcModified: srcModified ?? null,
+    orig: parsed.origType && parsed.orig && parsed.orig.length < 6e7 ? parsed.origType : null };
+  const res = await addDoc(doc, { quiet, typeGiven: type && type !== "AUTO" });
+  if (res === doc && doc.orig) { try { await filePut(doc.id, parsed.orig); } catch (e) { console.warn("original not stored", e); } }
+  return res;
 }
 async function addDoc(doc, { quiet, typeGiven } = {}) {
   const fam = familyKey(doc.name);
@@ -654,7 +884,7 @@ async function addDoc(doc, { quiet, typeGiven } = {}) {
   return doc;
 }
 async function removeFamily(d) {
-  for (const x of ALL.filter(x => x.family === d.family)) { await storeDel(x.id); localStorage.removeItem("procedure.run." + x.id); }
+  for (const x of ALL.filter(x => x.family === d.family)) { await storeDel(x.id); await fileDel(x.id); localStorage.removeItem("procedure.run." + x.id); }
   ALL = ALL.filter(x => x.family !== d.family);
 }
 async function addFiles(files) {
@@ -764,7 +994,7 @@ async function search(q, scope, k = 10) {
   res.sort((a, b) => b.score - a.score);
   return res.slice(0, k);
 }
-function isTitleOnly(h) { const t = h.c.text.trim().toLowerCase(); return !h.c.sec && t.length < 160 && (t === h.doc.name.toLowerCase() || t.split("\n").length === 1 && familyKey(t) === h.doc.family); }
+function isTitleOnly(h) { const t = h.c.text.trim().toLowerCase(); const f = familyKey(t.split("\n")[0]), fam = String(h.doc.family || ""); return !h.c.sec && t.length < 200 && (t === h.doc.name.toLowerCase() || (fam.length > 5 && f.slice(0, 20) === fam.slice(0, 20))); }
 function highlight(text, q) {
   const qt = new Set(queryTerms(q).keys()); if (!qt.size) return esc(text);
   return esc(text).replace(/[A-Za-z0-9][A-Za-z0-9\-_]*/g, w => { const lw = w.toLowerCase(); return (qt.has(lw) || qt.has(stem(lw))) ? "<mark>" + w + "</mark>" : w; });
@@ -833,28 +1063,30 @@ function buildPrompt(q, hits) {
   const gl = glossaryPairs(); const glTxt = gl.length ? "Team glossary:\n" + gl.map(([a, b]) => `${a} = ${b}`).join("\n") + "\n\n" : "";
   return `${glTxt}Source passages:\n\n${ctx}\n\nQuestion: ${q}`;
 }
-async function aiAnswer(q, hits, history) {
-  const user = buildPrompt(q, hits);
-  const hist = history.slice(-4).flatMap(h => [{ role: "user", content: h.q }, { role: "assistant", content: h.a || "(no answer)" }]);
+async function aiChat(system, messages, maxTokens = 1500) {
   if (S.engine === "ollama") {
-    const r = await fetch(S.ollamaUrl.replace(/\/$/, "") + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: S.ollamaModel, stream: false, options: { temperature: 0.1 }, messages: [{ role: "system", content: SYS }, ...hist, { role: "user", content: user }] }) });
+    const r = await fetch(S.ollamaUrl.replace(/\/$/, "") + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: S.ollamaModel, stream: false, options: { temperature: 0.1, num_ctx: 8192 }, messages: [{ role: "system", content: system }, ...messages] }) });
     if (!r.ok) throw new Error("Ollama: " + r.status + " " + (await r.text()).slice(0, 200));
     return (await r.json()).message.content;
   }
   if (S.engine === "openai") {
     const h = { "Content-Type": "application/json" }; if (S.oaKey) h.Authorization = "Bearer " + S.oaKey;
-    const r = await fetch(S.oaUrl.replace(/\/$/, "") + "/chat/completions", { method: "POST", headers: h, body: JSON.stringify({ model: S.oaModel, temperature: 0.1, messages: [{ role: "system", content: SYS }, ...hist, { role: "user", content: user }] }) });
+    const r = await fetch(S.oaUrl.replace(/\/$/, "") + "/chat/completions", { method: "POST", headers: h, body: JSON.stringify({ model: S.oaModel, temperature: 0.1, messages: [{ role: "system", content: system }, ...messages] }) });
     if (!r.ok) throw new Error("Server: " + r.status + " " + (await r.text()).slice(0, 200));
     return (await r.json()).choices[0].message.content;
   }
   if (S.engine === "anthropic") {
     if (!S.anKey) throw new Error("Add your Anthropic API key in Answer engine settings.");
     const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": S.anKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-      body: JSON.stringify({ model: S.anModel, max_tokens: 1500, system: SYS, messages: [...hist, { role: "user", content: user }] }) });
+      body: JSON.stringify({ model: S.anModel, max_tokens: maxTokens, system, messages }) });
     if (!r.ok) throw new Error("Claude API: " + r.status + " " + (await r.text()).slice(0, 300));
     return (await r.json()).content.map(b => b.text || "").join("");
   }
-  return null;
+  throw new Error("No AI engine is turned on");
+}
+async function aiAnswer(q, hits, history) {
+  const hist = history.slice(-4).flatMap(h => [{ role: "user", content: h.q }, { role: "assistant", content: h.a || "(no answer)" }]);
+  return aiChat(SYS, [...hist, { role: "user", content: buildPrompt(q, hits) }]);
 }
 
 /* ================= UI: library ================= */
@@ -868,15 +1100,20 @@ function renderLib() {
   else lib.innerHTML = list.map(d => {
     const multi = famCount[d.family] > 1;
     const sic = d.srcKey ? (d.srcKey.startsWith("gh:") ? '<span class="srcic" title="Synced from GitHub">🐙</span>' : '<span class="srcic" title="Synced from folder">📁</span>') : "";
-    return `<div class="doc" data-id="${d.id}"><span class="tag ${d.type}" data-act="flip" title="Click to change type">${d.type}</span>${sic}<span class="name" title="${esc(d.file || d.name)}">${esc(d.name)}</span>${multi ? `<span class="rev" title="${famCount[d.family]} revisions">${esc(revName(d))}</span>` : ""}<span class="meta">${d.pages ? d.pages + "p" : d.chunks.length + "§"}${d.ocr ? " · OCR" : ""}</span><span class="acts"><button class="ghost" data-act="check" title="Run as checklist">☑</button><button class="ghost" data-act="hist" title="Revision history${multi ? "" : " (add a newer version to compare)"}">⟲</button><button class="ghost" data-act="del" title="Remove">✕</button></span></div>`;
+    const rv = reviewState(d); const dot = rv && rv.level !== "ok" ? `<span class="rvdot ${rv.level}" title="${rv.level === "over" ? "Review overdue since " : "Review due "}${rv.due.toLocaleDateString()}">●</span>` : "";
+    return `<div class="doc" data-id="${d.id}"><span class="tag ${d.type}" data-act="flip" title="Click to change type">${d.type}</span>${sic}<span class="name" title="${esc(d.file || d.name)}">${esc(d.name)}</span>${dot}${multi ? `<span class="rev" title="${famCount[d.family]} revisions">${esc(revName(d))}</span>` : ""}<span class="meta">${d.pages ? d.pages + "p" : d.chunks.length + "§"}${d.ocr ? " · OCR" : ""}</span><span class="acts"><button class="ghost" data-act="quiz" title="Quiz yourself">🎓</button><button class="ghost" data-act="check" title="Run as checklist">☑</button><button class="ghost" data-act="hist" title="Revision history${multi ? "" : " (add a newer version to compare)"}">⟲</button><button class="ghost" data-act="del" title="Remove">✕</button></span></div>`;
   }).join("") || '<div class="hint" style="padding:8px">No matches.</div>';
+  const over = DOCS.filter(d => (reviewState(d) || {}).level === "over").length, soon = DOCS.filter(d => (reviewState(d) || {}).level === "soon").length;
+  $("#reviewWarn").style.display = over || soon ? "" : "none";
+  $("#reviewWarn").textContent = over ? `⚠ ${over} procedure${over === 1 ? " is" : "s are"} overdue for review${soon ? ` · ${soon} due soon` : ""}` : `${soon} procedure${soon === 1 ? "" : "s"} due for review soon`;
   const sc = $("#scope"); const cur = sc.value || "ALL";
   sc.innerHTML = `<option value="ALL">All documents</option><option value="SOP">SOPs only</option><option value="MOP">MOPs only</option><option value="HIST">All incl. old revisions</option>` + DOCS.map(d => `<option value="${d.id}">${esc(d.name.slice(0, 40))}</option>`).join("");
   sc.value = [...sc.options].some(o => o.value === cur) ? cur : "ALL";
   const names = { search: "Search only (offline)", ollama: "Ollama · " + S.ollamaModel, openai: "Local server · " + S.oaModel, anthropic: "Claude API · " + S.anModel };
   const pb = $("#privBadge"); const cloud = S.engine === "anthropic";
   pb.classList.toggle("warn", cloud);
-  pb.textContent = cloud ? "⚠ Claude API on — matching passages go to Anthropic" : "🔒 Your files stay on this computer";
+  pb.textContent = cloud ? "⚠ Claude API on — matching passages go to Anthropic" : LOCK() ? "🔐 Files stay on this computer · PIN-locked" : "🔒 Your files stay on this computer";
+  $("#lockNow").style.display = LOCK() ? "" : "none";
   $("#modeLabel").innerHTML = "Answer engine: <b>" + esc(names[S.engine]) + "</b>" + (S.smart ? " · <b>smart search</b>" : "");
   renderPins();
   if (!HISTORY.length) renderEmpty();
@@ -895,13 +1132,13 @@ function togglePin(q) { const i = PINS.indexOf(q); if (i >= 0) PINS.splice(i, 1)
 
 /* ================= UI: asking ================= */
 function srcHTML(hits, q) {
-  return hits.map((h, i) => `<div class="src" data-doc="${h.doc.id}" data-chunk="${h.i}"><div class="h"><span class="n">[${i + 1}]</span><span class="tag ${h.doc.type}">${h.doc.type}</span><span class="d">${esc(h.doc.name)}</span>${h.doc.archived ? '<span class="rev">old ' + esc(revName(h.doc)) + "</span>" : ""}${h.c.sec ? "<span>› " + esc(h.c.sec) + "</span>" : ""}${h.c.page ? "<span>· p." + h.c.page + "</span>" : ""}</div><div class="t">${highlight(h.c.text, q)}</div></div>`).join("");
+  return hits.map((h, i) => `<div class="src" data-doc="${h.doc.id}" data-chunk="${h.i}"><div class="h"><span class="n">[${i + 1}]</span><span class="tag ${h.doc.type}">${h.doc.type}</span><span class="d">${esc(h.doc.name)}</span>${h.doc.archived ? '<span class="rev">old ' + esc(revName(h.doc)) + "</span>" : ""}${h.c.sec ? "<span>› " + esc(h.c.sec) + "</span>" : ""}${h.c.page ? "<span>· p." + h.c.page + "</span>" : ""}${h.doc.orig ? `<span class="pdflink" data-pdf="${h.doc.id}" data-page="${h.c.page || 1}" data-chunk="${h.i}" title="Open the original ${h.doc.orig === "pdf" ? "PDF page" : "image"}">📄 original</span>` : ""}${oldBadge(h.c.text)}</div><div class="t">${highlight(h.c.text, q)}</div></div>`).join("");
 }
 function linkCites(text, hits) {
   return esc(text).replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g, (m, g) => g.split(/\s*,\s*/).map(n => { const h = hits[+n - 1]; return h ? `<span class="cite" data-doc="${h.doc.id}" data-chunk="${h.i}" title="${esc(h.doc.name)}">${n}</span>` : "[" + n + "]"; }).join(""))
     .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
 }
-function feedbackHTML(id) { return `<div class="fb" data-fb="${id}">Was this helpful? <button data-v="1" title="Yes — rank these sources higher for questions like this">👍</button><button data-v="-1" title="No — rank these sources lower">👎</button></div>`; }
+function feedbackHTML(id) { return `<div class="fb" data-fb="${id}">Was this helpful? <button data-v="1" title="Yes — rank these sources higher for questions like this">👍</button><button data-v="-1" title="No — rank these sources lower">👎</button><span style="flex:1"></span><button data-speak title="Read aloud">🔊</button><button data-copy title="Copy the answer with its sources, to paste into a ticket or email">📋 Copy</button><button data-print title="Print or save as PDF">🖨</button></div>`; }
 async function ask(qText) {
   const q = (qText ?? $("#q").value).trim(); if (!q) return;
   if (!DOCS.length) { toast("Add some documents first"); return; }
@@ -921,11 +1158,11 @@ async function ask(qText) {
     ansBox.innerHTML = `<h4>Answer</h4><div class="ans">Nothing in ${scope === "ALL" ? "your library" : "this scope"} matches that. Try different wording, a step name, or a system/equipment name${S.smart ? "" : " — or turn on Smart search in ⚙ Answer engine"}.</div>`;
     srcBox.remove(); scrollEnd(); return;
   }
-  const shown = hits.slice(0, S.engine === "search" ? 8 : S.topK);
+  const shown = hits.slice(0, S.engine === "search" ? 8 : S.topK); entry.shown = shown;
   srcBox.innerHTML = `<h4>Sources — click to open in document</h4>` + srcHTML(shown, q);
   const extractive = () => { const bs = bestSentences(hits, q); entry.refs = [...new Set(bs.map(b => b.ref - 1))]; return bs.map(b => `• ${highlight(b.s, q)} ${linkCites("[" + b.ref + "]", hits)}`).join("\n"); };
   if (S.engine === "search") {
-    const html = extractive(); entry.a = bestSentences(hits, q).map(b => b.s).join(" ");
+    const html = extractive(); entry.a = bestSentences(hits, q).map(b => "• " + b.s + " [" + b.ref + "]").join("\n");
     ansBox.innerHTML = `<h4>Best matching lines</h4><div class="ans">${html || "See the matching sections below."}</div>` + feedbackHTML(entry.id);
   } else {
     ansBox.innerHTML = `<h4>Answer</h4><div class="ans"><span class="spin"></span>Reading the procedures…</div>`;
@@ -955,11 +1192,11 @@ function scrollEnd() { const c = $("#chat"); c.scrollTop = c.scrollHeight; }
 function autoGrow() { const t = $("#q"); t.style.height = "auto"; t.style.height = Math.min(160, t.scrollHeight) + "px"; }
 
 /* ================= Viewer ================= */
-let VDOC = null;
+let VDOC = null, VCH = null, VQ = "";
 function openDoc(id, chunk, q) {
   const d = ALL.find(x => x.id === id); if (!d) return; VDOC = d;
   $("#vTag").className = "tag " + d.type; $("#vTag").textContent = d.type; $("#vTitle").textContent = d.name + (d.archived ? " (old revision)" : "");
-  $("#vRev").textContent = revName(d);
+  $("#vRev").textContent = revName(d); $("#vOrig").style.display = d.orig ? "" : "none"; VCH = chunk; VQ = q;
   renderViewer(chunk, q, "");
   $("#vFind").value = ""; show("#viewModal");
   if (chunk != null) setTimeout(() => $("#ch" + chunk)?.scrollIntoView({ block: "center" }), 30);
@@ -976,6 +1213,8 @@ function renderViewer(chunk, q, find) {
 }
 $("#vFind").addEventListener("input", e => renderViewer(null, null, e.target.value.trim()));
 $("#vCheck").addEventListener("click", () => { $("#viewModal").classList.remove("on"); openChecklist(VDOC); });
+$("#vQuiz").addEventListener("click", () => { $("#viewModal").classList.remove("on"); openQuiz(VDOC, false); });
+$("#vOrig").addEventListener("click", () => { const c = VDOC.chunks[VCH ?? 0]; $("#viewModal").classList.remove("on"); openOriginal(VDOC, (c && c.page) || 1, VQ, VCH != null && c ? c.text : ""); });
 $("#vHist").addEventListener("click", () => { $("#viewModal").classList.remove("on"); openHistory(VDOC); });
 
 /* ================= Checklist mode ================= */
@@ -988,7 +1227,7 @@ function extractSteps(doc) {
     const l = line.trim(); if (!l) continue;
     const isStep = STEP_RE.test(l), isWarn = WARN_RE.test(l);
     if (!isStep && !isWarn) continue;
-    addSec(c.sec); out.push({ kind: isStep ? "step" : "warn", text: l }); if (isStep) any = true;
+    addSec(c.sec); out.push({ kind: isStep ? "step" : "warn", text: l, sec: c.sec }); if (isStep) any = true;
   }
   if (!any) { out.length = 0; lastSec = null;
     for (const c of doc.chunks) { addSec(c.sec); for (const p of c.text.split("\n")) { const l = p.trim(); if (l) out.push({ kind: WARN_RE.test(l) ? "warn" : "step", text: l }); } } }
@@ -996,11 +1235,10 @@ function extractSteps(doc) {
   return out;
 }
 let CK = null;
-function ckKey(d) { return "procedure.run." + d.id; }
-function openChecklist(d) {
-  const items = extractSteps(d);
-  const st = lsGet(ckKey(d), { meta: {}, items: {} });
-  CK = { d, items, st };
+async function openChecklist(d, presetItems) {
+  const items = presetItems || extractSteps(d);
+  const st = await vaultGet("run." + d.id, { meta: {}, items: {} });
+  CK = { d, items, st, voice: false }; $("#ckVoice").classList.remove("on"); $("#ckPhone").style.display = String(d.id).startsWith("shared-") ? "none" : "";
   $("#ckTag").className = "tag " + d.type; $("#ckTag").textContent = d.type; $("#ckTitle").textContent = d.name + (familyKey(d.name) !== d.name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() ? "" : " · " + revName(d));
   $("#ckOp").value = st.meta.op || ""; $("#ckTicket").value = st.meta.ticket || ""; $("#ckStart").value = st.meta.start || "";
   renderChecklist(); show("#ckModal");
@@ -1019,7 +1257,7 @@ function updateCkProgress() {
   const total = CK.items.filter(x => x.kind === "step").length; const done = Object.values(CK.st.items).filter(s => s.done).length;
   $("#ckCount").textContent = `${done} / ${total} done`; $("#ckBar").style.width = (total ? done / total * 100 : 0) + "%";
 }
-const saveCk = () => lsSet(ckKey(CK.d), CK.st);
+const saveCk = () => vaultSet("run." + CK.d.id, CK.st);
 $("#ckBody").addEventListener("change", e => {
   const row = e.target.closest(".ck"); if (!row || e.target.type !== "checkbox") return;
   const n = row.dataset.n; const s = CK.st.items[n] = CK.st.items[n] || {};
@@ -1078,6 +1316,9 @@ function renderDiff() {
   const add = d.filter(x => x.op === "+").length, del = d.filter(x => x.op === "-").length;
   $("#hSum").innerHTML = `<span style="color:var(--ok)">+${add} added</span> · <span style="color:var(--err)">−${del} removed</span>`;
   if (!add && !del) { $("#hDiff").innerHTML = '<div class="hint">These revisions have the same text.</div>'; return; }
+  $("#hDiff").innerHTML = diffToHTML(d, showAll);
+}
+function diffToHTML(d, showAll) {
   const html = []; const C = 2;
   for (let i = 0; i < d.length; i++) {
     const x = d[i];
@@ -1093,7 +1334,7 @@ function renderDiff() {
     }
     html.push(`<div class="${x.op === "+" ? "add" : x.op === "-" ? "del" : "same"}">${esc(x.t)}</div>`);
   }
-  $("#hDiff").innerHTML = `<div class="diff">${html.join("")}</div>`;
+  return `<div class="diff">${html.join("")}</div>`;
 }
 ["hA", "hB", "hAll"].forEach(id => $("#" + id).addEventListener("change", renderDiff));
 $("#hList").addEventListener("click", async e => {
@@ -1134,11 +1375,15 @@ function auditDoc(d) {
 }
 function renderAudit() {
   const f = $("#auFilter").value;
-  let rows = DOCS.filter(d => d.type !== "OTHER").map(auditDoc);
+  let rows = DOCS.filter(d => d.type !== "OTHER").map(d => ({ ...auditDoc(d), rv: reviewState(d), old: outdatedHits(d.chunks.map(c => c.text).join("\n")) }));
   if (f === "SOP" || f === "MOP") rows = rows.filter(r => r.d.type === f);
   if (f === "GAPS") rows = rows.filter(r => r.reqMissing);
-  rows.sort((a, b) => b.reqMissing - a.reqMissing || a.score - b.score);
-  $("#auTable").innerHTML = `<tr><th>Document</th><th>Type</th><th>Score</th><th>Missing</th></tr>` + (rows.map(r => `<tr class="click" data-id="${r.d.id}"><td>${esc(r.d.name)}</td><td><span class="tag ${r.d.type}">${r.d.type}</span></td><td class="score" style="color:${r.reqMissing ? "var(--err)" : r.missing.length ? "var(--accent2)" : "var(--ok)"}">${r.score}%</td><td>${r.missing.length ? r.missing.map(m => `<span class="miss${m.req ? "" : " rec"}">${esc(m.name)}</span>`).join("") : '<span class="okk">✓ Complete</span>'}</td></tr>`).join("") || `<tr><td colspan="4" class="hint">Nothing to show.</td></tr>`);
+  if (f === "REVIEW") rows = rows.filter(r => r.rv && r.rv.level !== "ok");
+  if (f === "OLD") rows = rows.filter(r => r.old.length);
+  const weight = r => r.reqMissing * 2 + (r.rv && r.rv.level === "over" ? 3 : r.rv && r.rv.level === "soon" ? 1 : 0) + r.old.length * 2;
+  rows.sort((a, b) => weight(b) - weight(a) || a.score - b.score);
+  const rvCell = r => !r.rv ? '<span class="hint" style="margin:0">no date found</span>' : `<span class="rv ${r.rv.level}" title="${esc(r.rv.basis)}">${r.rv.level === "over" ? "Overdue · " : r.rv.level === "soon" ? "Due soon · " : ""}${r.rv.due.toLocaleDateString()}</span>`;
+  $("#auTable").innerHTML = `<tr><th>Document</th><th>Type</th><th>Score</th><th>Missing sections</th><th>Next review</th><th>Outdated terms</th></tr>` + (rows.map(r => `<tr class="click" data-id="${r.d.id}"><td>${esc(r.d.name)}</td><td><span class="tag ${r.d.type}">${r.d.type}</span></td><td class="score" style="color:${r.reqMissing ? "var(--err)" : r.missing.length ? "var(--accent2)" : "var(--ok)"}">${r.score}%</td><td>${r.missing.length ? r.missing.map(m => `<span class="miss${m.req ? "" : " rec"}">${esc(m.name)}</span>`).join("") : '<span class="okk">✓ Complete</span>'}</td><td>${rvCell(r)}</td><td>${r.old.length ? r.old.map(o => `<span class="miss" title="${o.repl ? "Now: " + esc(o.repl) : "Marked outdated"}">${esc(o.term)}${o.repl ? " → " + esc(o.repl) : ""}</span>`).join("") : '<span class="okk">—</span>'}</td></tr>`).join("") || `<tr><td colspan="6" class="hint">Nothing to show.</td></tr>`);
   return rows;
 }
 $("#auditBtn").addEventListener("click", () => { if (!DOCS.length) { toast("Add some documents first"); return; } renderAudit(); show("#auditModal"); });
@@ -1146,7 +1391,7 @@ $("#auFilter").addEventListener("change", renderAudit);
 $("#auTable").addEventListener("click", e => { const r = e.target.closest("tr[data-id]"); if (r) { $("#auditModal").classList.remove("on"); openDoc(r.dataset.id, null); } });
 $("#auCsv").addEventListener("click", () => {
   const rows = renderAudit(); const q = v => '"' + String(v).replace(/"/g, '""') + '"';
-  download([["Document", "Type", "Score", "Missing (required)", "Missing (recommended)"], ...rows.map(r => [r.d.name, r.d.type, r.score + "%", r.missing.filter(m => m.req).map(m => m.name).join("; "), r.missing.filter(m => !m.req).map(m => m.name).join("; ")])].map(l => l.map(q).join(",")).join("\r\n"), "procedure-audit.csv", "text/csv");
+  download([["Document", "Type", "Score", "Missing (required)", "Missing (recommended)", "Next review", "Review status", "Outdated terms"], ...rows.map(r => [r.d.name, r.d.type, r.score + "%", r.missing.filter(m => m.req).map(m => m.name).join("; "), r.missing.filter(m => !m.req).map(m => m.name).join("; "), r.rv ? r.rv.due.toLocaleDateString() : "", r.rv ? { over: "Overdue", soon: "Due soon", ok: "OK" }[r.rv.level] : "No date found", r.old.map(o => o.term + (o.repl ? " → " + o.repl : "")).join("; ")])].map(l => l.map(q).join(",")).join("\r\n"), "procedure-audit.csv", "text/csv");
 });
 
 /* ================= Team library: shared folder + GitHub ================= */
@@ -1218,7 +1463,7 @@ async function syncGitHub(interactive) {
   } catch (e) { $("#ghState").innerHTML = '<span class="err">' + esc(e.message) + "</span>"; if (interactive) toast("GitHub sync failed: " + e.message, 6000); }
   setStatus(""); await refresh(); ensureEmbeddings();
 }
-$("#ghSync").addEventListener("click", () => { ["ghRepo", "ghBranch", "ghPath", "ghToken"].forEach(k => S[k] = $("#" + k).value.trim()); S.ghAuto = $("#ghAuto").checked; saveS(); syncGitHub(true); });
+$("#ghSync").addEventListener("click", () => { ["ghRepo", "ghBranch", "ghPath", "ghToken"].forEach(k => S[k] = $("#" + k).value.trim()); S.ghAuto = $("#ghAuto").checked; saveS(); saveTeam(); syncGitHub(true); });
 
 /* ================= Wiring ================= */
 function show(sel) { $(sel).classList.add("on"); }
@@ -1239,14 +1484,20 @@ $("#lib").addEventListener("click", async e => {
   if (act === "del") { const n = ALL.filter(x => x.family === d.family).length; if (confirm(`Remove "${d.name}"${n > 1 ? ` and its ${n - 1} older revision${n > 2 ? "s" : ""}` : ""} from the library?`)) { await removeFamily(d); await refresh(); } return; }
   if (act === "flip") { const t = { SOP: "MOP", MOP: "OTHER", OTHER: "SOP" }[d.type]; for (const x of ALL.filter(x => x.family === d.family)) { x.type = t; x.typeLocked = true; await storePut(x); } await refresh(); return; }
   if (act === "check") { openChecklist(d); return; }
+  if (act === "quiz") { openQuiz(d, false); return; }
   if (act === "hist") { openHistory(d); return; }
   openDoc(d.id, null);
 });
 $("#chatInner").addEventListener("click", e => {
+  const pl = e.target.closest("[data-pdf]"); if (pl) { const d = ALL.find(x => x.id === pl.dataset.pdf); const q = pl.closest(".a")?.parentElement?.querySelector(".q")?.textContent || ""; if (d) openOriginal(d, +pl.dataset.page, q, d.chunks[+pl.dataset.chunk]?.text || ""); return; }
   const s = e.target.closest("[data-doc]"); if (s) { const q = s.closest(".a")?.parentElement?.querySelector(".q")?.textContent || ""; openDoc(s.dataset.doc, +s.dataset.chunk, q); return; }
   if (e.target.hasAttribute("data-sug")) { ask(e.target.textContent); return; }
   if (e.target.classList.contains("pinbtn")) { togglePin(e.target.dataset.q); return; }
-  const fb = e.target.closest(".fb button"); if (fb) { const box = fb.closest(".fb"); giveFeedback(+box.dataset.fb, +fb.dataset.v, [...box.querySelectorAll("button")]); }
+  const fb = e.target.closest(".fb button"); if (fb) { const box = fb.closest(".fb"); const ent = HISTORY[+box.dataset.fb];
+    if (fb.hasAttribute("data-copy")) { copyText(answerText(ent)); return; }
+    if (fb.hasAttribute("data-print")) { printHTML("Answer — " + ent.q, `<h1>${esc(ent.q)}</h1><pre>${esc(answerText(ent))}</pre>`); return; }
+    if (fb.hasAttribute("data-speak")) { speak(ent.a); return; }
+    giveFeedback(+box.dataset.fb, +fb.dataset.v, [...box.querySelectorAll("button[data-v]")]); }
 });
 $("#pins").addEventListener("click", e => {
   const un = e.target.dataset.unpin; if (un != null) { e.stopPropagation(); togglePin(PINS[+un]); return; }
@@ -1267,14 +1518,12 @@ $("#pSave").addEventListener("click", async () => {
 });
 
 /* privacy */
-function openPrivacy() { renderNetLog(); show("#privModal"); }
+function openPrivacy() { renderNetLog(); renderLockState(); show("#privModal"); }
 $("#privBadge").addEventListener("click", openPrivacy);
 document.addEventListener("click", e => { if (e.target.closest("[data-priv]")) { e.preventDefault(); openPrivacy(); } });
 $("#wipeBtn").addEventListener("click", async () => {
-  if (!confirm("Delete ALL Procédure documents, settings, keys, checklists and history from this computer?\n\nThis can't be undone. Use Export first if you want a backup.")) return;
-  try { for (const d of ALL) await storeDel(d.id); await metaDel("folder"); } catch (e) {}
-  try { Object.keys(localStorage).filter(k => k.startsWith("procedure.")).forEach(k => localStorage.removeItem(k)); } catch (e) {}
-  location.reload();
+  if (!confirm("Delete ALL Procédure data on this computer — every library, document, original file, setting, key, checklist and saved question?\n\nThis can't be undone. Use Export first if you want a backup.")) return;
+  wipeAll();
 });
 
 /* ---- Easy local-AI (Ollama) setup ---- */
@@ -1321,11 +1570,11 @@ $("#easyInstall").addEventListener("click", async () => {
 });
 
 /* settings */
-const F = ["engine", "ollamaUrl", "ollamaModel", "oaUrl", "oaModel", "oaKey", "anKey", "anModel", "topK", "glossary"];
+const F = ["engine", "ollamaUrl", "ollamaModel", "oaUrl", "oaModel", "oaKey", "anKey", "anModel", "topK", "glossary", "outdated", "reviewMonths"];
 function showCfg() { document.querySelectorAll(".cfg").forEach(c => c.style.display = c.id === "cfg-" + $("#engine").value ? "" : "none"); }
 $("#settingsBtn").addEventListener("click", () => { F.forEach(k => $("#" + k).value = S[k]); $("#smart").checked = !!S.smart; showCfg(); $("#testOut").textContent = ""; show("#settingsModal"); });
 $("#engine").addEventListener("change", showCfg);
-function readForm() { F.forEach(k => S[k] = k === "topK" ? Math.max(3, Math.min(20, +$("#topK").value || 8)) : k === "glossary" ? $("#glossary").value : $("#" + k).value.trim()); S.smart = $("#smart").checked; }
+function readForm() { F.forEach(k => S[k] = k === "topK" ? Math.max(3, Math.min(20, +$("#topK").value || 8)) : k === "reviewMonths" ? Math.max(1, Math.min(120, +$("#reviewMonths").value || 12)) : (k === "glossary" || k === "outdated") ? $("#" + k).value : $("#" + k).value.trim()); S.smart = $("#smart").checked; }
 $("#saveSettings").addEventListener("click", () => {
   const was = S.engine;
   if ($("#engine").value === "anthropic" && was !== "anthropic" && !confirm("With the Claude API engine, each question and the matching passages from your documents are sent to Anthropic over the internet to write the answer. Your full documents are not sent.\n\nOnly use this if your organization allows it. Turn it on?")) return;
@@ -1346,6 +1595,7 @@ $("#ollamaList").addEventListener("click", async () => {
 
 /* export / import */
 $("#exportBtn").addEventListener("click", () => {
+  if (LOCK() && !confirm("Your export file will NOT be protected by your PIN. Anyone with the file can read it. Export anyway?")) return;
   const json = JSON.stringify({ app: "procedure", version: VERSION, settings: { glossary: S.glossary }, pins: PINS, docs: ALL }, (k, v) => k === "emb" ? undefined : v);
   download(json, "procedure-library-" + new Date().toISOString().slice(0, 10) + ".json", "application/json");
 });
@@ -1361,6 +1611,467 @@ $("#importFile").addEventListener("change", async e => {
   } catch (err) { toast("That file isn't a Procédure library export", 4000); }
 });
 $("#dataBtn").addEventListener("click", () => DESKTOP && DESKTOP.openData());
+
+/* ================= v1.4: share, voice, phone, review dates, outdated terms, drafting, compare, quiz, original files, PIN lock, libraries ================= */
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = t; document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+  toast("Copied — paste it into your ticket or email");
+}
+function printHTML(title, body) {
+  const w = window.open("", "_blank"); if (!w) { toast("Allow pop-ups to print"); return; }
+  w.document.write(`<!DOCTYPE html><html><head><title>${esc(title)}</title><style>body{font:13px Segoe UI,Arial,sans-serif;margin:28px;max-width:820px}h1{font-size:18px}pre{white-space:pre-wrap;font:inherit}</style></head><body>${body}<script>onload=()=>print()<\/script></body></html>`);
+  w.document.close();
+}
+function engineLabel() { return { search: "", ollama: "Ollama on this computer", openai: "your local AI server", anthropic: "the Claude API (sends text to Anthropic)" }[S.engine]; }
+function cloudOK(what) { return S.engine !== "anthropic" || confirm(`This sends ${what} to Anthropic through the Claude API.\n\nContinue?`); }
+
+/* ---- Share answers ---- */
+function answerText(e) {
+  const list = (e.refs && e.refs.length ? e.refs : [0, 1, 2]).map(i => (e.shown || [])[i] ? [i, e.shown[i]] : null).filter(Boolean);
+  return `Q: ${e.q}\n\nA:\n${String(e.a || "(see sources)").replace(/\*\*/g, "")}\n\nSources:\n` +
+    list.map(([i, h]) => `[${i + 1}] ${h.doc.name} (${revName(h.doc)})${h.c.sec ? " — " + h.c.sec : ""}${h.c.page ? ", p." + h.c.page : ""}\n    ${h.c.text.replace(/\s+/g, " ").slice(0, 240)}${h.c.text.length > 240 ? "…" : ""}`).join("\n") +
+    `\n\n— from Procédure (answers come from our own SOPs/MOPs)`;
+}
+
+/* ---- Voice: read aloud (local voices) and spoken questions (browser speech service, asks first) ---- */
+function pickVoice() {
+  const lang = (navigator.language || "en").slice(0, 2); const vs = speechSynthesis.getVoices();
+  return vs.find(v => v.localService && v.lang.startsWith(lang)) || vs.find(v => v.localService) || null;
+}
+function speak(text, keep) {
+  if (!("speechSynthesis" in window)) { toast("Read-aloud isn't supported in this browser"); return; }
+  if (speechSynthesis.speaking && !keep) { speechSynthesis.cancel(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(String(text || "").replace(/\[\d+(?:\s*,\s*\d+)*\]/g, "").replace(/[•*#_]/g, " ").slice(0, 4000));
+  const v = pickVoice(); if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR || DESKTOP) $("#micBtn").style.display = "none";
+let REC = null;
+$("#micBtn").addEventListener("click", () => {
+  if (REC) { REC.stop(); return; }
+  if (!lsGet("procedure.voiceOk", false)) {
+    if (!confirm("Voice questions use your browser's built-in speech service to turn your voice into text. In Chrome that service is run by Google, and in Edge by Microsoft, so the sound of your question is sent to them. Your documents are not sent.\n\nUse voice questions?")) return;
+    lsSet("procedure.voiceOk", true);
+  }
+  REC = new SR(); REC.lang = navigator.language || "en-US"; REC.interimResults = true;
+  NETLOG.push({ t: new Date(), host: "browser speech service", path: " (your spoken question)", how: "VOICE" });
+  $("#micBtn").classList.add("on"); $("#q").placeholder = "Listening… ask your question";
+  REC.onresult = e => { const last = e.results[e.results.length - 1]; $("#q").value = [...e.results].map(x => x[0].transcript).join(""); autoGrow(); if (last.isFinal) { REC.stop(); ask(); } };
+  REC.onerror = e => toast(e.error === "not-allowed" ? "Microphone access was blocked" : e.error === "network" ? "Voice questions need internet (browser speech service)" : "Voice input: " + e.error, 4500);
+  REC.onend = () => { REC = null; $("#micBtn").classList.remove("on"); $("#q").placeholder = "Ask a question about your procedures…  (Enter to ask, Shift+Enter for new line)"; };
+  REC.start();
+});
+function ckReadNext() {
+  if (!CK || !CK.voice) return;
+  const next = CK.items.find(x => x.kind === "step" && !(CK.st.items[x.n] || {}).done);
+  if (!next) { speak("All steps are done.", true); CK.voice = false; $("#ckVoice").classList.remove("on"); return; }
+  const idx = CK.items.indexOf(next); let pre = "";
+  for (let i = idx - 1; i >= 0 && CK.items[i].kind === "warn"; i--) pre = CK.items[i].text + ". " + pre;
+  document.querySelector(`.ck[data-n="${next.n}"]`)?.scrollIntoView({ block: "center", behavior: "smooth" });
+  speak(pre + "Step " + (next.n + 1) + ". " + next.text.replace(STEP_RE, ""), true);
+}
+$("#ckVoice").addEventListener("click", () => { CK.voice = !CK.voice; $("#ckVoice").classList.toggle("on", CK.voice); if (CK.voice) ckReadNext(); else speechSynthesis.cancel(); });
+$("#ckBody").addEventListener("change", e => { if (e.target.type === "checkbox" && e.target.checked && CK && CK.voice) setTimeout(ckReadNext, 250); });
+$("#ckModal").addEventListener("click", e => { if ((e.target.id === "ckModal" || e.target.hasAttribute("data-close")) && "speechSynthesis" in window) { speechSynthesis.cancel(); if (CK) CK.voice = false; } });
+
+/* ---- Phone checklists: the steps travel in the link's #fragment, which is never sent to a server ---- */
+const toB64u = u => b64(u).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const fromB64u = s => { s = s.replace(/-/g, "+").replace(/_/g, "/"); return unb64(s + "=".repeat((4 - s.length % 4) % 4)); };
+async function packChecklist() {
+  const payload = JSON.stringify({ n: CK.d.name, t: CK.d.type, r: CK.d.revLabel || CK.d.revSeq || 1, i: CK.items.map(x => [x.kind === "sec" ? "h" : x.kind === "warn" ? "w" : "s", x.text]) });
+  const bytes = new TextEncoder().encode(payload);
+  if (window.CompressionStream) { const out = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()); return "z" + toB64u(out); }
+  return "j" + toB64u(bytes);
+}
+async function unpackChecklist(s) {
+  let bytes = fromB64u(s.slice(1));
+  if (s[0] === "z") bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function appURL() { return location.protocol.startsWith("http") && !/^(localhost|127\.0\.0\.1)/.test(location.host) ? location.origin + location.pathname : "https://kefirman9000.github.io/Procedure/"; }
+$("#ckPhone").addEventListener("click", async () => {
+  const url = appURL() + "#ck=" + await packChecklist();
+  $("#phoneLink").value = url; $("#phoneQR").innerHTML = '<span class="spin"></span>'; show("#phoneModal");
+  if (url.length > 2900) { $("#phoneQR").innerHTML = '<div class="hint">This checklist is too long for one QR code. Copy the link and send it to your phone, for example in an email or a message to yourself.</div>'; return; }
+  try { await loadScript("https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"); const qr = window.qrcode(0, "L"); qr.addData(url); qr.make(); $("#phoneQR").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true }); }
+  catch (e) { $("#phoneQR").innerHTML = '<div class="hint">Couldn\'t make the QR code (offline?). Copy the link instead.</div>'; }
+});
+$("#phoneCopy").addEventListener("click", () => copyText($("#phoneLink").value));
+async function openSharedChecklist(s) {
+  try {
+    const p = await unpackChecklist(s); let n = 0;
+    const items = p.i.map(([k, text]) => ({ kind: k === "h" ? "sec" : k === "w" ? "warn" : "step", text }));
+    for (const x of items) if (x.kind === "step") x.n = n++;
+    await openChecklist({ id: "shared-" + hashStr(s), name: p.n, type: p.t || "MOP", revLabel: String(p.r || ""), chunks: [] }, items);
+    toast("Checklist from a shared link. Ticks and notes are saved on this device.", 5000);
+  } catch (e) { toast("That checklist link looks incomplete or damaged", 5000); }
+}
+
+/* ---- Review-due dates ---- */
+const MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split(" ");
+function parseDate(s) {
+  s = String(s).trim(); let m; const mo = t => MONTHS.indexOf(t.slice(0, 3).toLowerCase());
+  if ((m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/))) return new Date(+m[1], m[2] - 1, +m[3]);
+  if ((m = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})/))) { let y = +m[3]; if (y < 100) y += 2000; return new Date(y, m[1] - 1, +m[2]); }
+  if ((m = s.match(/^(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})\.?,?\s+(\d{4})/i)) && mo(m[2]) >= 0) return new Date(+m[3], mo(m[2]), +m[1]);
+  if ((m = s.match(/^([a-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/i)) && mo(m[1]) >= 0) return new Date(+m[3], mo(m[1]), +m[2]);
+  if ((m = s.match(/^([a-z]{3,9})\.?\s+(\d{4})/i)) && mo(m[1]) >= 0) return new Date(+m[2], mo(m[1]), 1);
+  return null;
+}
+const DATE_RE = "([0-9]{1,4}[-/.][0-9]{1,2}[-/.][0-9]{1,4}|[0-9]{1,2}(?:st|nd|rd|th)?\\s+[A-Za-z]{3,9}\\.?,?\\s+[0-9]{4}|[A-Za-z]{3,9}\\.?\\s+[0-9]{1,2}(?:st|nd|rd|th)?,?\\s+[0-9]{4}|[A-Za-z]{3,9}\\.?\\s+[0-9]{4})";
+const DUE_RE = new RegExp("(?:next review(?: date)?|review (?:by|due|before)|due for review|expir(?:es|y|ation)(?: date)?|valid until)\\s*[:\\-–]?\\s*(?:on\\s+)?" + DATE_RE, "i");
+const LAST_RE = new RegExp("(?:effective(?: date)?|last review(?:ed)?(?: date)?|reviewed(?: on)?|revision date|rev(?:ised)?\\s*date|approved(?: on| date)?|issue date|date issued|issued)\\s*[:\\-–]?\\s*(?:on\\s+)?" + DATE_RE, "i");
+const RVCACHE = new Map();
+function reviewState(d) {
+  const key = d.id + "|" + d.hash + "|" + S.reviewMonths; if (RVCACHE.has(key)) return RVCACHE.get(key);
+  const text = d.chunks.map(c => (c.sec ? c.sec + "\n" : "") + c.text).join("\n");
+  const ok = dt => dt && !isNaN(dt) && dt.getFullYear() > 1990 && dt.getFullYear() < 2100 ? dt : null;
+  let due = null, basis = "";
+  let m = text.match(DUE_RE); if (m && ok(parseDate(m[1]))) { due = parseDate(m[1]); basis = "Review date stated in the document"; }
+  else if ((m = text.match(LAST_RE)) && ok(parseDate(m[1]))) { const last = parseDate(m[1]); due = new Date(last); due.setMonth(due.getMonth() + (+S.reviewMonths || 12)); basis = `Dated ${last.toLocaleDateString()} + ${+S.reviewMonths || 12}-month review cycle`; }
+  let r = null;
+  if (due) { const days = Math.round((due - Date.now()) / 864e5); r = { due, basis, days, level: days < 0 ? "over" : days <= 30 ? "soon" : "ok" }; }
+  RVCACHE.set(key, r); return r;
+}
+$("#reviewWarn").addEventListener("click", () => { $("#auFilter").value = "REVIEW"; renderAudit(); show("#auditModal"); });
+
+/* ---- Outdated terms ---- */
+function outdatedList() {
+  return (S.outdated || "").split("\n").map(l => l.trim()).filter(Boolean).map(l => { const [a, b] = l.split(/\s*(?:=>|→|->)\s*/); return { term: (a || "").trim(), repl: (b || "").trim() }; }).filter(x => x.term.length > 1);
+}
+function outdatedHits(text) { return outdatedList().filter(o => new RegExp("(^|[^A-Za-z0-9])" + escRe(o.term) + "(?![A-Za-z0-9])", "i").test(text)); }
+function oldBadge(text) { const o = outdatedHits(text); return o.length ? `<span class="oldterm" title="Marked outdated in settings${o[0].repl ? " — now: " + esc(o[0].repl) : ""}">⚠ outdated: ${esc(o.map(x => x.term).join(", "))}</span>` : ""; }
+
+/* ---- Draft a procedure from notes ---- */
+const DRAFT_SEC = { MOP: "Purpose, Impact / Risk, Prerequisites, Procedure, Back-out Plan, Verification, Approvals, Contacts / Escalation, Schedule / Maintenance Window", SOP: "Purpose, Scope, Responsibilities, Safety / Precautions, Procedure, References, Revision History" };
+const DRAFT_SYS = "You write clear operational procedures. Turn the user's notes into a {TYPE} in Markdown. Start with '# ' and the title, then use exactly these '## ' sections: {SECTIONS}. Keep every command, value, hostname and time from the notes exactly. Number the procedure steps. If the notes don't include a back-out plan, write one that undoes the steps and mark it '(suggested — review)'. Put [fill in] where information is missing. Never invent names, phone numbers or ticket numbers.";
+function cleanNoteLine(l) { return l.replace(/^\s*\[?\(?\d{1,2}[:.]\d{2}(?::\d{2})?\s*(?:am|pm)?\]?\)?\s*[-–—:]?\s*/i, "").replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim(); }
+function templateDraft(type, title, notes) {
+  const lines = notes.split("\n").map(cleanNoteLine).filter(l => l.length > 2).map(l => l[0].toUpperCase() + l.slice(1));
+  const pre = [], steps = [], back = [], ver = [];
+  for (const l of lines) {
+    if (/roll ?back|back ?out|revert|restore (the )?previous|fall ?back/i.test(l)) back.push(l);
+    else if (!steps.length && /back ?up|snapshot|approv|ticket|notif|announce|pre-?check|before|confirm .*window/i.test(l)) pre.push(l);
+    else if (steps.length && /verif|validat|check|confirm|test|ping|monitor|green|healthy|\bis up\b|\bare up\b/i.test(l)) ver.push(l);
+    else steps.push(l);
+  }
+  const FI = "[fill in]"; const ol = a => a.length ? a.map((l, i) => `${i + 1}. ${l}`).join("\n") : `1. ${FI}`; const ul = a => a.length ? a.map(l => `- ${l}`).join("\n") : `- ${FI}`;
+  if (type === "SOP") return `# ${title}\n\n## Purpose\n${FI}\n\n## Scope\n${FI}\n\n## Responsibilities\n${FI}\n\n## Safety / Precautions\n${FI}\n\n## Procedure\n${ol([...pre, ...steps, ...ver])}\n\n## References\n${FI}\n\n## Revision History\n- Rev 1 · ${new Date().toLocaleDateString()} · Drafted from notes\n`;
+  return `# ${title}\n\n## Purpose\n${FI}\n\n## Impact / Risk\n${FI}\n\n## Prerequisites\n${ul(pre)}\n\n## Procedure\n${ol(steps)}\n\n## Back-out Plan\n${back.length ? ol(back) : "1. " + FI + " (how to undo each step above)"}\n\n## Verification\n${ul(ver)}\n\n## Approvals\n${FI}\n\n## Contacts / Escalation\n${FI}\n\n## Schedule / Maintenance Window\n${FI}\n`;
+}
+$("#draftBtn").addEventListener("click", () => { $("#dHow").textContent = S.engine === "search" ? "Uses a built-in template, no AI. Turn on an AI engine in ⚙ for a smarter draft." : "Uses " + engineLabel() + "."; show("#draftModal"); });
+$("#dGo").addEventListener("click", async () => {
+  const type = $("#dType").value, title = $("#dTitle").value.trim() || (type + " — untitled"), notes = $("#dNotes").value.trim();
+  if (!notes) { toast("Paste some notes first"); return; }
+  if (S.engine === "search") { $("#dOut").value = templateDraft(type, title, notes); return; }
+  if (!cloudOK("your notes")) return;
+  $("#dGo").disabled = true; $("#dHow").innerHTML = '<span class="spin"></span>Drafting…';
+  try {
+    const sys = DRAFT_SYS.replace("{TYPE}", type === "MOP" ? "Method of Procedure (MOP)" : "Standard Operating Procedure (SOP)").replace("{SECTIONS}", DRAFT_SEC[type]);
+    let out = await aiChat(sys, [{ role: "user", content: `Title: ${title}\n\nNotes:\n${notes}` }], 2500);
+    out = out.replace(/^```(?:markdown|md)?\s*\n?/, "").replace(/```\s*$/, "").trim(); if (!/^#\s/.test(out)) out = `# ${title}\n\n` + out;
+    $("#dOut").value = out; $("#dHow").textContent = "Drafted by " + engineLabel() + ". Check every step before using it.";
+  } catch (e) { $("#dOut").value = templateDraft(type, title, notes); $("#dHow").innerHTML = '<span class="err">The AI engine failed (' + esc(e.message.slice(0, 80)) + '), so the built-in template was used.</span>'; }
+  $("#dGo").disabled = false;
+});
+$("#dSave").addEventListener("click", async () => {
+  const text = $("#dOut").value.trim(); if (!text) { toast("Draft something first"); return; }
+  const name = ((text.match(/^#\s+(.+)$/m) || [])[1] || $("#dTitle").value || "Draft procedure").trim();
+  const chunks = chunkBlocks(textToBlocks(text));
+  await addDoc({ id: uid(), name, file: name + ".md", type: $("#dType").value, typeLocked: true, added: Date.now(), chunks, hash: hashStr(chunks.map(c => c.text).join("\n")) }, { typeGiven: true });
+  $("#draftModal").classList.remove("on"); await refresh(); ensureEmbeddings();
+});
+$("#dDownload").addEventListener("click", () => { const t = $("#dOut").value; if (t) download(t, (($("#dTitle").value.trim() || "draft") + ".md").replace(/[\\/:*?"<>|]/g, "_"), "text/markdown"); });
+
+/* ---- Compare two procedures ---- */
+function secCategory(sec) {
+  const s = (sec || "").toLowerCase(); if (!s) return "(intro)";
+  for (const [name, , re] of [...AUDIT.MOP, ...AUDIT.SOP]) if (re.test(s)) return name.replace("Step-by-step procedure", "Procedure").replace("Procedure steps", "Procedure");
+  return sec.replace(/^[\d.\s)]+/, "").trim() || "(intro)";
+}
+function sectionsOf(d) { const m = new Map(); for (const c of d.chunks) { const k = secCategory(c.sec); if (!m.has(k)) m.set(k, []); m.get(k).push(c.text); } return m; }
+async function renderCompare() {
+  const A = ALL.find(d => d.id === $("#cmpA").value), B = ALL.find(d => d.id === $("#cmpB").value), mode = $("#cmpMode").value, out = $("#cmpOut");
+  if (!A || !B) return;
+  if (A === B) { out.innerHTML = '<div class="hint">Pick two different procedures.</div>'; return; }
+  if (mode === "diff") { out.innerHTML = diffToHTML(diffLines(docLines(A), docLines(B)), false); return; }
+  if (mode === "ai") {
+    if (S.engine === "search") { out.innerHTML = '<div class="hint">Turn on an AI engine in ⚙ Answer engine to get a written summary. The other two views work without AI.</div>'; return; }
+    if (!cloudOK("the text of both procedures")) { $("#cmpMode").value = "side"; return renderCompare(); }
+    out.innerHTML = '<span class="spin"></span>Comparing…';
+    const txt = d => d.chunks.map(c => (c.sec ? "## " + c.sec + "\n" : "") + c.text).join("\n").slice(0, 12000);
+    try {
+      const a = await aiChat("You compare two operational procedures. List the meaningful differences section by section: steps, order, values, safety, approvals, rollback and verification. Say which procedure each point comes from as A or B. Use short bullet points. Use only the two texts.", [{ role: "user", content: `Procedure A: ${A.name}\n${txt(A)}\n\n---\n\nProcedure B: ${B.name}\n${txt(B)}` }], 1800);
+      out.innerHTML = `<div class="a"><h4>Differences — written by ${esc(engineLabel())}</h4><div class="ans">${esc(a).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")}</div></div>`;
+    } catch (e) { out.innerHTML = '<div class="err">' + esc(e.message) + "</div>"; }
+    return;
+  }
+  const sa = sectionsOf(A), sb = sectionsOf(B); const keys = [...new Set([...sa.keys(), ...sb.keys()])];
+  out.innerHTML = `<table class="cmp"><tr><th style="width:17%">Section</th><th>A · ${esc(A.name)}</th><th>B · ${esc(B.name)}</th></tr>` + keys.map(k => { const x = sa.get(k), y = sb.get(k);
+    return `<tr><td class="sec">${esc(k)}</td><td class="${x ? "" : "none"}">${x ? esc(x.join("\n")) : "— not in this procedure —"}</td><td class="${y ? "" : "none"}">${y ? esc(y.join("\n")) : "— not in this procedure —"}</td></tr>`; }).join("") + "</table>";
+}
+["cmpA", "cmpB", "cmpMode"].forEach(id => $("#" + id).addEventListener("change", renderCompare));
+$("#cmpBtn").addEventListener("click", () => {
+  if (DOCS.length < 2) { toast("Add at least two procedures to compare"); return; }
+  const o = DOCS.map(d => `<option value="${d.id}">${esc(d.type + " · " + d.name)}</option>`).join("");
+  $("#cmpA").innerHTML = o; $("#cmpB").innerHTML = o; $("#cmpB").selectedIndex = 1; $("#cmpMode").value = "side"; show("#cmpModal"); renderCompare();
+});
+
+/* ---- Quiz ---- */
+let QZ = null;
+const NUM_UNIT = /\b\d+(?:\.\d+)?\s?(?:minutes?|mins?|hours?|hrs?|seconds?|secs?|days?|weeks?|months?|%|percent|gb|mb|psi|volts?|amps?|°\s?[cf]|degrees|feet|ft|meters?|times)\b/i;
+function sentencesOf(d) {
+  const out = [];
+  d.chunks.forEach((c, ci) => { if (d.family && isTitleOnly({ c, doc: d })) return; for (const s of c.text.split(/(?<=[.!?])\s+|\n+/)) { const t = s.trim().replace(STEP_RE, ""); if (t.length >= 25 && t.length <= 240 && !/ · |: .*: /.test(t)) out.push({ s: t, ci, sec: c.sec }); } });
+  return out;
+}
+function makeQuiz(d, n = 6) {
+  const qs = [], used = new Set(); const sents = shuffle(sentencesOf(d));
+  const words = new Map(); for (const x of DOCS) for (const c of x.chunks) for (const w of c.text.match(/\b[A-Za-z][A-Za-z\-]{4,}\b/g) || []) { const k = w.toLowerCase(); if (!STOP.has(k)) words.set(k, w); }
+  const vocab = [...words.values()];
+  for (const x of sents) { // numbers and values
+    if (qs.length >= Math.ceil(n / 2)) break; const m = x.s.match(NUM_UNIT); if (!m) continue;
+    const num = parseFloat(m[0]), sp = /\d\s/.test(m[0]) ? " " : "", unit = m[0].replace(/^[\d.]+\s?/, "");
+    const alts = [...new Set([num * 2, Math.max(1, Math.round(num / 2)), num + (num >= 10 ? 10 : 2), num + (num >= 10 ? 5 : 1), num * 3])].filter(v => v !== num && v > 0).slice(0, 3);
+    if (alts.length < 3) continue;
+    const opts = shuffle([m[0], ...alts.map(v => (Number.isInteger(v) ? v : +v.toFixed(1)) + sp + unit)]);
+    qs.push({ q: x.s.replace(m[0], "_____"), opts, a: opts.indexOf(m[0]), ci: x.ci, sec: x.sec }); used.add(x.s);
+  }
+  const steps = extractSteps(d).filter(x => x.kind === "step"); const strip = s => s.text.replace(STEP_RE, "").trim();
+  if (steps.length >= 5) for (const i of shuffle(steps.map((_, i) => i).slice(0, -1))) { // step order
+    if (qs.length >= n - 1) break; if (steps[i].sec !== steps[i + 1].sec) continue;
+    const nxt = strip(steps[i + 1]); const others = [...new Set(shuffle(steps.filter((_, j) => j !== i && j !== i + 1).map(strip)))].filter(t => t !== nxt).slice(0, 3);
+    if (others.length < 3) break;
+    const opts = shuffle([nxt, ...others]);
+    qs.push({ q: `What comes right after this step?\n“${strip(steps[i])}”`, opts, a: opts.indexOf(nxt), ci: d.chunks.findIndex(c => c.text.includes(steps[i + 1].text)), sec: null });
+  }
+  for (const x of sents) { // key words
+    if (qs.length >= n) break; if (used.has(x.s)) continue;
+    const w = (x.s.match(/\b[A-Za-z][A-Za-z\-]{5,}\b/g) || []).filter(v => !STOP.has(v.toLowerCase())).sort((a, b) => b.length - a.length)[0]; if (!w) continue;
+    const pool = shuffle(vocab.filter(v => v.toLowerCase() !== w.toLowerCase() && Math.abs(v.length - w.length) <= 3 && !x.s.toLowerCase().includes(v.toLowerCase()))).slice(0, 3);
+    if (pool.length < 3) continue;
+    const opts = shuffle([w, ...pool]); qs.push({ q: x.s.replace(new RegExp("\\b" + escRe(w) + "\\b"), "_____"), opts, a: opts.indexOf(w), ci: x.ci, sec: x.sec }); used.add(x.s);
+  }
+  return shuffle(qs).slice(0, n);
+}
+async function aiQuiz(d) {
+  const txt = d.chunks.map((c, i) => `[${i}] ${c.sec ? c.sec + ": " : ""}${c.text}`).join("\n").slice(0, 12000);
+  const out = await aiChat('You write training quizzes for operational procedures. Write 6 multiple-choice questions that test the important details of this procedure: order of steps, values, safety warnings, approvals and rollback. Use only the procedure text. Each question has 4 options and exactly one correct answer. Reply with JSON only, like [{"q":"question","opts":["a","b","c","d"],"a":0,"ci":3}] where "a" is the index of the correct option and "ci" is the number of the [n] passage the question comes from.', [{ role: "user", content: txt }], 2000);
+  const m = out.match(/\[[\s\S]*\]/); const arr = JSON.parse(m ? m[0] : out);
+  return arr.filter(x => x && x.q && Array.isArray(x.opts) && x.opts.length >= 2 && +x.a >= 0 && +x.a < x.opts.length)
+    .map(x => ({ q: String(x.q), opts: x.opts.map(String), a: +x.a, ci: d.chunks[+x.ci] ? +x.ci : -1, sec: d.chunks[+x.ci]?.sec || null }));
+}
+async function openQuiz(d, ai) {
+  $("#qzTag").className = "tag " + d.type; $("#qzTag").textContent = d.type; $("#qzTitle").textContent = "Quiz — " + d.name; $("#qzCount").textContent = "";
+  show("#quizModal"); let qs = null;
+  if (ai) { $("#qzBody").innerHTML = '<span class="spin"></span>Writing questions…'; try { qs = await aiQuiz(d); } catch (e) { toast("AI questions failed, so built-in questions are used", 4000); } }
+  if (!qs || !qs.length) qs = makeQuiz(d);
+  QZ = { d, qs, i: 0, score: 0, answered: false };
+  if (!qs.length) { $("#qzBody").innerHTML = '<div class="hint">This document is too short to make questions from.</div>'; return; }
+  renderQuiz();
+}
+function renderQuiz() {
+  const { qs, i } = QZ; $("#qzCount").textContent = i < qs.length ? `${i + 1} / ${qs.length}` : "";
+  if (i >= qs.length) {
+    const pct = Math.round(QZ.score / qs.length * 100);
+    $("#qzBody").innerHTML = `<div style="text-align:center;padding:20px"><div style="font-size:42px;font-weight:700;color:${pct >= 80 ? "var(--ok)" : pct >= 50 ? "var(--accent2)" : "var(--err)"}">${QZ.score} / ${qs.length}</div><p>${pct >= 80 ? "Great, you know this procedure well." : pct >= 50 ? "Not bad. Review the sections you missed." : "Worth reading this procedure again."}</p><button class="primary" id="qzAgain">New questions</button> ${S.engine !== "search" ? '<button id="qzAI">Questions written by AI</button>' : ""}</div>`;
+    return;
+  }
+  const q = qs[i]; QZ.answered = false;
+  $("#qzBody").innerHTML = `<div class="qzq">${esc(q.q)}</div>` + q.opts.map((o, k) => `<button class="qzopt" data-k="${k}">${esc(o)}</button>`).join("") + `<div id="qzFb" class="hint" style="margin-top:10px"></div>`;
+}
+$("#qzBody").addEventListener("click", e => {
+  if (e.target.tagName === "A") e.preventDefault();
+  if (e.target.id === "qzAgain") return openQuiz(QZ.d, false);
+  if (e.target.id === "qzAI") { if (cloudOK("the text of this procedure")) openQuiz(QZ.d, true); return; }
+  if (e.target.id === "qzNext") { QZ.i++; return renderQuiz(); }
+  if (e.target.dataset.see != null) { $("#quizModal").classList.remove("on"); return openDoc(QZ.d.id, +e.target.dataset.see); }
+  const b = e.target.closest(".qzopt"); if (!b || QZ.answered) return;
+  QZ.answered = true; const q = QZ.qs[QZ.i], k = +b.dataset.k, ok = k === q.a; if (ok) QZ.score++;
+  document.querySelectorAll(".qzopt").forEach((x, j) => { x.classList.toggle("right", j === q.a); if (j === k && !ok) x.classList.add("wrong"); x.disabled = true; });
+  $("#qzFb").innerHTML = `${ok ? '<b style="color:var(--ok)">Correct.</b>' : '<b style="color:var(--err)">Not quite.</b> The answer is “' + esc(q.opts[q.a]) + '”.'} ${q.ci >= 0 ? `<a href="#" data-see="${q.ci}">See it in the procedure${q.sec ? " (" + esc(q.sec) + ")" : ""}</a>` : ""}<div style="margin-top:10px"><button class="primary" id="qzNext">${QZ.i + 1 < QZ.qs.length ? "Next question" : "See score"}</button></div>`;
+});
+
+/* ---- Original PDF / image viewer with highlighted lines ---- */
+let PV = null;
+async function openOriginal(d, page, q, chunkText) {
+  let bytes = null; try { bytes = await fileGet(d.id); } catch (e) {}
+  if (!bytes) { toast("The original file isn't stored for this document. Add the file again to view its pages.", 6000); return; }
+  $("#pvTag").className = "tag " + d.type; $("#pvTag").textContent = d.type; $("#pvTitle").textContent = d.name;
+  const isImg = d.orig === "img";
+  ["pvPrev", "pvNext", "pvOut", "pvIn"].forEach(id => $("#" + id).style.display = isImg ? "none" : "");
+  document.querySelector(".pdfwrap").style.display = isImg ? "none" : ""; $("#pvImg").style.display = isImg ? "" : "none";
+  show("#pdfModal");
+  if (isImg) { $("#pdfPage").textContent = ""; $("#pvImg").src = URL.createObjectURL(new Blob([bytes])); return; }
+  $("#pdfPage").innerHTML = '<span class="spin"></span>';
+  try {
+    const lib = await pdfLib(); const pdf = await lib.getDocument({ data: bytes }).promise;
+    const fit = ($("#pdfBody").clientWidth - 48) / 612;
+    PV = { d, pdf, page: Math.min(Math.max(1, page || 1), pdf.numPages), chunkPage: page || 1, scale: Math.max(0.6, Math.min(1.8, fit || 1.3)), q, chunkText, scrolled: false };
+    renderPdfPage();
+  } catch (e) { $("#pdfPage").textContent = ""; toast("Couldn't open the PDF: " + e.message, 6000); }
+}
+async function renderPdfPage() {
+  if (!PV) return; if (PV.busy) { PV.again = true; return; } PV.busy = true;
+  try {
+    const { pdf } = PV; const p = PV.page = Math.min(Math.max(1, PV.page), pdf.numPages);
+    const page = await pdf.getPage(p); const vp = page.getViewport({ scale: PV.scale }); const dpr = window.devicePixelRatio || 1;
+    const cv = $("#pdfCanvas"), ov = $("#pdfOverlay");
+    for (const c of [cv, ov]) { c.width = Math.floor(vp.width * dpr); c.height = Math.floor(vp.height * dpr); c.style.width = vp.width + "px"; c.style.height = vp.height + "px"; }
+    const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    const o = ov.getContext("2d"); o.setTransform(dpr, 0, 0, dpr, 0, 0); o.clearRect(0, 0, vp.width, vp.height);
+    const tc = await page.getTextContent(); const qt = PV.q ? new Set(queryTerms(PV.q).keys()) : new Set();
+    const norm = t => t.toLowerCase().replace(/\s+/g, " ").trim();
+    const chunkTxt = p === PV.chunkPage ? norm(PV.chunkText || "") : "";
+    let top = null;
+    for (const it of tc.items) {
+      const str = norm(it.str); if (!str || !it.transform) continue;
+      const inChunk = chunkTxt && str.length > 3 && chunkTxt.includes(str);
+      const termHit = qt.size && tokens(it.str).some(t => qt.has(t));
+      if (!inChunk && !termHit) continue;
+      const h = it.height || Math.abs(it.transform[3]) || 10;
+      const T = vp.transform, pt = (a, b) => [T[0] * a + T[2] * b + T[4], T[1] * a + T[3] * b + T[5]];
+      const [x1, y1] = pt(it.transform[4], it.transform[5] - h * 0.2), [x2, y2] = pt(it.transform[4] + (it.width || 0), it.transform[5] + h * 0.85);
+      const x = Math.min(x1, x2), y = Math.min(y1, y2), w = Math.abs(x2 - x1), hh = Math.abs(y2 - y1);
+      o.fillStyle = termHit ? "rgba(240,170,60,.55)" : "rgba(79,179,169,.35)"; o.fillRect(x - 1, y - 1, w + 2, hh + 2);
+      if (top == null || y < top) top = y;
+    }
+    $("#pdfPage").textContent = `Page ${p} / ${pdf.numPages}`;
+    if (!PV.scrolled) { $("#pdfBody").scrollTop = top != null ? Math.max(0, top - 140) : 0; PV.scrolled = true; }
+  } catch (e) { console.warn(e); }
+  PV.busy = false; if (PV.again) { PV.again = false; renderPdfPage(); }
+}
+$("#pvPrev").addEventListener("click", () => { if (PV) { PV.page--; PV.scrolled = false; renderPdfPage(); } });
+$("#pvNext").addEventListener("click", () => { if (PV) { PV.page++; PV.scrolled = false; renderPdfPage(); } });
+$("#pvIn").addEventListener("click", () => { if (PV) { PV.scale = Math.min(4, PV.scale * 1.2); renderPdfPage(); } });
+$("#pvOut").addEventListener("click", () => { if (PV) { PV.scale = Math.max(0.4, PV.scale / 1.2); renderPdfPage(); } });
+
+/* ---- Multiple libraries ---- */
+const TEAM_KEYS = ["ghRepo", "ghBranch", "ghPath", "ghAuto"];
+function loadTeam() { const t = lsGet("procedure.team." + CURLIB, null); Object.assign(S, t || { ghRepo: "", ghBranch: "main", ghPath: "", ghAuto: false }); }
+function saveTeam() { lsSet("procedure.team." + CURLIB, Object.fromEntries(TEAM_KEYS.map(k => [k, S[k]]))); }
+function renderLibSel() { $("#libSel").innerHTML = LIBS.map(l => `<option value="${l.id}">📚 ${esc(l.name)}</option>`).join("") + `<option value="__new">＋ New library…</option>`; $("#libSel").value = CURLIB; }
+async function switchLib(id) {
+  CURLIB = id; lsSet("procedure.curlib", id); renderLibSel();
+  try { await DB.open(); useMem = false; } catch (e) { useMem = true; }
+  loadTeam(); HISTORY = []; await refresh(); ensureEmbeddings();
+  try { const h = await metaGet("folder"); if (h && (await h.queryPermission({ mode: "read" })) === "granted") syncFolder(h, false); } catch (e) {}
+  if (S.ghAuto && S.ghRepo) syncGitHub(false);
+}
+async function newLibrary() {
+  const name = (prompt("Name for the new library (for example Network, Facilities or Security):") || "").trim(); if (!name) return;
+  LIBS.push({ id: uid().replace(/[^a-z0-9]/gi, "").slice(0, 10), name }); lsSet("procedure.libs", LIBS);
+  await switchLib(LIBS[LIBS.length - 1].id); renderLibsList(); toast(`Created "${name}". Add documents or connect a team library for it.`, 4500);
+}
+$("#libSel").addEventListener("change", e => { const v = e.target.value; if (v === "__new") { e.target.value = CURLIB; newLibrary(); } else switchLib(v); });
+function renderLibsList() {
+  $("#libsList").innerHTML = `<tr><th>Name</th><th></th></tr>` + LIBS.map(l => `<tr><td><input data-ren="${l.id}" value="${esc(l.name)}" style="width:100%"></td><td style="text-align:right;white-space:nowrap">${l.id === CURLIB ? '<b style="color:var(--ok);font-size:12px">open</b>' : `<button class="ghost" data-open="${l.id}">Open</button>`}<button class="ghost" data-dellib="${l.id}" ${LIBS.length < 2 ? "disabled" : ""}>Delete</button></td></tr>`).join("");
+}
+$("#libManage").addEventListener("click", () => { renderLibsList(); show("#libsModal"); });
+$("#libsNew").addEventListener("click", newLibrary);
+$("#libsList").addEventListener("change", e => { const id = e.target.dataset.ren; if (!id) return; const l = LIBS.find(x => x.id === id); l.name = e.target.value.trim() || l.name; lsSet("procedure.libs", LIBS); renderLibSel(); });
+$("#libsList").addEventListener("click", async e => {
+  const o = e.target.dataset.open, d = e.target.dataset.dellib;
+  if (o) { await switchLib(o); renderLibsList(); }
+  if (d) {
+    const l = LIBS.find(x => x.id === d); if (!confirm(`Delete the "${l.name}" library and all its documents from this computer? This can't be undone.`)) return;
+    if (d === CURLIB) await switchLib(LIBS.find(x => x.id !== d).id);
+    await new Promise(r => { const q = indexedDB.deleteDatabase(dbName(d)); q.onsuccess = q.onerror = q.onblocked = () => r(); });
+    LIBS = LIBS.filter(x => x.id !== d); lsSet("procedure.libs", LIBS); localStorage.removeItem("procedure.team." + d);
+    renderLibSel(); renderLibsList(); toast(`Deleted "${l.name}"`);
+  }
+});
+
+/* ---- PIN lock ---- */
+let PIN_CANCEL = null;
+function askPin(title, twice, note) {
+  return new Promise(res => {
+    $("#pinTitle").textContent = title; $("#pinNote").innerHTML = note || ""; $("#pin1").value = ""; $("#pin2").value = ""; $("#pin2row").style.display = twice ? "" : "none"; $("#pinErr").textContent = "";
+    show("#pinModal"); setTimeout(() => $("#pin1").focus(), 50);
+    const done = v => { $("#pinModal").classList.remove("on"); PIN_CANCEL = null; $("#pinOk").onclick = null; res(v); };
+    $("#pinOk").onclick = () => { const a = $("#pin1").value; if (a.length < 4) { $("#pinErr").textContent = "Use at least 4 characters."; return; } if (twice && a !== $("#pin2").value) { $("#pinErr").textContent = "The two entries don't match."; return; } done(a); };
+    PIN_CANCEL = () => done(null);
+  });
+}
+$("#pinCancel").addEventListener("click", () => PIN_CANCEL && PIN_CANCEL());
+$("#pinModal").addEventListener("click", e => { if (e.target.id === "pinModal" && PIN_CANCEL) PIN_CANCEL(); });
+["pin1", "pin2"].forEach(id => $("#" + id).addEventListener("keydown", e => { if (e.key === "Enter") $("#pinOk").click(); }));
+async function reencryptAll(newKey) {
+  const cur = CURLIB;
+  for (const l of LIBS) {
+    await DB.open(dbName(l.id));
+    const docs = []; for (const r of await rawAll()) docs.push(r.enc ? await decJSON(r.enc) : r);
+    const files = []; for (const k of await DB.req("files", "readonly", s => s.getAllKeys())) files.push([k, await fileGet(k)]);
+    const old = KEY; KEY = newKey;
+    for (const d of docs) await storePut(d);
+    for (const [k, b] of files) if (b) await filePut(k, b);
+    KEY = old;
+  }
+  const runs = []; for (const k of Object.keys(localStorage).filter(k => k.startsWith("procedure.run."))) runs.push([k.slice(10), await vaultGet(k.slice(10), null)]);
+  KEY = newKey; for (const [k, v] of runs) if (v) await vaultSet(k, v);
+  await DB.open(dbName(cur));
+}
+async function setPin(pin) {
+  setStatus(pin ? "Encrypting your library…" : "Removing the PIN lock…");
+  try {
+    let newKey = null, rec = null;
+    if (pin) {
+      const salt = crypto.getRandomValues(new Uint8Array(16)), iter = 310000; newKey = await deriveKey(pin, salt, iter);
+      const old = KEY; KEY = newKey; const chk = await encJSON("procedure-ok"); KEY = old;
+      rec = { salt: b64(salt), iter, check: { iv: b64(chk.iv), data: b64(chk.data) } };
+    }
+    await reencryptAll(newKey);
+    if (rec) lsSet("procedure.lock", rec); else localStorage.removeItem("procedure.lock");
+    localStorage.removeItem("procedure.secrets"); saveS();
+    toast(pin ? "PIN lock is on. Your library is encrypted on this computer." : "PIN lock is off.", 5000);
+  } catch (e) { toast("Couldn't change the PIN lock: " + e.message, 6000); }
+  setStatus(""); renderLockState(); await refresh(); setupAutoLock();
+}
+function renderLockState() {
+  const on = !!LOCK();
+  $("#lockState").innerHTML = on ? '<b style="color:var(--ok)">PIN lock is on.</b> Your library is encrypted on this computer.' : "PIN lock is off. Anyone using this computer account can open the app and see your library.";
+  $("#lockOn").style.display = on ? "none" : ""; $("#lockChange").style.display = $("#lockOff").style.display = on ? "" : "none";
+  $("#autoLock").value = String(S.autoLock ?? 15); $("#autoLock").disabled = !on;
+}
+$("#lockOn").addEventListener("click", async () => { const p = await askPin("Choose a PIN", true, "Use a PIN or passphrase you'll remember. <b>A forgotten PIN can't be recovered</b>. You would have to delete the library and add your documents again, so Export a backup first if you want one."); if (p) setPin(p); });
+$("#lockChange").addEventListener("click", async () => { const p = await askPin("Choose a new PIN", true, "Your library will be re-encrypted with the new PIN."); if (p) setPin(p); });
+$("#lockOff").addEventListener("click", () => { if (confirm("Turn off the PIN lock? Your library will be stored unencrypted on this computer again.")) setPin(null); });
+$("#autoLock").addEventListener("change", () => { S.autoLock = +$("#autoLock").value; saveS(); setupAutoLock(); });
+$("#lockNow").addEventListener("click", () => location.reload());
+let idleT = null;
+function setupAutoLock() {
+  const reset = () => { clearTimeout(idleT); const mins = +(S.autoLock ?? 15); if (LOCK() && mins > 0) idleT = setTimeout(() => location.reload(), mins * 60000); };
+  if (!setupAutoLock.bound) { ["mousemove", "keydown", "click", "touchstart", "scroll"].forEach(ev => document.addEventListener(ev, reset, { passive: true, capture: true })); setupAutoLock.bound = true; }
+  reset();
+}
+function showLockScreen() {
+  return new Promise(res => {
+    const L = LOCK(); $("#lockScreen").style.display = "flex"; setTimeout(() => $("#unlockPin").focus(), 50); let fails = 0;
+    const tryIt = async () => {
+      const pin = $("#unlockPin").value; if (!pin) return; $("#unlockBtn").disabled = true; $("#unlockErr").textContent = "";
+      try {
+        KEY = await deriveKey(pin, unb64(L.salt), L.iter);
+        if (await decJSON({ iv: unb64(L.check.iv), data: unb64(L.check.data) }) !== "procedure-ok") throw 0;
+        $("#lockScreen").style.display = "none"; Object.assign(S, await vaultGet("secrets", {})); $("#unlockBtn").disabled = false; res(); return;
+      } catch (e) { KEY = null; fails++; $("#unlockErr").textContent = "Wrong PIN."; $("#unlockPin").value = ""; await new Promise(r => setTimeout(r, Math.min(30000, 400 * 2 ** fails))); }
+      $("#unlockBtn").disabled = false;
+    };
+    $("#unlockBtn").onclick = tryIt; $("#unlockPin").onkeydown = e => { if (e.key === "Enter") tryIt(); };
+    $("#unlockForgot").onclick = () => { if (confirm("A forgotten PIN can't be recovered, because your data is encrypted with it.\n\nThe only option is to delete all Procédure data on this computer and start again. Do that now?")) wipeAll(); };
+  });
+}
+async function wipeAll() {
+  try { if (DB.db) { DB.db.close(); DB.db = null; } } catch (e) {}
+  for (const l of LIBS) await new Promise(r => { const q = indexedDB.deleteDatabase(dbName(l.id)); q.onsuccess = q.onerror = q.onblocked = () => r(); });
+  try { Object.keys(localStorage).filter(k => k.startsWith("procedure.")).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+  history.replaceState(null, "", location.pathname); location.reload();
+}
 
 /* updater — only acts when the user accepts */
 function newer(a, b) { const x = String(a).split(".").map(Number), y = String(b).split(".").map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) > (y[i] || 0)) return true; if ((x[i] || 0) < (y[i] || 0)) return false; } return false; }
@@ -1381,11 +2092,17 @@ $("#updateBtn").addEventListener("click", async () => {
 
 /* boot */
 (async () => {
+  if (lsGet("procedure.team.default", null) == null) lsSet("procedure.team.default", Object.fromEntries(TEAM_KEYS.map(k => [k, S[k]])));
+  const shared = location.hash.startsWith("#ck=") ? location.hash.slice(4) : null;
+  if (LOCK()) await showLockScreen();
   try { await DB.open(); } catch (e) { useMem = true; toast("Browser storage is blocked — documents are kept only until you close this tab. Use Export to save.", 8000); }
+  loadTeam(); renderLibSel();
   await refresh();
   ensureEmbeddings();
   try { const h = await metaGet("folder"); if (h && (await h.queryPermission({ mode: "read" })) === "granted") syncFolder(h, false); } catch (e) {}
   if (S.ghAuto && S.ghRepo) syncGitHub(false);
+  setupAutoLock();
+  if (shared) openSharedChecklist(shared);
 })();
 </script>
 </body>

@@ -31,6 +31,8 @@ Ask questions of your **SOPs** (Standard Operating Procedures) and **MOPs** (Met
 - **Local AI stays local:** Ollama and LM Studio run on your own machine.
 - **The one exception, off by default:** if you choose the **Claude API** engine, each question and the matching passages (not whole documents) are sent to Anthropic to write the answer. The app asks you to confirm before turning it on, and shows a warning badge while it's on.
 - **Check it yourself:** the 🔒 panel in the app lists every connection made since the window opened. You can also watch F12 → Network, and all the source code is in this repo.
+- **Voice questions** (optional, asks first) use your browser's speech service, which is Google in Chrome and Microsoft in Edge, so the sound of your question goes there. Read-aloud uses voices on your computer.
+- **PIN lock:** turn it on and your documents, original files, checklist notes and API keys are encrypted on your computer. A forgotten PIN can't be recovered.
 - **Delete everything:** the 🔒 panel has a button that removes all Procédure data from your computer.
 
 Anyone who can use your computer account can open the app and see your library, the same as any other file on your PC, so keep your normal login and lock screen.
@@ -50,6 +52,18 @@ Anyone who can use your computer account can open the app and see your library, 
 - **Answer feedback:** 👍/👎 an answer and its sources rank higher or lower for similar questions.
 - **Export and import** your library to back it up or move it between PCs.
 - **In-app updater:** it checks GitHub and only updates if you say yes.
+- **View the original:** open the real PDF page (or image) behind any answer, with the matching lines highlighted.
+- **Tables understood:** rows in PDF, Word, Markdown and CSV tables are read with their column names, so "what's the IP of core-sw2?" finds the right row.
+- **Voice:** ask by voice 🎤 (it asks first, and uses your browser's speech service), and have answers or checklist steps read aloud 🔊 with voices on your computer, hands-free.
+- **Phone checklists:** scan a QR code to run a checklist on your phone at the rack or in the plant room. The steps travel inside the link, so nothing is uploaded.
+- **Review dates:** reads "effective", "revised" and "next review" dates and flags procedures that are overdue for review.
+- **Outdated terms:** list old firmware versions, retired hostnames or people who've left, and the audit flags every procedure that still mentions them.
+- **Draft from notes ✍:** turn notes from a past change into a draft MOP or SOP with all the usual sections. It uses a built-in template, or AI if you've turned an engine on.
+- **Compare ⇆:** see two procedures side by side by section, line by line, or as an AI summary.
+- **Quiz 🎓:** training questions made from any procedure, with a link back to the right section.
+- **Share answers:** copy an answer with its sources to paste into a ticket or email, or print it.
+- **PIN lock 🔐:** optionally encrypt everything on the computer (AES-256), with auto-lock when idle.
+- **Multiple libraries:** keep separate sets like Network, Facilities and Security, each with its own team sync.
 
 ## Run it
 - **Web:** open the link above in Edge or Chrome.
