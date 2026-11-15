@@ -170,6 +170,8 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 .priv table{width:100%;border-collapse:collapse;font-size:12.5px}
 .priv td,.priv th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 .priv th{font-size:11px;color:var(--muted);text-transform:uppercase}
+.easy{background:rgba(79,179,169,.08);border:1px solid rgba(79,179,169,.35);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.easy b{color:var(--accent)}
 .netlog{font:12px Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;max-height:180px;overflow:auto;white-space:pre-wrap}
 .sentnote{font-size:11px;color:var(--accent2);margin-left:6px;text-transform:none;letter-spacing:0}
 @media (max-width:800px){.app{grid-template-columns:1fr}aside{max-height:42vh}.ckmeta,.row2{grid-template-columns:1fr}}
@@ -232,6 +234,21 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <div class="modal" id="settingsModal"><div class="box">
   <header><h3>Answer engine &amp; search</h3><button class="ghost" data-close>✕</button></header>
   <div class="body">
+    <div class="easy">
+      <b>🖥 Want AI-written answers that stay on your computer?</b>
+      <div class="hint">Easy setup installs free <b>Ollama</b> and an AI model (1–5 GB download, Windows 10/11). Everything runs on this PC, and your documents never leave it.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+        <select id="easyModel">
+          <option value="auto">Pick the best model for my PC (recommended)</option>
+          <option value="llama3.2:1b">Tiny — Llama 3.2 1B · ~1.3 GB · any PC</option>
+          <option value="llama3.2:3b">Small — Llama 3.2 3B · ~2 GB · 8 GB+ RAM</option>
+          <option value="llama3.1:8b">Best — Llama 3.1 8B · ~5 GB · 16 GB+ RAM</option>
+        </select>
+        <button class="primary" id="easyInstall">Install local AI</button>
+        <button id="easyDetect">Detect &amp; connect</button>
+      </div>
+      <div class="hint" id="easyMsg"></div>
+    </div>
     <div class="field">
       <label>Engine</label>
       <select id="engine">
@@ -247,7 +264,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
         <div class="field"><label>Ollama URL</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
         <div class="field"><label>Model</label><input id="ollamaModel" placeholder="llama3.1"></div>
       </div>
-      <div class="hint" style="margin:-8px 0 8px">Install from <code>ollama.com</code>, then run <code>ollama pull llama3.1</code>. If it can't connect, set the Windows environment variable <code>OLLAMA_ORIGINS=*</code> and restart Ollama.</div>
+      <div class="hint" style="margin:-8px 0 8px">Easiest: use <b>Install local AI</b> above. Manual setup: install from <code>ollama.com</code>, run <code>ollama pull llama3.1</code>, and set the Windows environment variable <code>OLLAMA_ORIGINS</code> to <code>https://kefirman9000.github.io,file://*,null</code>, then restart Ollama.</div>
       <button id="ollamaList">List installed models</button> <span id="ollamaModels" class="hint"></span>
       <div style="height:12px"></div>
     </div>
@@ -378,7 +395,8 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
       <tr><td>First PDF / Word / scanned file</td><td>cdnjs.cloudflare.com, cdn.jsdelivr.net</td><td>Downloads the free reader programs. <b>Your file is read on your computer and is not sent.</b></td></tr>
       <tr><td>Turning on Smart search</td><td>cdn.jsdelivr.net, huggingface.co</td><td>Downloads a small AI model once. The model then runs on your computer. Nothing is sent.</td></tr>
       <tr><td>Check for updates (only when you click)</td><td>raw.githubusercontent.com</td><td>Downloads the version number and, if you accept, the new app. Nothing is sent.</td></tr>
-      <tr><td>Ollama or LM Studio engine (optional)</td><td>Your own computer (localhost)</td><td>Your question and the matching passages go to the AI program on your own machine.</td></tr>
+      <tr><td>Ollama or LM Studio engine (optional)</td><td>Your own computer (localhost)</td><td>Your question and the matching passages go to the AI program on your own machine. Nothing leaves it.</td></tr>
+      <tr><td>Install local AI (only if you click it)</td><td>ollama.com</td><td>The setup downloads Ollama and the AI model. Nothing is sent. It lets only Procédure connect to Ollama, not other websites. The setup file is <a href="https://github.com/kefirman9000/procedure/blob/main/setup/Setup-Local-AI.cmd" target="_blank" rel="noopener">public to read</a>.</td></tr>
       <tr><td><b>Claude API engine (optional, off by default)</b></td><td>api.anthropic.com</td><td class="warnrow"><b style="color:var(--accent2)">Your question and the matching passages from your documents ARE sent to Anthropic</b> to write the answer. Whole documents are not sent. Only choose this if your organization allows it.</td></tr>
       <tr><td>Team library from GitHub (optional)</td><td>api.github.com, raw.githubusercontent.com</td><td>Downloads files from the repo you choose. Your token, if you add one, only goes to GitHub.</td></tr>
     </table>
@@ -396,7 +414,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 
 <script>
 "use strict";
-const VERSION = "1.2.1";
+const VERSION = "1.3.0";
 const REPO = "kefirman9000/procedure";
 const DESKTOP = window.procedureDesktop || null;
 const $ = s => document.querySelector(s);
@@ -1257,6 +1275,49 @@ $("#wipeBtn").addEventListener("click", async () => {
   try { for (const d of ALL) await storeDel(d.id); await metaDel("folder"); } catch (e) {}
   try { Object.keys(localStorage).filter(k => k.startsWith("procedure.")).forEach(k => localStorage.removeItem(k)); } catch (e) {}
   location.reload();
+});
+
+/* ---- Easy local-AI (Ollama) setup ---- */
+const SETUP_CMD = "<# : batch part - this file is both a Windows batch file and a PowerShell script\n@echo off\nset \"PROC_MODEL=%~1\"\nif \"%PROC_MODEL%\"==\"\" set \"PROC_MODEL=__MODEL__\"\npowershell -NoProfile -ExecutionPolicy Bypass -Command \"iex ([IO.File]::ReadAllText('%~f0'))\"\nexit /b\n#>\n# Procedure - local AI setup (source: https://github.com/kefirman9000/procedure/blob/main/setup/Setup-Local-AI.cmd)\n$ErrorActionPreference = \"Continue\"\n$Model = $env:PROC_MODEL\nif (-not $Model) { $Model = \"auto\" }\n$Host.UI.RawUI.WindowTitle = \"Procedure - Local AI setup\"\nfunction Step($n, $t) { Write-Host \"\"; Write-Host \"[$n/4] $t\" -ForegroundColor Cyan }\nfunction Done-Fail($msg) { Write-Host \"\"; Write-Host $msg -ForegroundColor Red; Read-Host \"Press Enter to close\" | Out-Null; exit 1 }\nWrite-Host \"Procedure - local AI setup\" -ForegroundColor Green\nWrite-Host \"This installs Ollama (free, from ollama.com), lets Procedure use it, and downloads an AI model.\"\nWrite-Host \"Everything runs on this computer. Your documents never leave it.\"\nWrite-Host \"\"\nRead-Host \"Press Enter to start (or close this window to cancel)\" | Out-Null\n\nfunction Find-Ollama {\n  $c = Get-Command ollama.exe -ErrorAction SilentlyContinue\n  if ($c) { return $c.Source }\n  foreach ($p in @(\"$env:LOCALAPPDATA\\Programs\\Ollama\\ollama.exe\", \"$env:ProgramFiles\\Ollama\\ollama.exe\")) { if (Test-Path $p) { return $p } }\n  return $null\n}\n\nStep 1 \"Installing Ollama\"\n$exe = Find-Ollama\nif ($exe) { Write-Host \"Ollama is already installed.\" }\nelse {\n  if (Get-Command winget -ErrorAction SilentlyContinue) {\n    winget install --id Ollama.Ollama -e --silent --accept-source-agreements --accept-package-agreements\n    $exe = Find-Ollama\n  }\n  if (-not $exe) {\n    $tmp = Join-Path $env:TEMP \"OllamaSetup.exe\"\n    Write-Host \"Downloading the installer from ollama.com (about 1 GB)...\"\n    try {\n      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12\n      $ProgressPreference = \"SilentlyContinue\"\n      Invoke-WebRequest \"https://ollama.com/download/OllamaSetup.exe\" -OutFile $tmp -UseBasicParsing\n      Start-Process $tmp -ArgumentList \"/VERYSILENT\", \"/NORESTART\" -Wait\n    } catch { Write-Host \"Download failed: $_\" -ForegroundColor Red }\n    $exe = Find-Ollama\n  }\n  if (-not $exe) { Done-Fail \"Couldn't install Ollama automatically. Install it from https://ollama.com/download and run this again.\" }\n  Write-Host \"Ollama installed.\"\n}\n\nStep 2 \"Allowing Procedure (and only Procedure) to use Ollama\"\n$allow = \"https://kefirman9000.github.io,file://*,null\"\n$cur = [Environment]::GetEnvironmentVariable(\"OLLAMA_ORIGINS\", \"User\")\nif ($cur -match \"kefirman9000\") { $allow = $cur } elseif ($cur) { $allow = \"$cur,$allow\" }\n[Environment]::SetEnvironmentVariable(\"OLLAMA_ORIGINS\", $allow, \"User\")\n$env:OLLAMA_ORIGINS = $allow\nWrite-Host \"Allowed: the Procedure website, the Procedure desktop app, and Procedure opened as a file on this PC. Other websites can't use it.\"\n\nStep 3 \"Starting Ollama\"\nGet-Process -Name \"ollama\", \"ollama app\" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\nStart-Sleep -Seconds 2\n$app = Join-Path (Split-Path $exe) \"ollama app.exe\"\nif (Test-Path $app) { Start-Process $app } else { Start-Process $exe -ArgumentList \"serve\" -WindowStyle Hidden }\n$up = $false\nfor ($i = 0; $i -lt 60; $i++) {\n  try { Invoke-RestMethod \"http://localhost:11434/api/version\" -TimeoutSec 2 | Out-Null; $up = $true; break } catch { Start-Sleep -Seconds 1 }\n}\nif (-not $up) { Done-Fail \"Ollama didn't start. Restart your computer, then run this again.\" }\nWrite-Host \"Ollama is running.\"\n\nStep 4 \"Downloading the AI model\"\nif ($Model -eq \"auto\") {\n  $gb = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB)\n  if ($gb -ge 16) { $Model = \"llama3.1:8b\" } elseif ($gb -ge 8) { $Model = \"llama3.2:3b\" } else { $Model = \"llama3.2:1b\" }\n  Write-Host \"This PC has $gb GB of memory, so using $Model.\"\n}\n& $exe pull $Model\nif ($LASTEXITCODE -ne 0) { Done-Fail \"The model download didn't finish. Check your internet connection and run this again.\" }\n\nWrite-Host \"\"\nWrite-Host \"All set! Local AI is ready ($Model).\" -ForegroundColor Green\nWrite-Host \"Go back to Procedure - it connects by itself within a few seconds.\"\nWrite-Host \"(Or open Answer engine and click 'Detect & connect'.)\"\nRead-Host \"Press Enter to close\" | Out-Null\n";
+let easyPoll = null;
+function easyMsg(h) { $("#easyMsg").innerHTML = h; }
+async function detectOllama(quiet) {
+  const base = ($("#ollamaUrl").value || S.ollamaUrl || "http://localhost:11434").replace(/\/$/, "");
+  try {
+    const r = await fetch(base + "/api/tags"); if (!r.ok) throw new Error(r.status);
+    const names = ((await r.json()).models || []).map(m => m.name);
+    if (!names.length) { if (!quiet) easyMsg("Ollama is running, but no AI model is downloaded yet. If the setup window is still downloading, give it a few minutes."); return false; }
+    const want = $("#easyModel").value;
+    const pick = names.find(n => want !== "auto" && n.startsWith(want)) || ["llama3.1:8b", "llama3.2:3b", "llama3.2:1b"].map(p => names.find(n => n.startsWith(p))).find(Boolean) || names[0];
+    S.engine = "ollama"; S.ollamaUrl = base; S.ollamaModel = pick; saveS();
+    $("#engine").value = "ollama"; $("#ollamaUrl").value = base; $("#ollamaModel").value = pick; showCfg(); renderLib();
+    easyMsg(`<span style="color:var(--ok)">✓ Connected to local AI (<b>${esc(pick)}</b>). Answers are now written on this computer.</span>`);
+    toast("Local AI is ready — using " + pick, 5000);
+    if (easyPoll) { clearInterval(easyPoll); easyPoll = null; }
+    return true;
+  } catch (e) {
+    if (!quiet) easyMsg("Ollama isn't reachable yet. If you haven't, click <b>Install local AI</b>. If it's installed, make sure it's running (look for the llama icon by the clock).");
+    return false;
+  }
+}
+function startEasyPoll() {
+  if (easyPoll) clearInterval(easyPoll); let n = 0;
+  easyPoll = setInterval(async () => { if (++n > 240 || await detectOllama(true)) { clearInterval(easyPoll); easyPoll = null; } }, 5000);
+}
+$("#easyDetect").addEventListener("click", () => { easyMsg('<span class="spin"></span>Looking for Ollama…'); detectOllama(false); });
+$("#easyInstall").addEventListener("click", async () => {
+  const model = $("#easyModel").value;
+  const text = SETUP_CMD.replace("__MODEL__", model).replace(/\r?\n/g, "\r\n");
+  if (DESKTOP && DESKTOP.setupOllama) {
+    if (!confirm("This opens a setup window that installs Ollama (free, from ollama.com) and downloads an AI model (1–5 GB).\n\nEverything runs on this computer. Continue?")) return;
+    await DESKTOP.setupOllama(text);
+    easyMsg('<span class="spin"></span>Follow the setup window. Procédure will connect by itself when it finishes.');
+  } else {
+    if (!/Windows/i.test(navigator.userAgent)) { easyMsg('The one-click setup is for Windows. On Mac or Linux, install Ollama from <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com</a>, run <code>ollama pull llama3.2</code>, then click <b>Detect &amp; connect</b>.'); return; }
+    download(text, "Setup-Local-AI.cmd", "application/octet-stream");
+    easyMsg('<b>1.</b> Open <b>Setup-Local-AI.cmd</b> from your Downloads.<br><b>2.</b> If Windows says "Windows protected your PC", click <b>More info → Run anyway</b>. It is the open setup script from this project.<br><b>3.</b> Follow the window. Procédure connects by itself when it\'s done.<br><span class="spin"></span>Waiting for local AI…');
+  }
+  startEasyPoll();
 });
 
 /* settings */

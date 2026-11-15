@@ -58,10 +58,13 @@ Anyone who can use your computer account can open the app and see your library, 
 
 PDF, Word, OCR and smart search download their helper libraries the first time you use them, so that step needs internet. After that, search runs on your computer.
 
-## Local AI with Ollama
-1. Install Ollama from https://ollama.com, then run `ollama pull llama3.1`.
-2. Set the Windows environment variable `OLLAMA_ORIGINS` to `*`, then restart Ollama.
-3. In the app, open **⚙ Answer engine**, choose Ollama, then click **Test engine**.
+## Local AI with Ollama (easy setup)
+If you want AI-written answers that stay on your computer:
+1. In the app, open **⚙ Answer engine** and click **Install local AI**. You can leave the model on "pick the best model for my PC".
+2. **Desktop app:** a setup window opens. **Web version:** a small `Setup-Local-AI.cmd` file downloads. Open it, and if Windows shows "Windows protected your PC", click *More info → Run anyway*.
+3. The setup installs [Ollama](https://ollama.com) (free), allows **only Procédure** to talk to it, and downloads a model sized to your PC's memory (1–5 GB). Procédure detects it and switches over by itself.
+
+You can read the setup script before running it: [`setup/Setup-Local-AI.cmd`](setup/Setup-Local-AI.cmd). On Mac or Linux, install Ollama from ollama.com, run `ollama pull llama3.2`, then click **Detect & connect**.
 
 ## Releasing an update
 Bump `VERSION` in `index.html` and `version` in `version.json`, then push to `main`. The web version updates automatically, and the Windows `.exe` files are built and published as a release automatically.

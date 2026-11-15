@@ -15,6 +15,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Check the local-AI setup script
+        shell: pwsh
+        run: |
+          $t = Get-Content setup/Setup-Local-AI.cmd -Raw
+          $errs = $null
+          [System.Management.Automation.Language.Parser]::ParseInput($t, [ref]$null, [ref]$errs) | Out-Null
+          if ($errs) { $errs | ForEach-Object { $_.ToString() }; exit 1 }
+          Write-Host "Setup script parses OK"
       - name: Build
         id: build
         shell: bash

@@ -2,6 +2,8 @@
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
+const { exec } = require("child_process");
 
 const updatedFile = () => path.join(app.getPath("userData"), "app", "index.html");
 const bundledFile = path.join(__dirname, "index.html");
@@ -34,6 +36,13 @@ ipcMain.handle("save-update", async (_e, html) => {
   fs.mkdirSync(path.dirname(updatedFile()), { recursive: true });
   fs.writeFileSync(updatedFile(), html, "utf8");
   win.loadFile(updatedFile());
+  return true;
+});
+// Easy local-AI setup: writes the open setup script to the temp folder and opens it in a visible window.
+ipcMain.handle("setup-ollama", async (_e, text) => {
+  const f = path.join(os.tmpdir(), "Procedure-Local-AI-Setup.cmd");
+  fs.writeFileSync(f, text, "utf8");
+  exec(`start "Procedure setup" "${f}"`, { shell: "cmd.exe" });
   return true;
 });
 ipcMain.handle("open-data", () => shell.openPath(app.getPath("userData")));
