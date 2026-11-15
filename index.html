@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procédure — Ask your SOPs &amp; MOPs</title>
+<style>
+:root{
+  --bg:#0f1216;--panel:#161b21;--panel2:#1d232b;--line:#2a323c;--text:#e6e9ee;--muted:#8b95a3;
+  --accent:#4fb3a9;--accent2:#e0a54b;--sop:#4f8fd6;--mop:#c47ad6;--hl:rgba(224,165,75,.28);--err:#e06b6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#06201d;font-weight:600}
+button.ghost{background:transparent;border-color:transparent;color:var(--muted);padding:4px 8px}
+button.ghost:hover{color:var(--text);border-color:var(--line)}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.app{display:grid;grid-template-columns:320px 1fr;height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{padding:16px 16px 10px;border-bottom:1px solid var(--line)}
+.brand h1{margin:0;font-size:18px;letter-spacing:.3px}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.drop{margin:12px;border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+.drop.over,.drop:hover{border-color:var(--accent);color:var(--text)}
+.drop b{color:var(--text)}
+.typepick{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.typepick label{display:flex;gap:4px;align-items:center;font-size:12px;cursor:pointer}
+.libhead{display:flex;justify-content:space-between;align-items:center;padding:4px 16px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.lib{flex:1;overflow:auto;padding:0 8px 8px}
+.doc{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer}
+.doc:hover{background:var(--panel2)}
+.doc .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc .meta{color:var(--muted);font-size:11px}
+.tag{font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;letter-spacing:.4px;cursor:pointer;user-select:none}
+.tag.SOP{background:rgba(79,143,214,.18);color:var(--sop)}
+.tag.MOP{background:rgba(196,122,214,.18);color:var(--mop)}
+.tag.OTHER{background:rgba(139,149,163,.18);color:var(--muted)}
+.doc .x{opacity:0}
+.doc:hover .x{opacity:1}
+.foot{border-top:1px solid var(--line);padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.foot button{font-size:12px;padding:4px 8px}
+.sponsor{width:100%;font-size:11px;color:var(--muted);margin-top:4px}
+.sponsor a{color:var(--accent2)}
+main{display:flex;flex-direction:column;min-height:0;min-width:0}
+.topbar{display:flex;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.topbar .grow{flex:1}
+.mode{font-size:12px;color:var(--muted)}
+.mode b{color:var(--accent)}
+.chat{flex:1;overflow:auto;padding:20px 16px}
+.inner{max-width:900px;margin:0 auto}
+.empty{color:var(--muted);text-align:center;margin-top:12vh}
+.empty h2{color:var(--text);font-weight:500}
+.empty .sugs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.empty .sugs button{font-size:12px}
+.q{margin:18px 0 8px;font-weight:600;font-size:15px}
+.q::before{content:"Q ";color:var(--accent)}
+.a{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.a h4{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.a .ans{white-space:pre-wrap}
+.cite{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--accent2);border-radius:4px;font-size:11px;padding:0 5px;margin:0 1px;cursor:pointer;vertical-align:1px}
+.cite:hover{border-color:var(--accent2)}
+.src{border-top:1px solid var(--line);padding:10px 0 4px;cursor:pointer}
+.src:first-of-type{border-top:none}
+.src .h{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:4px}
+.src .h .n{color:var(--accent2);font-weight:700}
+.src .h .d{color:var(--text);font-weight:600}
+.src .t{font-size:13px;color:#c9cfd8;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
+.src:hover .t{color:var(--text)}
+mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
+.err{color:var(--err)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+.askbar{border-top:1px solid var(--line);background:var(--panel);padding:12px 16px}
+.askbar .inner{display:flex;gap:8px;align-items:flex-end}
+.askbar textarea{flex:1;resize:none;min-height:42px;max-height:160px}
+.askbar select{max-width:200px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10}
+.modal.on{display:flex}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,94vw);max-height:88vh;display:flex;flex-direction:column}
+.box.wide{width:min(1000px,96vw)}
+.box header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.box header h3{margin:0;flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.box .body{padding:16px;overflow:auto}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.hint code{background:var(--bg);padding:1px 4px;border-radius:3px}
+.chunk{padding:10px 12px;border-left:3px solid transparent;white-space:pre-wrap;font-size:13px}
+.chunk .sec{font-size:11px;color:var(--muted);margin-bottom:2px}
+.chunk.focus{border-left-color:var(--accent2);background:rgba(224,165,75,.07)}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:8px 14px;border-radius:8px;z-index:20;display:none}
+@media (max-width:800px){.app{grid-template-columns:1fr}aside{max-height:40vh}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <h1>Procédure</h1>
+      <p>Ask questions of your SOPs &amp; MOPs</p>
+    </div>
+    <div class="drop" id="drop">
+      <b>Drop files here</b> or click to add<br>
+      <span style="font-size:12px">PDF · DOCX · TXT · MD · HTML · CSV</span>
+      <div class="typepick" onclick="event.stopPropagation()">
+        <label><input type="radio" name="dtype" value="AUTO" checked> Auto</label>
+        <label><input type="radio" name="dtype" value="SOP"> SOP</label>
+        <label><input type="radio" name="dtype" value="MOP"> MOP</label>
+      </div>
+      <input type="file" id="file" multiple hidden accept=".pdf,.docx,.txt,.md,.markdown,.html,.htm,.csv,.log,.json,.xml,.rtf">
+    </div>
+    <div class="libhead"><span id="libcount">Library</span><button class="ghost" id="pasteBtn" title="Paste text as a document">+ Paste text</button></div>
+    <div class="lib" id="lib"></div>
+    <div class="foot">
+      <button id="settingsBtn">⚙ Answer engine</button>
+      <button id="exportBtn" title="Save library to a .json file">Export</button>
+      <button id="importBtn" title="Load a library .json file">Import</button>
+      <button id="updateBtn">Check for updates</button>
+      <input type="file" id="importFile" hidden accept=".json">
+      <div class="sponsor">v<span id="ver"></span> · Free &amp; open source — if it helps, consider <a href="https://github.com/sponsors/kefirman9000" target="_blank" rel="noopener">sponsoring on GitHub</a> ♥</div>
+    </div>
+  </aside>
+  <main>
+    <div class="topbar">
+      <div class="mode" id="modeLabel"></div>
+      <div class="grow"></div>
+      <button class="ghost" id="clearChat">Clear chat</button>
+    </div>
+    <div class="chat" id="chat"><div class="inner" id="chatInner"></div></div>
+    <div class="askbar">
+      <div class="inner">
+        <select id="scope" title="Which documents to search"></select>
+        <textarea id="q" rows="1" placeholder="Ask a question about your procedures…  (Enter to ask, Shift+Enter for new line)"></textarea>
+        <button class="primary" id="askBtn">Ask</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Settings -->
+<div class="modal" id="settingsModal"><div class="box">
+  <header><h3>Answer engine</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <div class="field">
+      <label>Engine</label>
+      <select id="engine">
+        <option value="search">Search only — fully offline, no AI (shows best matching steps)</option>
+        <option value="ollama">Ollama — local AI on this computer</option>
+        <option value="openai">LM Studio / OpenAI-compatible server</option>
+        <option value="anthropic">Claude API (your own API key)</option>
+      </select>
+      <div class="hint">Search is always shown. AI engines additionally write a direct answer that cites the source passages.</div>
+    </div>
+    <div id="cfg-ollama" class="cfg">
+      <div class="field"><label>Ollama URL</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
+      <div class="field"><label>Model</label><input id="ollamaModel" placeholder="llama3.1"><div class="hint">Install from <code>ollama.com</code>, then run <code>ollama pull llama3.1</code>. If answers fail with a network error, set the Windows environment variable <code>OLLAMA_ORIGINS=*</code> and restart Ollama.</div></div>
+      <button id="ollamaList">List installed models</button> <span id="ollamaModels" class="hint"></span>
+    </div>
+    <div id="cfg-openai" class="cfg">
+      <div class="field"><label>Server base URL</label><input id="oaUrl" placeholder="http://localhost:1234/v1"></div>
+      <div class="field"><label>Model</label><input id="oaModel" placeholder="local-model"></div>
+      <div class="field"><label>API key (optional)</label><input id="oaKey" type="password" placeholder="leave blank for LM Studio"><div class="hint">In LM Studio: Developer tab → Start Server, and enable CORS.</div></div>
+    </div>
+    <div id="cfg-anthropic" class="cfg">
+      <div class="field"><label>Anthropic API key</label><input id="anKey" type="password" placeholder="sk-ant-…"><div class="hint">Stored only in this browser on this computer. Your question and the matching passages are sent to Anthropic.</div></div>
+      <div class="field"><label>Model</label><input id="anModel" placeholder="claude-sonnet-5-5"></div>
+    </div>
+    <div class="field"><label>Passages sent to the AI per question</label><input id="topK" type="number" min="3" max="20"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button id="testEngine">Test</button><button class="primary" id="saveSettings">Save</button></div>
+    <div id="testOut" class="hint"></div>
+  </div>
+</div></div>
+
+<!-- Viewer -->
+<div class="modal" id="viewModal"><div class="box wide">
+  <header><span class="tag" id="vTag"></span><h3 id="vTitle"></h3><input id="vFind" placeholder="Find in document" style="width:200px"><button class="ghost" data-close>✕</button></header>
+  <div class="body" id="vBody"></div>
+</div></div>
+
+<!-- Paste -->
+<div class="modal" id="pasteModal"><div class="box">
+  <header><h3>Paste a procedure</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <div class="field"><label>Title</label><input id="pTitle" placeholder="e.g. MOP-0142 Core switch firmware upgrade"></div>
+    <div class="field"><label>Type</label><select id="pType"><option>SOP</option><option>MOP</option><option>OTHER</option></select></div>
+    <div class="field"><label>Text</label><textarea id="pText" rows="14"></textarea></div>
+    <div style="text-align:right"><button class="primary" id="pSave">Add to library</button></div>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const VERSION = "1.0.0";
+const REPO = "kefirman9000/procedure";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+$("#ver").textContent = VERSION;
+
+function toast(msg, ms=2600){const t=$("#toast");t.textContent=msg;t.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>t.style.display="none",ms);}
+
+/* ---------------- Storage (IndexedDB) ---------------- */
+const DB = {
+  db:null,
+  open(){return new Promise((res,rej)=>{const r=indexedDB.open("procedure",1);r.onupgradeneeded=()=>r.result.createObjectStore("docs",{keyPath:"id"});r.onsuccess=()=>{this.db=r.result;res()};r.onerror=()=>rej(r.error);});},
+  tx(mode){return this.db.transaction("docs",mode).objectStore("docs");},
+  all(){return new Promise((res,rej)=>{const r=this.tx("readonly").getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});},
+  put(d){return new Promise((res,rej)=>{const r=this.tx("readwrite").put(d);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});},
+  del(id){return new Promise((res,rej)=>{const r=this.tx("readwrite").delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
+};
+const memStore = new Map(); let useMem = false; // fallback if IndexedDB is blocked
+async function storeAll(){return useMem?[...memStore.values()]:DB.all();}
+async function storePut(d){if(useMem)memStore.set(d.id,d);else await DB.put(d);}
+async function storeDel(id){if(useMem)memStore.delete(id);else await DB.del(id);}
+
+/* ---------------- Settings ---------------- */
+const defaults = {engine:"search",ollamaUrl:"http://localhost:11434",ollamaModel:"llama3.1",oaUrl:"http://localhost:1234/v1",oaModel:"local-model",oaKey:"",anKey:"",anModel:"claude-sonnet-5-5",topK:8};
+let S = {...defaults};
+try{Object.assign(S, JSON.parse(localStorage.getItem("procedure.settings")||"{}"));}catch(e){}
+function saveS(){try{localStorage.setItem("procedure.settings",JSON.stringify(S));}catch(e){}}
+
+/* ---------------- Text processing ---------------- */
+const STOP = new Set("a an and are as at be been but by can could do does did for from has have how i if in into is it its may must not of on or our shall should so such than that the their then there these they this to was we were what when where which who why will with would you your".split(" "));
+function stem(w){
+  if(w.length<=3) return w;
+  return w.replace(/(ization|isation)$/,"ize").replace(/(ational)$/,"ate").replace(/(iveness|fulness|ousness)$/,"")
+          .replace(/(ies)$/,"y").replace(/(sses)$/,"ss").replace(/([^s])s$/,"$1")
+          .replace(/(ing|edly|ed|ly|ment)$/,m=>w.length-m.length>=3?"":m);
+}
+function tokens(text){
+  const out=[]; const re=/[a-z0-9][a-z0-9\-_.\/]*[a-z0-9]|[a-z0-9]/gi; let m;
+  while((m=re.exec(text.toLowerCase()))){
+    const raw=m[0];
+    const parts = /[\-_.\/]/.test(raw) ? [raw, ...raw.split(/[\-_.\/]+/)] : [raw];
+    for(const p of parts){ if(!p||STOP.has(p)) continue; out.push(/\d/.test(p)?p:stem(p)); }
+  }
+  return out;
+}
+const HEADING_RE = /^(#{1,6}\s+.+|(step\s+\d+[\.:)]?|section\s+\d+|phase\s+\d+|appendix\s+[a-z0-9]+)\b.*|\d+(\.\d+){0,4}[\.)]?\s+[A-Z][^.!?]{0,80}|[A-Z][A-Z0-9 \-&\/,()]{3,70})$/i;
+function isHeading(line){
+  const l=line.trim(); if(!l||l.length>90) return false;
+  if(/^#{1,6}\s/.test(l)) return true;
+  if(/^(step|section|phase|appendix|procedure|purpose|scope|prerequisites?|rollback|back-?out|verification|responsibilit(y|ies)|definitions|references|safety|warnings?|precautions?)\b/i.test(l) && l.length<70 && !/[.;]$/.test(l)) return true;
+  if(/^\d+(\.\d+){0,4}[\.)]?\s+\S/.test(l) && l.length<70 && !/[.;:,]$/.test(l)) return true;
+  if(l===l.toUpperCase() && /[A-Z]{3}/.test(l) && l.length<70) return true;
+  return false;
+}
+// blocks: [{text, heading?, page?}] -> chunks with section path
+function chunkBlocks(blocks){
+  const chunks=[]; let sec=""; let buf=[]; let bufLen=0; let page=null; const MAX=900;
+  const flush=()=>{ if(!buf.length) return; const text=buf.join("\n").trim(); if(text) chunks.push({sec, page, text}); buf=[]; bufLen=0; };
+  for(const b of blocks){
+    const t=(b.text||"").replace(/\s+\n/g,"\n").trim(); if(!t) continue;
+    if(b.heading || isHeading(t)){ flush(); sec=t.replace(/^#+\s*/,""); page=b.page??page; continue; }
+    if(bufLen && bufLen+t.length>MAX) flush();
+    if(!buf.length) page=b.page??page;
+    if(t.length>MAX*1.6){ // split long paragraph by sentences
+      const sents=t.match(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g)||[t]; let cur="";
+      for(const s of sents){ if(cur.length+s.length>MAX){ buf.push(cur); flush(); cur=""; page=b.page??page;} cur+=s; }
+      if(cur){buf.push(cur); bufLen+=cur.length;}
+    } else { buf.push(t); bufLen+=t.length; }
+  }
+  flush();
+  return chunks;
+}
+function textToBlocks(text, page){
+  // Split into lines; merge wrapped lines into paragraphs, keep list items/steps separate
+  const lines=text.replace(/\r/g,"").split("\n"); const blocks=[]; let para="";
+  const push=()=>{ if(para.trim()) blocks.push({text:para.trim(), page}); para=""; };
+  for(const raw of lines){
+    const l=raw.trim();
+    if(!l){ push(); continue; }
+    if(isHeading(l)){ push(); blocks.push({text:l, heading:true, page}); continue; }
+    if(/^([-*•▪◦●]|\(?[a-z0-9]{1,3}[\.)])\s+/i.test(l)){ push(); para=l; continue; }
+    para += (para?" ":"") + l;
+  }
+  push(); return blocks;
+}
+
+/* ---------------- File parsing ---------------- */
+const libCache={};
+function loadScript(src){ if(libCache[src]) return libCache[src];
+  return libCache[src]=new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>{delete libCache[src];rej(new Error("Couldn't load "+src.split("/").pop()+" — reading PDF/DOCX needs an internet connection the first time."));};document.head.appendChild(s);});
+}
+async function parsePDF(buf){
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+  const pdfjs=window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const pdf=await pdfjs.getDocument({data:buf}).promise; const blocks=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p); const tc=await page.getTextContent(); let text=""; let lastY=null;
+    for(const it of tc.items){
+      const y=it.transform?it.transform[5]:null;
+      if(lastY!==null && y!==null && Math.abs(y-lastY)>2 && !text.endsWith("\n")) text+="\n";
+      text+=it.str; if(it.hasEOL) text+="\n"; lastY=y;
+    }
+    blocks.push(...textToBlocks(text,p));
+  }
+  return {blocks, pages:pdf.numPages};
+}
+async function parseDOCX(buf){
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js");
+  const r=await window.mammoth.convertToHtml({arrayBuffer:buf});
+  return {blocks: htmlToBlocks(r.value)};
+}
+function htmlToBlocks(html){
+  const doc=new DOMParser().parseFromString(html,"text/html"); doc.querySelectorAll("script,style").forEach(e=>e.remove());
+  const blocks=[];
+  doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,pre,td,th,dt,dd,blockquote").forEach(el=>{
+    if(el.closest("li")&&el.tagName!=="LI"&&el.closest("li")!==el) return;
+    if(el.tagName==="LI" && el.querySelector("li")) { const own=[...el.childNodes].filter(n=>!(n.nodeType===1&&/^(UL|OL)$/.test(n.tagName))).map(n=>n.textContent).join(" ").trim(); if(own) blocks.push({text:"• "+own}); return; }
+    if((el.tagName==="TD"||el.tagName==="TH") && el.querySelector("p")) return;
+    if(el.tagName==="P" && el.closest("li")) return;
+    const t=el.textContent.replace(/\s+/g," ").trim(); if(!t) return;
+    const isH=/^H\d$/.test(el.tagName);
+    blocks.push({text: el.tagName==="LI"?"• "+t:t, heading:isH});
+  });
+  if(!blocks.length) return textToBlocks(doc.body.textContent||"");
+  return blocks;
+}
+function guessType(name,text){
+  const s=(name+" "+text.slice(0,3000)).toLowerCase();
+  if(/\bmop\b|method of procedure|maintenance window|back-?out plan|rollback plan|change request/.test(s)) return "MOP";
+  if(/\bsop\b|standard operating procedure/.test(s)) return "SOP";
+  return "SOP";
+}
+async function addFiles(files){
+  const pick=document.querySelector('input[name=dtype]:checked').value;
+  for(const f of files){
+    const ext=(f.name.split(".").pop()||"").toLowerCase();
+    toast("Reading "+f.name+"…",60000);
+    try{
+      let parsed;
+      if(ext==="pdf") parsed=await parsePDF(await f.arrayBuffer());
+      else if(ext==="docx") parsed=await parseDOCX(await f.arrayBuffer());
+      else if(ext==="html"||ext==="htm") parsed={blocks:htmlToBlocks(await f.text())};
+      else if(ext==="rtf") parsed={blocks:textToBlocks((await f.text()).replace(/\\par[d]?/g,"\n").replace(/\{\*?\\[^{}]+}|[{}]|\\[a-z]+-?\d* ?/gi,""))};
+      else parsed={blocks:textToBlocks(await f.text())};
+      const chunks=chunkBlocks(parsed.blocks);
+      if(!chunks.length){ toast("No readable text in "+f.name+" (scanned PDFs need OCR first)",5000); continue; }
+      const full=chunks.map(c=>c.text).join("\n");
+      const doc={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()), name:f.name.replace(/\.[^.]+$/,""), file:f.name,
+        type: pick==="AUTO"?guessType(f.name,full):pick, added:Date.now(), pages:parsed.pages||null, chunks};
+      await storePut(doc);
+    }catch(e){ console.error(e); toast("Couldn't read "+f.name+": "+e.message,6000); }
+  }
+  toast("Library updated");
+  await refresh();
+}
+
+/* ---------------- Index (BM25) ---------------- */
+let DOCS=[]; let IDX=null;
+function buildIndex(){
+  const items=[]; const df=new Map();
+  for(const d of DOCS) d.chunks.forEach((c,i)=>{
+    const toks=tokens((c.sec?c.sec+" ":"")+c.text+" "+d.name);
+    const tf=new Map(); for(const t of toks) tf.set(t,(tf.get(t)||0)+1);
+    for(const t of tf.keys()) df.set(t,(df.get(t)||0)+1);
+    items.push({doc:d, i, c, tf, len:toks.length});
+  });
+  const avg=items.reduce((a,b)=>a+b.len,0)/(items.length||1);
+  IDX={items, df, avg, N:items.length};
+}
+function search(q, scope, k=10){
+  if(!IDX||!IDX.N) return [];
+  const qt=[...new Set(tokens(q))]; if(!qt.length) return [];
+  const {items,df,avg,N}=IDX; const k1=1.4,b=0.7; const res=[];
+  const phrase=q.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+  for(const it of items){
+    if(scope!=="ALL"){ if(scope==="SOP"||scope==="MOP"){ if(it.doc.type!==scope) continue; } else if(it.doc.id!==scope) continue; }
+    let s=0, hit=0;
+    for(const t of qt){ const f=it.tf.get(t); if(!f) continue; hit++; const n=df.get(t)||0; const idf=Math.log(1+(N-n+.5)/(n+.5)); s+=idf*(f*(k1+1))/(f+k1*(1-b+b*it.len/avg)); }
+    if(!s) continue;
+    s*= 1 + 0.5*(hit/qt.length);                       // reward covering more of the question
+    if(phrase.length>8 && it.c.text.toLowerCase().includes(phrase)) s*=1.5;
+    if(it.c.sec){ const st=tokens(it.c.sec); if(qt.some(t=>st.includes(t))) s*=1.15; }
+    res.push({...it, score:s});
+  }
+  res.sort((a,b)=>b.score-a.score);
+  return res.slice(0,k);
+}
+function highlight(text, q){
+  const qt=new Set(tokens(q)); if(!qt.size) return esc(text);
+  return esc(text).replace(/[A-Za-z0-9][A-Za-z0-9\-_]*/g, w=>{ const lw=w.toLowerCase(); return (qt.has(lw)||qt.has(stem(lw)))?"<mark>"+w+"</mark>":w; });
+}
+function bestSentences(hits,q,n=3){
+  const qt=new Set(tokens(q)); const cand=[];
+  hits.slice(0,4).forEach((h,hi)=>{
+    const sents=h.c.text.split(/(?<=[.!?])\s+|\n+/).map(s=>s.trim()).filter(s=>s.length>12);
+    sents.forEach((s,si)=>{ const st=tokens(s); let m=0; const seen=new Set(); for(const t of st) if(qt.has(t)&&!seen.has(t)){m++;seen.add(t);} if(m) cand.push({s, score:m/Math.sqrt(qt.size)+(4-hi)*0.15-si*0.01, ref:hi+1}); });
+  });
+  cand.sort((a,b)=>b.score-a.score);
+  return cand.slice(0,n);
+}
+
+/* ---------------- AI engines ---------------- */
+const SYS = `You answer questions about an organization's Standard Operating Procedures (SOPs) and Methods of Procedure (MOPs).
+Rules:
+- Use ONLY the numbered source passages provided. Do not use outside knowledge for procedure details.
+- Cite sources inline like [1] or [2][4] after each claim.
+- When the answer is a procedure, give the steps in order, keeping the original step numbers, values, commands and warnings exactly.
+- Always mention any safety warnings, prerequisites, approvals, or rollback/back-out steps that the passages attach to the steps you give.
+- If the passages don't contain the answer, say plainly that the documents don't cover it, and mention the closest related passage if any.
+- Be concise.`;
+function buildPrompt(q,hits){
+  const ctx=hits.map((h,i)=>`[${i+1}] ${h.doc.type} "${h.doc.name}"${h.c.sec?" — "+h.c.sec:""}${h.c.page?" (p."+h.c.page+")":""}\n${h.c.text}`).join("\n\n");
+  return `Source passages:\n\n${ctx}\n\nQuestion: ${q}`;
+}
+async function aiAnswer(q,hits,history){
+  const user=buildPrompt(q,hits);
+  const hist=history.slice(-4).flatMap(h=>[{role:"user",content:h.q},{role:"assistant",content:h.a||"(no answer)"}]);
+  if(S.engine==="ollama"){
+    const r=await fetch(S.ollamaUrl.replace(/\/$/,"")+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:S.ollamaModel,stream:false,options:{temperature:0.1},messages:[{role:"system",content:SYS},...hist,{role:"user",content:user}]})});
+    if(!r.ok) throw new Error("Ollama: "+r.status+" "+(await r.text()).slice(0,200));
+    return (await r.json()).message.content;
+  }
+  if(S.engine==="openai"){
+    const h={"Content-Type":"application/json"}; if(S.oaKey) h.Authorization="Bearer "+S.oaKey;
+    const r=await fetch(S.oaUrl.replace(/\/$/,"")+"/chat/completions",{method:"POST",headers:h,body:JSON.stringify({model:S.oaModel,temperature:0.1,messages:[{role:"system",content:SYS},...hist,{role:"user",content:user}]})});
+    if(!r.ok) throw new Error("Server: "+r.status+" "+(await r.text()).slice(0,200));
+    return (await r.json()).choices[0].message.content;
+  }
+  if(S.engine==="anthropic"){
+    if(!S.anKey) throw new Error("Add your Anthropic API key in Answer engine settings.");
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":S.anKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:S.anModel,max_tokens:1500,system:SYS,messages:[...hist,{role:"user",content:user}]})});
+    if(!r.ok) throw new Error("Claude API: "+r.status+" "+(await r.text()).slice(0,300));
+    return (await r.json()).content.map(b=>b.text||"").join("");
+  }
+  return null;
+}
+
+/* ---------------- UI ---------------- */
+let HISTORY=[];
+function renderLib(){
+  const lib=$("#lib"); const n=DOCS.length;
+  $("#libcount").textContent=`Library · ${n} doc${n===1?"":"s"}`;
+  if(!n){ lib.innerHTML='<div class="hint" style="padding:8px">No documents yet. Add your SOPs and MOPs above — everything stays on this computer.</div>'; }
+  else lib.innerHTML=DOCS.map(d=>`<div class="doc" data-id="${d.id}"><span class="tag ${d.type}" data-flip title="Click to change type">${d.type}</span><span class="name" title="${esc(d.file||d.name)}">${esc(d.name)}</span><span class="meta">${d.pages?d.pages+"p":d.chunks.length+"§"}</span><button class="ghost x" data-del title="Remove">✕</button></div>`).join("");
+  const sc=$("#scope"); const cur=sc.value||"ALL";
+  sc.innerHTML=`<option value="ALL">All documents</option><option value="SOP">SOPs only</option><option value="MOP">MOPs only</option>`+DOCS.map(d=>`<option value="${d.id}">${esc(d.name.slice(0,40))}</option>`).join("");
+  sc.value=[...sc.options].some(o=>o.value===cur)?cur:"ALL";
+  const names={search:"Search only (offline)",ollama:"Ollama · "+S.ollamaModel,openai:"Local server · "+S.oaModel,anthropic:"Claude API · "+S.anModel};
+  $("#modeLabel").innerHTML="Answer engine: <b>"+esc(names[S.engine])+"</b>";
+  if(!HISTORY.length) renderEmpty();
+}
+function renderEmpty(){
+  const sugs = DOCS.length ? ["What are the prerequisites?","What is the rollback procedure?","Who needs to approve this change?","What safety precautions are required?"] : [];
+  $("#chatInner").innerHTML=`<div class="empty"><h2>${DOCS.length?"Ask anything about your procedures":"Add SOPs and MOPs to get started"}</h2>
+  <div>${DOCS.length?"Answers come straight from your documents, with links to the exact section.":"Drop PDF, Word or text files on the left. Nothing is uploaded — it all stays in this browser."}</div>
+  <div class="sugs">${sugs.map(s=>`<button data-sug>${s}</button>`).join("")}</div></div>`;
+}
+async function refresh(){ DOCS=(await storeAll()).sort((a,b)=>a.name.localeCompare(b.name)); buildIndex(); renderLib(); }
+
+function srcHTML(hits,q){
+  return hits.map((h,i)=>`<div class="src" data-doc="${h.doc.id}" data-chunk="${h.i}"><div class="h"><span class="n">[${i+1}]</span><span class="tag ${h.doc.type}">${h.doc.type}</span><span class="d">${esc(h.doc.name)}</span>${h.c.sec?"<span>› "+esc(h.c.sec)+"</span>":""}${h.c.page?"<span>· p."+h.c.page+"</span>":""}</div><div class="t">${highlight(h.c.text,q)}</div></div>`).join("");
+}
+function linkCites(text,hits){
+  return esc(text).replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g,(m,g)=>g.split(/\s*,\s*/).map(n=>{const h=hits[+n-1]; return h?`<span class="cite" data-doc="${h.doc.id}" data-chunk="${h.i}" title="${esc(h.doc.name)}">${n}</span>`:"["+n+"]";}).join(""))
+    .replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+}
+async function ask(qText){
+  const q=(qText??$("#q").value).trim(); if(!q) return;
+  if(!DOCS.length){ toast("Add some documents first"); return; }
+  $("#q").value=""; autoGrow();
+  if(!HISTORY.length) $("#chatInner").innerHTML="";
+  const scope=$("#scope").value;
+  // include the previous question's words for short follow-ups ("and the rollback?")
+  const prev=HISTORY.length?HISTORY[HISTORY.length-1].q:"";
+  let hits=search(q,scope,Math.max(S.topK,6));
+  if(prev && tokens(q).length<=3){ const more=search(q+" "+prev,scope,Math.max(S.topK,6)); if(more.length) hits=more; }
+  const wrap=document.createElement("div");
+  wrap.innerHTML=`<div class="q">${esc(q)}</div>`;
+  const ansBox=document.createElement("div"); ansBox.className="a";
+  const srcBox=document.createElement("div"); srcBox.className="a";
+  wrap.append(ansBox,srcBox); $("#chatInner").append(wrap);
+  const entry={q,a:""}; HISTORY.push(entry);
+  if(!hits.length){
+    ansBox.innerHTML=`<h4>Answer</h4><div class="ans">Nothing in ${scope==="ALL"?"your library":"this scope"} matches that. Try different wording, a step name, or a system/equipment name.</div>`;
+    srcBox.remove(); scrollEnd(); return;
+  }
+  srcBox.innerHTML=`<h4>Sources — click to open in document</h4>`+srcHTML(hits.slice(0,S.engine==="search"?8:S.topK),q);
+  if(S.engine==="search"){
+    const bs=bestSentences(hits,q);
+    entry.a=bs.map(b=>b.s).join(" ");
+    ansBox.innerHTML=`<h4>Best matching lines</h4><div class="ans">${bs.length?bs.map(b=>`• ${highlight(b.s,q)} ${linkCites("["+b.ref+"]",hits)}`).join("\n"):"See the matching sections below."}</div>`;
+  } else {
+    ansBox.innerHTML=`<h4>Answer</h4><div class="ans"><span class="spin"></span>Reading the procedures…</div>`;
+    scrollEnd();
+    try{
+      const a=await aiAnswer(q,hits.slice(0,S.topK),HISTORY.slice(0,-1));
+      entry.a=a; ansBox.innerHTML=`<h4>Answer</h4><div class="ans">${linkCites(a.trim(),hits)}</div>`;
+    }catch(e){
+      const bs=bestSentences(hits,q);
+      ansBox.innerHTML=`<h4>Answer</h4><div class="ans err">${esc(e.message.includes("Failed to fetch")?"Couldn't reach the AI engine. Is it running? (For Ollama, set OLLAMA_ORIGINS=* and restart it.)":e.message)}</div><div class="ans" style="margin-top:8px">${bs.map(b=>`• ${highlight(b.s,q)} ${linkCites("["+b.ref+"]",hits)}`).join("\n")}</div>`;
+    }
+  }
+  scrollEnd();
+}
+function scrollEnd(){ const c=$("#chat"); c.scrollTop=c.scrollHeight; }
+function autoGrow(){ const t=$("#q"); t.style.height="auto"; t.style.height=Math.min(160,t.scrollHeight)+"px"; }
+
+function openDoc(id, chunk, q){
+  const d=DOCS.find(x=>x.id===id); if(!d) return;
+  $("#vTag").className="tag "+d.type; $("#vTag").textContent=d.type; $("#vTitle").textContent=d.name;
+  let lastSec=null;
+  $("#vBody").innerHTML=d.chunks.map((c,i)=>{ const showSec=c.sec&&c.sec!==lastSec; lastSec=c.sec;
+    return `<div class="chunk${i===chunk?" focus":""}" id="ch${i}">${showSec?`<div class="sec">${esc(c.sec)}${c.page?" · p."+c.page:""}</div>`:""}${i===chunk&&q?highlight(c.text,q):esc(c.text)}</div>`;}).join("");
+  $("#vFind").value=""; show("#viewModal");
+  if(chunk!=null) setTimeout(()=>$("#ch"+chunk)?.scrollIntoView({block:"center"}),30);
+}
+$("#vFind").addEventListener("input",e=>{
+  const v=e.target.value.trim().toLowerCase(); const d=DOCS.find(x=>x.name===$("#vTitle").textContent);
+  document.querySelectorAll("#vBody .chunk").forEach((el,i)=>{
+    const c=d?.chunks[i]; if(!c) return; const sec=el.querySelector(".sec")?.outerHTML||"";
+    if(!v){ el.innerHTML=sec+esc(c.text); el.style.display=""; return; }
+    const hit=c.text.toLowerCase().includes(v)||(c.sec||"").toLowerCase().includes(v);
+    el.style.display=hit?"":"none";
+    if(hit) el.innerHTML=sec+esc(c.text).replace(new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"),"gi"),m=>"<mark>"+m+"</mark>");
+  });
+});
+
+function show(sel){ $(sel).classList.add("on"); }
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m||e.target.hasAttribute("data-close")) m.classList.remove("on"); }));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".modal.on").forEach(m=>m.classList.remove("on")); });
+
+/* events */
+const drop=$("#drop");
+drop.addEventListener("click",()=>$("#file").click());
+$("#file").addEventListener("change",e=>{ addFiles([...e.target.files]); e.target.value=""; });
+["dragenter","dragover"].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();if(ev==="drop"||e.target===document.documentElement)drop.classList.remove("over");}));
+document.addEventListener("drop",e=>{ if(e.dataTransfer?.files?.length) addFiles([...e.dataTransfer.files]); });
+
+$("#lib").addEventListener("click",async e=>{
+  const row=e.target.closest(".doc"); if(!row) return; const d=DOCS.find(x=>x.id===row.dataset.id);
+  if(e.target.hasAttribute("data-del")){ if(confirm(`Remove "${d.name}" from the library?`)){ await storeDel(d.id); await refresh(); } return; }
+  if(e.target.hasAttribute("data-flip")){ d.type={SOP:"MOP",MOP:"OTHER",OTHER:"SOP"}[d.type]; await storePut(d); await refresh(); return; }
+  openDoc(d.id,null);
+});
+$("#chatInner").addEventListener("click",e=>{
+  const s=e.target.closest("[data-doc]"); if(s){ const q=s.closest(".a")?.parentElement?.querySelector(".q")?.textContent||""; openDoc(s.dataset.doc,+s.dataset.chunk,q); return; }
+  if(e.target.hasAttribute("data-sug")) ask(e.target.textContent);
+});
+$("#askBtn").addEventListener("click",()=>ask());
+$("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); ask(); } });
+$("#q").addEventListener("input",autoGrow);
+$("#clearChat").addEventListener("click",()=>{ HISTORY=[]; renderEmpty(); });
+
+$("#pasteBtn").addEventListener("click",()=>{ $("#pTitle").value=""; $("#pText").value=""; show("#pasteModal"); });
+$("#pSave").addEventListener("click",async()=>{
+  const text=$("#pText").value.trim(); if(!text) return;
+  const name=$("#pTitle").value.trim()||text.split("\n")[0].slice(0,60);
+  await storePut({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()), name, file:"(pasted)", type:$("#pType").value, added:Date.now(), chunks:chunkBlocks(textToBlocks(text))});
+  $("#pasteModal").classList.remove("on"); await refresh(); toast("Added "+name);
+});
+
+/* settings */
+const F=["engine","ollamaUrl","ollamaModel","oaUrl","oaModel","oaKey","anKey","anModel","topK"];
+function showCfg(){ document.querySelectorAll(".cfg").forEach(c=>c.style.display=c.id==="cfg-"+$("#engine").value?"":"none"); }
+$("#settingsBtn").addEventListener("click",()=>{ F.forEach(k=>$("#"+k).value=S[k]); showCfg(); $("#testOut").textContent=""; show("#settingsModal"); });
+$("#engine").addEventListener("change",showCfg);
+function readForm(){ F.forEach(k=>S[k]=k==="topK"?Math.max(3,Math.min(20,+$("#topK").value||8)):$("#"+k).value.trim()); }
+$("#saveSettings").addEventListener("click",()=>{ readForm(); saveS(); renderLib(); $("#settingsModal").classList.remove("on"); toast("Saved"); });
+$("#testEngine").addEventListener("click",async()=>{
+  readForm(); const o=$("#testOut");
+  if(S.engine==="search"){ o.textContent="Search-only mode needs no setup."; return; }
+  o.innerHTML='<span class="spin"></span>Testing…';
+  try{ const a=await aiAnswer("What is step 1?",[{doc:{type:"SOP",name:"Test"},c:{sec:"Procedure",text:"Step 1: Put on safety glasses."}}],[]); o.textContent="✓ Works. Reply: "+a.slice(0,140); }
+  catch(e){ o.innerHTML='<span class="err">'+esc(e.message.includes("Failed to fetch")?"Couldn't connect. Check it's running and allows browser requests (Ollama: OLLAMA_ORIGINS=*; LM Studio: enable CORS).":e.message)+"</span>"; }
+});
+$("#ollamaList").addEventListener("click",async()=>{
+  try{ const r=await fetch($("#ollamaUrl").value.replace(/\/$/,"")+"/api/tags"); const j=await r.json(); const names=j.models.map(m=>m.name);
+    $("#ollamaModels").innerHTML=names.length?names.map(n=>`<a href="#" data-m="${esc(n)}" style="color:var(--accent)">${esc(n)}</a>`).join(" · "):"No models installed.";
+    $("#ollamaModels").onclick=e=>{ if(e.target.dataset.m){ e.preventDefault(); $("#ollamaModel").value=e.target.dataset.m; } };
+  }catch(e){ $("#ollamaModels").innerHTML='<span class="err">Not reachable — is Ollama running with OLLAMA_ORIGINS=* ?</span>'; }
+});
+
+/* export / import */
+$("#exportBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify({app:"procedure",version:VERSION,docs:DOCS})],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="procedure-library-"+new Date().toISOString().slice(0,10)+".json"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+});
+$("#importBtn").addEventListener("click",()=>$("#importFile").click());
+$("#importFile").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  try{ const j=JSON.parse(await f.text()); const docs=j.docs||[]; let n=0; for(const d of docs){ if(d.id&&d.chunks){ await storePut(d); n++; } } await refresh(); toast("Imported "+n+" document"+(n===1?"":"s")); }
+  catch(err){ toast("That file isn't a Procédure library export",4000); }
+});
+
+/* updater — only acts when the user accepts */
+function newer(a,b){ const x=a.split(".").map(Number),y=b.split(".").map(Number); for(let i=0;i<3;i++){ if((x[i]||0)>(y[i]||0)) return true; if((x[i]||0)<(y[i]||0)) return false; } return false; }
+$("#updateBtn").addEventListener("click",async()=>{
+  try{
+    const r=await fetch(`https://raw.githubusercontent.com/${REPO}/main/version.json?t=${Date.now()}`); if(!r.ok) throw new Error(r.status);
+    const v=await r.json();
+    if(!newer(v.version,VERSION)){ toast("You're on the latest version ("+VERSION+")"); return; }
+    if(!confirm(`Version ${v.version} is available (you have ${VERSION}).\n\n${v.notes||""}\n\nUpdate now? Your library is kept.`)) return;
+    if(location.protocol.startsWith("http")){ location.reload(); return; }
+    const html=await (await fetch(`https://raw.githubusercontent.com/${REPO}/main/index.html?t=${Date.now()}`)).text();
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([html],{type:"text/html"})); a.download="Procedure.html"; a.click();
+    alert("The new version was downloaded as Procedure.html.\nReplace your old copy with it and open it — your library is kept in this browser.\n(If you renamed the file or moved folders, use Export/Import to carry your library over.)");
+  }catch(e){ toast("Couldn't check for updates (offline?)",4000); }
+});
+
+/* boot */
+(async()=>{
+  try{ await DB.open(); }catch(e){ useMem=true; toast("Browser storage is blocked — documents will be kept only until you close this tab. Use Export to save.",8000); }
+  await refresh();
+})();
+</script>
+</body>
+</html>
