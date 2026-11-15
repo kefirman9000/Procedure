@@ -5,6 +5,24 @@ Ask questions of your **SOPs** (Standard Operating Procedures) and **MOPs** (Met
 **Use it on the web:** https://kefirman9000.github.io/procedure/
 **Windows desktop app:** [latest release](https://github.com/kefirman9000/procedure/releases/latest) (installer or portable .exe)
 
+## Screenshots
+**Ask a question:** answers point to the exact section of the procedure
+![Asking a question](docs/screenshots/1-ask.png)
+
+**Privacy panel:** see what stays on your computer and every connection the app makes
+![Privacy panel](docs/screenshots/5-privacy.png)
+
+**Checklist mode:** tick off a MOP during the maintenance window, with times and notes
+![Checklist mode](docs/screenshots/2-checklist.png)
+
+**Revision history:** compare any two versions of a procedure
+![Revision compare](docs/screenshots/3-history.png)
+
+**Audit:** find procedures missing rollback, verification, approvals and other sections
+![Audit](docs/screenshots/4-audit.png)
+
+*Screenshots use made-up sample procedures.*
+
 ## 🔒 Privacy & safety — your information isn't going anywhere
 **Your documents are never uploaded, including when you use the GitHub web version.** Procédure is a single page of code that runs entirely inside your own browser (or the desktop app). GitHub Pages only delivers the app to you. It never receives your files, questions or answers. There is no server, no account, no tracking and no analytics.
 

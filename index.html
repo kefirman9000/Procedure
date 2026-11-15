@@ -396,7 +396,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 
 <script>
 "use strict";
-const VERSION = "1.2.0";
+const VERSION = "1.2.1";
 const REPO = "kefirman9000/procedure";
 const DESKTOP = window.procedureDesktop || null;
 const $ = s => document.querySelector(s);
@@ -733,6 +733,7 @@ async function search(q, scope, k = 10) {
       s *= 1 + 0.5 * (hit / base);
       if (phrase.length > 8 && it.c.text.toLowerCase().includes(phrase)) s *= 1.5;
       if (it.c.sec) { const st = tokens(it.c.sec); if ([...qw.keys()].some(t => st.includes(t))) s *= 1.15; }
+      if (isTitleOnly(it)) s *= 0.25; // a chunk that is just the document title isn't an answer
     }
     const cos = qv && it.c.emb ? dot(qv, it.c.emb) : 0;
     if (!s && cos < 0.45) continue;
@@ -745,6 +746,7 @@ async function search(q, scope, k = 10) {
   res.sort((a, b) => b.score - a.score);
   return res.slice(0, k);
 }
+function isTitleOnly(h) { const t = h.c.text.trim().toLowerCase(); return !h.c.sec && t.length < 160 && (t === h.doc.name.toLowerCase() || t.split("\n").length === 1 && familyKey(t) === h.doc.family); }
 function highlight(text, q) {
   const qt = new Set(queryTerms(q).keys()); if (!qt.size) return esc(text);
   return esc(text).replace(/[A-Za-z0-9][A-Za-z0-9\-_]*/g, w => { const lw = w.toLowerCase(); return (qt.has(lw) || qt.has(stem(lw))) ? "<mark>" + w + "</mark>" : w; });
@@ -752,6 +754,7 @@ function highlight(text, q) {
 function bestSentences(hits, q, n = 3) {
   const qw = queryTerms(q); const cand = [];
   hits.slice(0, 4).forEach((h, hi) => {
+    if (isTitleOnly(h)) return;
     const sents = h.c.text.split(/(?<=[.!?])\s+|\n+/).map(s => s.trim()).filter(s => s.length > 12);
     sents.forEach((s, si) => { let m = 0; const seen = new Set(); for (const t of tokens(s)) if (qw.has(t) && !seen.has(t)) { m += qw.get(t); seen.add(t); } if (m) cand.push({ s, score: m / Math.sqrt(qw.size) + (4 - hi) * 0.15 - si * 0.01, ref: hi + 1 }); });
   });
@@ -980,7 +983,7 @@ function openChecklist(d) {
   const items = extractSteps(d);
   const st = lsGet(ckKey(d), { meta: {}, items: {} });
   CK = { d, items, st };
-  $("#ckTag").className = "tag " + d.type; $("#ckTag").textContent = d.type; $("#ckTitle").textContent = d.name + " · " + revName(d);
+  $("#ckTag").className = "tag " + d.type; $("#ckTag").textContent = d.type; $("#ckTitle").textContent = d.name + (familyKey(d.name) !== d.name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() ? "" : " · " + revName(d));
   $("#ckOp").value = st.meta.op || ""; $("#ckTicket").value = st.meta.ticket || ""; $("#ckStart").value = st.meta.start || "";
   renderChecklist(); show("#ckModal");
 }
