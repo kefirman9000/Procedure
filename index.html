@@ -159,6 +159,19 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 .audit tr.click{cursor:pointer}
 .audit tr.click:hover td{background:var(--panel2)}
 .score{font-weight:700}
+.privbadge{font-size:12px;color:var(--ok);background:rgba(95,191,122,.1);border:1px solid rgba(95,191,122,.35);border-radius:14px;padding:2px 10px;cursor:pointer;white-space:nowrap}
+.privbadge:hover{border-color:var(--ok)}
+.privbadge.warn{color:var(--accent2);background:rgba(224,165,75,.1);border-color:rgba(224,165,75,.4)}
+.privnote{max-width:620px;margin:22px auto 0;text-align:left;background:rgba(95,191,122,.07);border:1px solid rgba(95,191,122,.3);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text)}
+.privnote b{color:var(--ok)}
+.priv h5{margin:18px 0 6px}
+.priv ul{margin:4px 0;padding-left:20px}
+.priv li{margin:3px 0}
+.priv table{width:100%;border-collapse:collapse;font-size:12.5px}
+.priv td,.priv th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.priv th{font-size:11px;color:var(--muted);text-transform:uppercase}
+.netlog{font:12px Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;max-height:180px;overflow:auto;white-space:pre-wrap}
+.sentnote{font-size:11px;color:var(--accent2);margin-left:6px;text-transform:none;letter-spacing:0}
 @media (max-width:800px){.app{grid-template-columns:1fr}aside{max-height:42vh}.ckmeta,.row2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -197,6 +210,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
   <main>
     <div class="topbar">
       <div class="mode" id="modeLabel"></div>
+      <span class="privbadge" id="privBadge" title="Privacy details">🔒 Your files stay on this computer</span>
       <span class="status" id="status"></span>
       <div class="grow"></div>
       <a id="desktopLink" href="https://github.com/kefirman9000/procedure/releases/latest" target="_blank" rel="noopener" style="font-size:12px">⬇ Desktop app</a>
@@ -224,9 +238,9 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
         <option value="search">Search only — fully offline, no AI (shows best matching steps)</option>
         <option value="ollama">Ollama — local AI on this computer</option>
         <option value="openai">LM Studio / OpenAI-compatible server</option>
-        <option value="anthropic">Claude API (your own API key)</option>
+        <option value="anthropic">Claude API (your own API key) — sends passages to Anthropic</option>
       </select>
-      <div class="hint">Matching sections are always shown. AI engines also write a direct answer that cites them.</div>
+      <div class="hint">Matching sections are always shown. AI engines also write a direct answer that cites them. Search only, Ollama and LM Studio keep everything on your computer.</div>
     </div>
     <div id="cfg-ollama" class="cfg">
       <div class="row2">
@@ -249,7 +263,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
         <div class="field"><label>Anthropic API key</label><input id="anKey" type="password" placeholder="sk-ant-…"></div>
         <div class="field"><label>Model</label><input id="anModel" placeholder="claude-sonnet-5-5"></div>
       </div>
-      <div class="hint" style="margin:-8px 0 12px">Stored only on this computer. Your question and the matching passages are sent to Anthropic.</div>
+      <div class="hint" style="margin:-8px 0 12px;color:var(--accent2)">⚠ This is the only option that sends document content off your computer: each question plus the matching passages go to Anthropic. Your key is stored only on this computer.</div>
     </div>
     <div class="field"><label>Passages sent to the AI per question</label><input id="topK" type="number" min="3" max="20" style="width:100px"></div>
     <hr>
@@ -345,17 +359,63 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
   </div>
 </div></div>
 
+<!-- Privacy -->
+<div class="modal" id="privModal"><div class="box wide">
+  <header><h3>🔒 Privacy &amp; safety — where your information goes</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body priv">
+    <p style="margin-top:0"><b style="color:var(--ok)">Your documents are never uploaded.</b> Procédure is just one page of code that runs inside your own browser (or the desktop app). Even when you use it from the GitHub web address, GitHub only sends you the app. It never receives your files, your questions or your answers. There is no server, no account, no tracking and no analytics.</p>
+    <h5>What stays on this computer</h5>
+    <ul>
+      <li>Every document you add, and the text read from it (including OCR of scanned pages)</li>
+      <li>Your questions, answers, saved questions, feedback, checklists and notes</li>
+      <li>Settings, glossary, and any API key or GitHub token you enter</li>
+    </ul>
+    <p class="hint">These are stored in this browser's private storage for this site (or the desktop app's data folder). Other websites can't read them. Anyone who can use this computer account and browser could open the app and see them, so use your normal computer login and lock screen. Clearing this browser's site data deletes them, so use <b>Export</b> for a backup.</p>
+    <h5>What connects to the internet, and what is sent</h5>
+    <table>
+      <tr><th>When</th><th>Connects to</th><th>What is sent</th></tr>
+      <tr><td>Opening the web version</td><td>GitHub Pages</td><td>A normal page request, the same as visiting any website. No document data.</td></tr>
+      <tr><td>First PDF / Word / scanned file</td><td>cdnjs.cloudflare.com, cdn.jsdelivr.net</td><td>Downloads the free reader programs. <b>Your file is read on your computer and is not sent.</b></td></tr>
+      <tr><td>Turning on Smart search</td><td>cdn.jsdelivr.net, huggingface.co</td><td>Downloads a small AI model once. The model then runs on your computer. Nothing is sent.</td></tr>
+      <tr><td>Check for updates (only when you click)</td><td>raw.githubusercontent.com</td><td>Downloads the version number and, if you accept, the new app. Nothing is sent.</td></tr>
+      <tr><td>Ollama or LM Studio engine (optional)</td><td>Your own computer (localhost)</td><td>Your question and the matching passages go to the AI program on your own machine.</td></tr>
+      <tr><td><b>Claude API engine (optional, off by default)</b></td><td>api.anthropic.com</td><td class="warnrow"><b style="color:var(--accent2)">Your question and the matching passages from your documents ARE sent to Anthropic</b> to write the answer. Whole documents are not sent. Only choose this if your organization allows it.</td></tr>
+      <tr><td>Team library from GitHub (optional)</td><td>api.github.com, raw.githubusercontent.com</td><td>Downloads files from the repo you choose. Your token, if you add one, only goes to GitHub.</td></tr>
+    </table>
+    <p class="hint">With the default settings (search only), the only connections are downloading the app and its helper programs. Your information stays on your computer.</p>
+    <h5>Check it yourself — connections made since this window opened</h5>
+    <div class="netlog" id="netLog"></div>
+    <p class="hint">You can confirm this with your browser's developer tools (F12 → Network). The full source code is public at <a href="https://github.com/kefirman9000/procedure" target="_blank" rel="noopener">github.com/kefirman9000/procedure</a>.</p>
+    <h5>Remove everything</h5>
+    <button id="wipeBtn" style="border-color:var(--err);color:var(--err)">Delete all Procédure data on this computer</button>
+    <span class="hint">Deletes documents, settings, keys, checklists and history from this browser. This can't be undone.</span>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 "use strict";
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const REPO = "kefirman9000/procedure";
 const DESKTOP = window.procedureDesktop || null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 $("#ver").textContent = VERSION;
+
+/* ---- Network transparency log: every request this page makes is recorded here ---- */
+const NETLOG = [];
+function logNet(url, how) {
+  try { const u = new URL(url, location.href); if (u.protocol === "blob:" || u.protocol === "data:") return;
+    NETLOG.push({ t: new Date(), host: u.host || "(this file)", path: u.pathname.length > 60 ? u.pathname.slice(0, 57) + "…" : u.pathname, how });
+    if ($("#privModal")?.classList.contains("on")) renderNetLog(); } catch (e) {}
+}
+const _fetch = window.fetch.bind(window);
+window.fetch = (input, init) => { logNet(typeof input === "string" ? input : input.url, (init && init.method) || "GET"); return _fetch(input, init); };
+function renderNetLog() {
+  $("#netLog").textContent = NETLOG.length ? NETLOG.map(n => `${n.t.toLocaleTimeString()}  ${n.how.padEnd(6)} ${n.host}${n.path}`).join("\n") : "No connections yet — everything so far happened on this computer.";
+}
 if (DESKTOP) { $("#desktopLink").style.display = "none"; $("#dataBtn").style.display = ""; }
 
 function toast(msg, ms = 2600) { const t = $("#toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast._t); if (ms) toast._t = setTimeout(() => t.style.display = "none", ms); }
@@ -460,7 +520,7 @@ const SUPPORTED = /\.(pdf|docx|txt|md|markdown|html?|csv|log|json|xml|rtf|png|jp
 const libCache = {};
 function loadScript(src) {
   if (libCache[src]) return libCache[src];
-  return libCache[src] = new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res;
+  return libCache[src] = new Promise((res, rej) => { logNet(src, "LOAD"); const s = document.createElement("script"); s.src = src; s.onload = res;
     s.onerror = () => { delete libCache[src]; rej(new Error("couldn't load " + src.split("/").pop() + " — reading PDF, Word and scanned files needs internet the first time")); }; document.head.appendChild(s); });
 }
 let ocrWorker = null;
@@ -793,6 +853,9 @@ function renderLib() {
   sc.innerHTML = `<option value="ALL">All documents</option><option value="SOP">SOPs only</option><option value="MOP">MOPs only</option><option value="HIST">All incl. old revisions</option>` + DOCS.map(d => `<option value="${d.id}">${esc(d.name.slice(0, 40))}</option>`).join("");
   sc.value = [...sc.options].some(o => o.value === cur) ? cur : "ALL";
   const names = { search: "Search only (offline)", ollama: "Ollama · " + S.ollamaModel, openai: "Local server · " + S.oaModel, anthropic: "Claude API · " + S.anModel };
+  const pb = $("#privBadge"); const cloud = S.engine === "anthropic";
+  pb.classList.toggle("warn", cloud);
+  pb.textContent = cloud ? "⚠ Claude API on — matching passages go to Anthropic" : "🔒 Your files stay on this computer";
   $("#modeLabel").innerHTML = "Answer engine: <b>" + esc(names[S.engine]) + "</b>" + (S.smart ? " · <b>smart search</b>" : "");
   renderPins();
   if (!HISTORY.length) renderEmpty();
@@ -801,7 +864,8 @@ function renderEmpty() {
   const sugs = DOCS.length ? ["What are the prerequisites?", "What is the rollback procedure?", "Who needs to approve this change?", "What safety precautions are required?"] : [];
   $("#chatInner").innerHTML = `<div class="empty"><h2>${DOCS.length ? "Ask anything about your procedures" : "Add SOPs and MOPs to get started"}</h2>
   <div>${DOCS.length ? "Answers come straight from your documents, with links to the exact section." : "Drop PDF, Word, scanned or text files on the left. Nothing is uploaded — it all stays on this computer."}</div>
-  <div class="sugs">${sugs.map(s => `<button data-sug>${esc(s)}</button>`).join("")}</div></div>`;
+  <div class="sugs">${sugs.map(s => `<button data-sug>${esc(s)}</button>`).join("")}</div>
+  <div class="privnote"><b>🔒 Private by design.</b> Your SOPs and MOPs are read and searched right here on your computer. They are never uploaded to GitHub or anywhere else, even on the web version. ${S.engine === "anthropic" ? '<span style="color:var(--accent2)">You have the Claude API engine on, so the matching passages for each question are sent to Anthropic.</span> ' : ""}<a href="#" data-priv>See exactly what connects to the internet →</a></div></div>`;
 }
 function renderPins() {
   $("#pins").innerHTML = PINS.map((p, i) => `<span class="chip" data-pin="${i}" title="Ask again">★ ${esc(p.length > 60 ? p.slice(0, 57) + "…" : p)}<span class="x" data-unpin="${i}" title="Unpin">✕</span></span>`).join("");
@@ -848,7 +912,7 @@ async function ask(qText) {
     try {
       const a = await aiAnswer(q, shown, HISTORY.slice(0, -1));
       entry.a = a; entry.refs = [...new Set([...a.matchAll(/\[(\d+(?:\s*,\s*\d+)*)\]/g)].flatMap(m => m[1].split(/\s*,\s*/).map(n => +n - 1)))].filter(i => i >= 0 && i < shown.length);
-      ansBox.innerHTML = `<h4>Answer</h4><div class="ans">${linkCites(a.trim(), hits)}</div>` + feedbackHTML(entry.id);
+      ansBox.innerHTML = `<h4>Answer${S.engine === "anthropic" ? '<span class="sentnote">· written by Claude API (passages were sent to Anthropic)</span>' : '<span class="sentnote" style="color:var(--ok)">· written by AI on this computer</span>'}</h4><div class="ans">${linkCites(a.trim(), hits)}</div>` + feedbackHTML(entry.id);
     } catch (e) {
       ansBox.innerHTML = `<h4>Answer</h4><div class="ans err">${esc(e.message.includes("Failed to fetch") ? "Couldn't reach the AI engine. Is it running? (For Ollama, set OLLAMA_ORIGINS=* and restart it.)" : e.message)}</div><div class="ans" style="margin-top:8px">${extractive()}</div>` + feedbackHTML(entry.id);
     }
@@ -1181,13 +1245,27 @@ $("#pSave").addEventListener("click", async () => {
   $("#pasteModal").classList.remove("on"); await refresh(); ensureEmbeddings();
 });
 
+/* privacy */
+function openPrivacy() { renderNetLog(); show("#privModal"); }
+$("#privBadge").addEventListener("click", openPrivacy);
+document.addEventListener("click", e => { if (e.target.closest("[data-priv]")) { e.preventDefault(); openPrivacy(); } });
+$("#wipeBtn").addEventListener("click", async () => {
+  if (!confirm("Delete ALL Procédure documents, settings, keys, checklists and history from this computer?\n\nThis can't be undone. Use Export first if you want a backup.")) return;
+  try { for (const d of ALL) await storeDel(d.id); await metaDel("folder"); } catch (e) {}
+  try { Object.keys(localStorage).filter(k => k.startsWith("procedure.")).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+  location.reload();
+});
+
 /* settings */
 const F = ["engine", "ollamaUrl", "ollamaModel", "oaUrl", "oaModel", "oaKey", "anKey", "anModel", "topK", "glossary"];
 function showCfg() { document.querySelectorAll(".cfg").forEach(c => c.style.display = c.id === "cfg-" + $("#engine").value ? "" : "none"); }
 $("#settingsBtn").addEventListener("click", () => { F.forEach(k => $("#" + k).value = S[k]); $("#smart").checked = !!S.smart; showCfg(); $("#testOut").textContent = ""; show("#settingsModal"); });
 $("#engine").addEventListener("change", showCfg);
 function readForm() { F.forEach(k => S[k] = k === "topK" ? Math.max(3, Math.min(20, +$("#topK").value || 8)) : k === "glossary" ? $("#glossary").value : $("#" + k).value.trim()); S.smart = $("#smart").checked; }
-$("#saveSettings").addEventListener("click", () => { readForm(); saveS(); renderLib(); $("#settingsModal").classList.remove("on"); toast("Saved"); ensureEmbeddings(); });
+$("#saveSettings").addEventListener("click", () => {
+  const was = S.engine;
+  if ($("#engine").value === "anthropic" && was !== "anthropic" && !confirm("With the Claude API engine, each question and the matching passages from your documents are sent to Anthropic over the internet to write the answer. Your full documents are not sent.\n\nOnly use this if your organization allows it. Turn it on?")) return;
+  readForm(); saveS(); renderLib(); $("#settingsModal").classList.remove("on"); toast("Saved"); ensureEmbeddings(); });
 $("#testEngine").addEventListener("click", async () => {
   readForm(); const o = $("#testOut");
   if (S.engine === "search") { o.textContent = "Search-only mode needs no setup."; return; }

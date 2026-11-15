@@ -5,7 +5,17 @@ Ask questions of your **SOPs** (Standard Operating Procedures) and **MOPs** (Met
 **Use it on the web:** https://kefirman9000.github.io/procedure/
 **Windows desktop app:** [latest release](https://github.com/kefirman9000/procedure/releases/latest) (installer or portable .exe)
 
-Your documents stay on your computer and are never uploaded.
+## 🔒 Privacy & safety — your information isn't going anywhere
+**Your documents are never uploaded, including when you use the GitHub web version.** Procédure is a single page of code that runs entirely inside your own browser (or the desktop app). GitHub Pages only delivers the app to you. It never receives your files, questions or answers. There is no server, no account, no tracking and no analytics.
+
+- **Stored only on your computer:** your documents and their text, questions, answers, checklists, notes, settings, and any key or token. They are kept in your browser's private storage for this site (or the desktop app's data folder), where other websites can't read them.
+- **Internet is used only to download things:** the app itself, the free PDF/Word/OCR reader programs, and the smart-search model, the first time you need each one. Your files are read on your computer and are not sent with these downloads.
+- **Local AI stays local:** Ollama and LM Studio run on your own machine.
+- **The one exception, off by default:** if you choose the **Claude API** engine, each question and the matching passages (not whole documents) are sent to Anthropic to write the answer. The app asks you to confirm before turning it on, and shows a warning badge while it's on.
+- **Check it yourself:** the 🔒 panel in the app lists every connection made since the window opened. You can also watch F12 → Network, and all the source code is in this repo.
+- **Delete everything:** the 🔒 panel has a button that removes all Procédure data from your computer.
+
+Anyone who can use your computer account can open the app and see your library, the same as any other file on your PC, so keep your normal login and lock screen.
 
 ## Features
 - **Add any procedure file:** PDF, Word (.docx), TXT, Markdown, HTML, CSV, or pasted text. Scanned PDFs and photos are read with built-in text recognition (OCR).
