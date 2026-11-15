@@ -1,39 +1,42 @@
 # Procédure
 
-Ask questions of your **SOPs** (Standard Operating Procedures) and **MOPs** (Methods of Procedure) and get answers that come from your own documents, with links to the exact section they came from.
+Ask questions of your **SOPs** (Standard Operating Procedures) and **MOPs** (Methods of Procedure) and get answers from your own documents, with links to the exact section each answer came from.
 
-It's one HTML file. You can run it locally (double-click `index.html`) or host it on GitHub Pages. Your documents stay in your browser and are never uploaded.
+**Use it on the web:** https://kefirman9000.github.io/procedure/
+**Windows desktop app:** [latest release](https://github.com/kefirman9000/procedure/releases/latest) (installer or portable .exe)
+
+Your documents stay on your computer and are never uploaded.
 
 ## Features
-- Drop in **PDF, Word (.docx), TXT, Markdown, HTML, CSV** files, or paste text
-- Tags each document as SOP or MOP automatically; click the tag to change it
-- Ask across all documents, SOPs only, MOPs only, or a single document
-- **Search-only mode** works fully offline: it ranks the matching sections and pulls out the best lines
-- **Optional AI answers** with numbered citations you can click:
-  - **Ollama** (local AI on your PC)
-  - **LM Studio** or any OpenAI-compatible local server
-  - **Claude API** with your own key
-- Built-in document viewer with find-in-document
-- Export and import your library as a `.json` file, to back it up or move it to another PC
-- In-app updater: it checks GitHub for a new version and only updates if you say yes
+- **Add any procedure file:** PDF, Word (.docx), TXT, Markdown, HTML, CSV, or pasted text. Scanned PDFs and photos are read with built-in text recognition (OCR).
+- **Ask questions** across everything, SOPs only, MOPs only, one document, or old revisions too.
+- **Answers you can check:** every answer links to its source section. In search-only mode it works fully offline.
+- **Optional AI answers:** Ollama (local), LM Studio or any OpenAI-compatible server, or the Claude API with your own key.
+- **Smart search:** an optional small local model matches by meaning, so "rollback" finds "back-out plan". Common procedure synonyms are built in.
+- **Glossary:** add your team's abbreviations (`MW = maintenance window`) and questions in either form will match.
+- **Checklist mode:** run any SOP or MOP as a tick-off checklist. Each step is timestamped and can take a note, warnings are highlighted, and you can enter operator, ticket and window details. Print it or save it as a PDF or CSV.
+- **Revision tracking:** add a newer version of a file and the old one goes into History. You can compare any two revisions line by line or restore an old one.
+- **Audit:** finds MOPs missing rollback, verification, approvals, impact or pre-checks, and SOPs missing purpose, scope, responsibilities and similar sections. You can export the report as CSV.
+- **Team library:** sync a shared folder (network drive, OneDrive or SharePoint sync) or a GitHub repo. Changed files come in as new revisions, and removed files drop out.
+- **Saved questions:** pin the questions you ask often for one-click answers.
+- **Answer feedback:** 👍/👎 an answer and its sources rank higher or lower for similar questions.
+- **Export and import** your library to back it up or move it between PCs.
+- **In-app updater:** it checks GitHub and only updates if you say yes.
 
-## Run locally (Windows)
-1. Download `index.html` (you can rename it `Procedure.html`).
-2. Double-click it to open it in Edge or Chrome.
-3. Your library is saved in that browser, so keep opening the same file from the same place.
+## Run it
+- **Web:** open the link above in Edge or Chrome.
+- **Local file:** download `index.html` and double-click it.
+- **Desktop app:** download the setup or portable `.exe` from Releases. Your library lives in the app's own data folder, which you can open with the **Data folder** button.
 
-The PDF and Word readers load from a CDN the first time you add one of those files, so you need internet for that step. After that, text files and search work offline.
+PDF, Word, OCR and smart search download their helper libraries the first time you use them, so that step needs internet. After that, search runs on your computer.
 
 ## Local AI with Ollama
 1. Install Ollama from https://ollama.com, then run `ollama pull llama3.1`.
-2. Let the browser talk to it: set the Windows environment variable `OLLAMA_ORIGINS` to `*`, then restart Ollama.
-3. In the app, open **⚙ Answer engine**, choose Ollama, then click **Test**.
-
-## Host on GitHub Pages
-Push `index.html` and `version.json` to `kefirman9000/procedure`, then go to Settings → Pages → Deploy from branch `main`, folder `/root`.
+2. Set the Windows environment variable `OLLAMA_ORIGINS` to `*`, then restart Ollama.
+3. In the app, open **⚙ Answer engine**, choose Ollama, then click **Test engine**.
 
 ## Releasing an update
-Bump `VERSION` in `index.html` and `version` in `version.json` to the same number, then push. Users click **Check for updates** to get it.
+Bump `VERSION` in `index.html` and `version` in `version.json`, then push to `main` (the web version is served from `gh-pages`, so push there too). Push a tag such as `v1.2.0` to build new Windows `.exe` files automatically.
 
 ## Support
 Procédure is free and open source. If it saves you time, please consider [sponsoring me on GitHub](https://github.com/sponsors/kefirman9000) ♥

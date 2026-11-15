@@ -1,0 +1,25 @@
+{
+  "name": "procedure",
+  "productName": "Procedure",
+  "version": "1.1.0",
+  "description": "Ask questions of your SOPs and MOPs",
+  "author": "kefirman9000",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable nsis --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "io.github.kefirman9000.procedure",
+    "productName": "Procedure",
+    "files": ["main.js", "preload.js", "index.html"],
+    "win": { "target": ["portable", "nsis"] },
+    "portable": { "artifactName": "Procedure-${version}-portable.exe" },
+    "nsis": { "artifactName": "Procedure-${version}-setup.exe", "oneClick": false, "allowToChangeInstallationDirectory": true }
+  }
+}

@@ -7,65 +7,80 @@
 <style>
 :root{
   --bg:#0f1216;--panel:#161b21;--panel2:#1d232b;--line:#2a323c;--text:#e6e9ee;--muted:#8b95a3;
-  --accent:#4fb3a9;--accent2:#e0a54b;--sop:#4f8fd6;--mop:#c47ad6;--hl:rgba(224,165,75,.28);--err:#e06b6b;
+  --accent:#4fb3a9;--accent2:#e0a54b;--sop:#4f8fd6;--mop:#c47ad6;--hl:rgba(224,165,75,.28);--err:#e06b6b;--ok:#5fbf7a;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
 button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
 button:hover{border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
 button.primary{background:var(--accent);border-color:var(--accent);color:#06201d;font-weight:600}
 button.ghost{background:transparent;border-color:transparent;color:var(--muted);padding:4px 8px}
 button.ghost:hover{color:var(--text);border-color:var(--line)}
 input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px;outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-.app{display:grid;grid-template-columns:320px 1fr;height:100vh}
+input[type=checkbox]{width:auto;accent-color:var(--accent)}
+a{color:var(--accent)}
+.app{display:grid;grid-template-columns:330px 1fr;height:100vh}
 aside{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 .brand{padding:16px 16px 10px;border-bottom:1px solid var(--line)}
 .brand h1{margin:0;font-size:18px;letter-spacing:.3px}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
-.drop{margin:12px;border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+.drop{margin:12px;border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
 .drop.over,.drop:hover{border-color:var(--accent);color:var(--text)}
 .drop b{color:var(--text)}
-.typepick{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.typepick{display:flex;gap:8px;justify-content:center;margin-top:8px}
 .typepick label{display:flex;gap:4px;align-items:center;font-size:12px;cursor:pointer}
-.libhead{display:flex;justify-content:space-between;align-items:center;padding:4px 16px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.libhead{display:flex;justify-content:space-between;align-items:center;padding:4px 12px 4px 16px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.libfilter{margin:0 12px 6px;width:calc(100% - 24px);font-size:12px;padding:5px 8px}
 .lib{flex:1;overflow:auto;padding:0 8px 8px}
-.doc{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer}
+.doc{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer}
 .doc:hover{background:var(--panel2)}
 .doc .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.doc .meta{color:var(--muted);font-size:11px}
-.tag{font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;letter-spacing:.4px;cursor:pointer;user-select:none}
+.doc .meta{color:var(--muted);font-size:11px;white-space:nowrap}
+.doc .acts{display:none;gap:0}
+.doc:hover .acts{display:flex}
+.doc:hover .meta{display:none}
+.doc .acts button{padding:2px 5px;font-size:12px}
+.tag{font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;letter-spacing:.4px;cursor:pointer;user-select:none;white-space:nowrap}
 .tag.SOP{background:rgba(79,143,214,.18);color:var(--sop)}
 .tag.MOP{background:rgba(196,122,214,.18);color:var(--mop)}
 .tag.OTHER{background:rgba(139,149,163,.18);color:var(--muted)}
-.doc .x{opacity:0}
-.doc:hover .x{opacity:1}
+.rev{font-size:10px;color:var(--accent2);border:1px solid rgba(224,165,75,.35);border-radius:4px;padding:0 4px;white-space:nowrap}
+.srcic{font-size:11px;opacity:.7}
 .foot{border-top:1px solid var(--line);padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
 .foot button{font-size:12px;padding:4px 8px}
 .sponsor{width:100%;font-size:11px;color:var(--muted);margin-top:4px}
 .sponsor a{color:var(--accent2)}
 main{display:flex;flex-direction:column;min-height:0;min-width:0}
-.topbar{display:flex;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.topbar{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
 .topbar .grow{flex:1}
 .mode{font-size:12px;color:var(--muted)}
 .mode b{color:var(--accent)}
+.status{font-size:12px;color:var(--accent2)}
 .chat{flex:1;overflow:auto;padding:20px 16px}
 .inner{max-width:900px;margin:0 auto}
-.empty{color:var(--muted);text-align:center;margin-top:12vh}
+.empty{color:var(--muted);text-align:center;margin-top:10vh}
 .empty h2{color:var(--text);font-weight:500}
 .empty .sugs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
 .empty .sugs button{font-size:12px}
-.q{margin:18px 0 8px;font-weight:600;font-size:15px}
+.qrow{display:flex;align-items:center;gap:6px;margin:18px 0 8px}
+.q{font-weight:600;font-size:15px;flex:1}
 .q::before{content:"Q ";color:var(--accent)}
+.pinbtn{color:var(--muted)}
+.pinbtn.on{color:var(--accent2)}
 .a{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
 .a h4{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
 .a .ans{white-space:pre-wrap}
+.fb{display:flex;gap:6px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.fb button{padding:2px 8px;font-size:13px}
+.fb button.on{border-color:var(--accent);background:rgba(79,179,169,.15)}
 .cite{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--accent2);border-radius:4px;font-size:11px;padding:0 5px;margin:0 1px;cursor:pointer;vertical-align:1px}
 .cite:hover{border-color:var(--accent2)}
 .src{border-top:1px solid var(--line);padding:10px 0 4px;cursor:pointer}
 .src:first-of-type{border-top:none}
-.src .h{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:4px}
+.src .h{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
 .src .h .n{color:var(--accent2);font-weight:700}
 .src .h .d{color:var(--text);font-weight:600}
 .src .t{font-size:13px;color:#c9cfd8;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
@@ -74,28 +89,77 @@ mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
 .err{color:var(--err)}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes s{to{transform:rotate(360deg)}}
-.askbar{border-top:1px solid var(--line);background:var(--panel);padding:12px 16px}
+.askbar{border-top:1px solid var(--line);background:var(--panel);padding:10px 16px 12px}
+.pins{max-width:900px;margin:0 auto 8px;display:flex;flex-wrap:wrap;gap:6px}
+.pins:empty{display:none}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:2px 4px 2px 10px;cursor:pointer}
+.chip:hover{border-color:var(--accent2)}
+.chip .x{color:var(--muted);padding:0 4px;border-radius:8px}
+.chip .x:hover{color:var(--err)}
 .askbar .inner{display:flex;gap:8px;align-items:flex-end}
 .askbar textarea{flex:1;resize:none;min-height:42px;max-height:160px}
-.askbar select{max-width:200px}
+.askbar select{max-width:210px}
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10}
 .modal.on{display:flex}
-.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,94vw);max-height:88vh;display:flex;flex-direction:column}
-.box.wide{width:min(1000px,96vw)}
-.box header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
-.box header h3{margin:0;flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,94vw);max-height:90vh;display:flex;flex-direction:column}
+.box.wide{width:min(1060px,96vw)}
+.box header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.box header h3{margin:0;flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:120px}
 .box .body{padding:16px;overflow:auto}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-.field input,.field select,.field textarea{width:100%}
+.field label.inline{display:flex;gap:8px;align-items:center;color:var(--text);font-size:13px}
+.field input:not([type=checkbox]),.field select,.field textarea{width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
 .hint code{background:var(--bg);padding:1px 4px;border-radius:3px}
+h5{margin:4px 0 10px;font-size:13px}
+hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 .chunk{padding:10px 12px;border-left:3px solid transparent;white-space:pre-wrap;font-size:13px}
 .chunk .sec{font-size:11px;color:var(--muted);margin-bottom:2px}
 .chunk.focus{border-left-color:var(--accent2);background:rgba(224,165,75,.07)}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:8px 14px;border-radius:8px;z-index:20;display:none}
-@media (max-width:800px){.app{grid-template-columns:1fr}aside{max-height:40vh}}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:8px 14px;border-radius:8px;z-index:30;display:none;max-width:80vw}
+/* checklist */
+.ckmeta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.ckmeta input{width:100%}
+.ckprog{height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.ckprog div{height:100%;background:var(--ok);transition:width .2s}
+.cksec{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 4px}
+.ck{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:start;padding:6px 8px;border-radius:6px}
+.ck:hover{background:var(--panel2)}
+.ck input[type=checkbox]{margin-top:4px;transform:scale(1.15)}
+.ck .txt{white-space:pre-wrap}
+.ck.done .txt{color:var(--muted);text-decoration:line-through}
+.ck .time{font-size:11px;color:var(--ok);white-space:nowrap}
+.ck .note{grid-column:2 / 4;font-size:12px;padding:4px 8px}
+.ck.warn{background:rgba(224,107,107,.08);border-left:3px solid var(--err)}
+.ckwarn{padding:6px 10px;margin:4px 0;border-left:3px solid var(--err);background:rgba(224,107,107,.08);font-size:13px;white-space:pre-wrap}
+.ckwarn::before{content:"⚠ ";color:var(--err)}
+/* diff */
+.diff{font:12.5px/1.45 Consolas,"Cascadia Mono",monospace;white-space:pre-wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.diff div{padding:1px 10px}
+.diff .add{background:rgba(95,191,122,.14);color:#bfe9cb}
+.diff .add::before{content:"+ ";color:var(--ok)}
+.diff .del{background:rgba(224,107,107,.14);color:#f0c3c3}
+.diff .del::before{content:"− ";color:var(--err)}
+.diff .same{color:var(--muted)}
+.diff .same::before{content:"  "}
+.diff .gap{color:var(--muted);font-style:italic;background:var(--panel2);text-align:center}
+.revlist{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px}
+.revlist td,.revlist th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.revlist th{font-size:11px;color:var(--muted);text-transform:uppercase}
+/* audit */
+.audit{width:100%;border-collapse:collapse;font-size:13px}
+.audit td,.audit th{padding:8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.audit th{font-size:11px;color:var(--muted);text-transform:uppercase;position:sticky;top:0;background:var(--panel)}
+.audit .miss{display:inline-block;font-size:11px;border-radius:4px;padding:1px 6px;margin:1px 2px;background:rgba(224,107,107,.15);color:#f0b0b0}
+.audit .miss.rec{background:rgba(224,165,75,.13);color:#e9c88e}
+.audit .okk{color:var(--ok)}
+.audit tr.click{cursor:pointer}
+.audit tr.click:hover td{background:var(--panel2)}
+.score{font-weight:700}
+@media (max-width:800px){.app{grid-template-columns:1fr}aside{max-height:42vh}.ckmeta,.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -107,21 +171,25 @@ mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
     </div>
     <div class="drop" id="drop">
       <b>Drop files here</b> or click to add<br>
-      <span style="font-size:12px">PDF · DOCX · TXT · MD · HTML · CSV</span>
+      <span style="font-size:12px">PDF (incl. scanned) · Word · images · TXT · MD · HTML</span>
       <div class="typepick" onclick="event.stopPropagation()">
         <label><input type="radio" name="dtype" value="AUTO" checked> Auto</label>
         <label><input type="radio" name="dtype" value="SOP"> SOP</label>
         <label><input type="radio" name="dtype" value="MOP"> MOP</label>
       </div>
-      <input type="file" id="file" multiple hidden accept=".pdf,.docx,.txt,.md,.markdown,.html,.htm,.csv,.log,.json,.xml,.rtf">
+      <input type="file" id="file" multiple hidden accept=".pdf,.docx,.txt,.md,.markdown,.html,.htm,.csv,.log,.json,.xml,.rtf,.png,.jpg,.jpeg,.bmp,.webp">
     </div>
     <div class="libhead"><span id="libcount">Library</span><button class="ghost" id="pasteBtn" title="Paste text as a document">+ Paste text</button></div>
+    <input class="libfilter" id="libFilter" placeholder="Filter documents…">
     <div class="lib" id="lib"></div>
     <div class="foot">
       <button id="settingsBtn">⚙ Answer engine</button>
+      <button id="teamBtn" title="Sync a shared folder or GitHub repo">👥 Team library</button>
+      <button id="auditBtn" title="Find missing sections">🔍 Audit</button>
       <button id="exportBtn" title="Save library to a .json file">Export</button>
       <button id="importBtn" title="Load a library .json file">Import</button>
       <button id="updateBtn">Check for updates</button>
+      <button id="dataBtn" style="display:none">Data folder</button>
       <input type="file" id="importFile" hidden accept=".json">
       <div class="sponsor">v<span id="ver"></span> · Free &amp; open source — if it helps, consider <a href="https://github.com/sponsors/kefirman9000" target="_blank" rel="noopener">sponsoring on GitHub</a> ♥</div>
     </div>
@@ -129,11 +197,14 @@ mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
   <main>
     <div class="topbar">
       <div class="mode" id="modeLabel"></div>
+      <span class="status" id="status"></span>
       <div class="grow"></div>
+      <a id="desktopLink" href="https://github.com/kefirman9000/procedure/releases/latest" target="_blank" rel="noopener" style="font-size:12px">⬇ Desktop app</a>
       <button class="ghost" id="clearChat">Clear chat</button>
     </div>
     <div class="chat" id="chat"><div class="inner" id="chatInner"></div></div>
     <div class="askbar">
+      <div class="pins" id="pins"></div>
       <div class="inner">
         <select id="scope" title="Which documents to search"></select>
         <textarea id="q" rows="1" placeholder="Ask a question about your procedures…  (Enter to ask, Shift+Enter for new line)"></textarea>
@@ -145,7 +216,7 @@ mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
 
 <!-- Settings -->
 <div class="modal" id="settingsModal"><div class="box">
-  <header><h3>Answer engine</h3><button class="ghost" data-close>✕</button></header>
+  <header><h3>Answer engine &amp; search</h3><button class="ghost" data-close>✕</button></header>
   <div class="body">
     <div class="field">
       <label>Engine</label>
@@ -155,32 +226,112 @@ mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
         <option value="openai">LM Studio / OpenAI-compatible server</option>
         <option value="anthropic">Claude API (your own API key)</option>
       </select>
-      <div class="hint">Search is always shown. AI engines additionally write a direct answer that cites the source passages.</div>
+      <div class="hint">Matching sections are always shown. AI engines also write a direct answer that cites them.</div>
     </div>
     <div id="cfg-ollama" class="cfg">
-      <div class="field"><label>Ollama URL</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
-      <div class="field"><label>Model</label><input id="ollamaModel" placeholder="llama3.1"><div class="hint">Install from <code>ollama.com</code>, then run <code>ollama pull llama3.1</code>. If answers fail with a network error, set the Windows environment variable <code>OLLAMA_ORIGINS=*</code> and restart Ollama.</div></div>
+      <div class="row2">
+        <div class="field"><label>Ollama URL</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
+        <div class="field"><label>Model</label><input id="ollamaModel" placeholder="llama3.1"></div>
+      </div>
+      <div class="hint" style="margin:-8px 0 8px">Install from <code>ollama.com</code>, then run <code>ollama pull llama3.1</code>. If it can't connect, set the Windows environment variable <code>OLLAMA_ORIGINS=*</code> and restart Ollama.</div>
       <button id="ollamaList">List installed models</button> <span id="ollamaModels" class="hint"></span>
+      <div style="height:12px"></div>
     </div>
     <div id="cfg-openai" class="cfg">
-      <div class="field"><label>Server base URL</label><input id="oaUrl" placeholder="http://localhost:1234/v1"></div>
-      <div class="field"><label>Model</label><input id="oaModel" placeholder="local-model"></div>
+      <div class="row2">
+        <div class="field"><label>Server base URL</label><input id="oaUrl" placeholder="http://localhost:1234/v1"></div>
+        <div class="field"><label>Model</label><input id="oaModel" placeholder="local-model"></div>
+      </div>
       <div class="field"><label>API key (optional)</label><input id="oaKey" type="password" placeholder="leave blank for LM Studio"><div class="hint">In LM Studio: Developer tab → Start Server, and enable CORS.</div></div>
     </div>
     <div id="cfg-anthropic" class="cfg">
-      <div class="field"><label>Anthropic API key</label><input id="anKey" type="password" placeholder="sk-ant-…"><div class="hint">Stored only in this browser on this computer. Your question and the matching passages are sent to Anthropic.</div></div>
-      <div class="field"><label>Model</label><input id="anModel" placeholder="claude-sonnet-5-5"></div>
+      <div class="row2">
+        <div class="field"><label>Anthropic API key</label><input id="anKey" type="password" placeholder="sk-ant-…"></div>
+        <div class="field"><label>Model</label><input id="anModel" placeholder="claude-sonnet-5-5"></div>
+      </div>
+      <div class="hint" style="margin:-8px 0 12px">Stored only on this computer. Your question and the matching passages are sent to Anthropic.</div>
     </div>
-    <div class="field"><label>Passages sent to the AI per question</label><input id="topK" type="number" min="3" max="20"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end"><button id="testEngine">Test</button><button class="primary" id="saveSettings">Save</button></div>
+    <div class="field"><label>Passages sent to the AI per question</label><input id="topK" type="number" min="3" max="20" style="width:100px"></div>
+    <hr>
+    <div class="field">
+      <label class="inline"><input type="checkbox" id="smart"> Smart search — match by meaning, not just exact words</label>
+      <div class="hint">Finds "back-out plan" when you ask about "rollback". Downloads a small AI model (~25 MB) once, then runs on this computer. Nothing is sent anywhere.</div>
+    </div>
+    <div class="field">
+      <label>Glossary — your team's terms and abbreviations (one per line: <code>TERM = meaning</code>)</label>
+      <textarea id="glossary" rows="6" placeholder="MW = maintenance window&#10;CAB = change advisory board&#10;FW = firmware&#10;DC1 = Ashburn data center"></textarea>
+      <div class="hint">Questions using either side will find the other. The AI also gets this list.</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button id="testEngine">Test engine</button><button class="primary" id="saveSettings">Save</button></div>
     <div id="testOut" class="hint"></div>
+  </div>
+</div></div>
+
+<!-- Team library -->
+<div class="modal" id="teamModal"><div class="box">
+  <header><h3>Team library</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <p class="hint" style="margin-top:0">Point Procédure at a place your team keeps procedures. It loads every supported file, picks up changes as new revisions, and drops files that were removed.</p>
+    <h5>📁 Shared folder (network drive, OneDrive, SharePoint sync…)</h5>
+    <div id="folderState" class="hint" style="margin-bottom:8px"></div>
+    <button id="folderPick">Choose folder…</button> <button id="folderSync">Sync now</button> <button class="ghost" id="folderForget">Disconnect</button>
+    <div class="hint">Works in Edge, Chrome and the desktop app.</div>
+    <hr>
+    <h5>🐙 GitHub repository</h5>
+    <div class="row2">
+      <div class="field"><label>Repository (owner/name)</label><input id="ghRepo" placeholder="my-team/procedures"></div>
+      <div class="field"><label>Branch</label><input id="ghBranch" placeholder="main"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Folder in repo (optional)</label><input id="ghPath" placeholder="sops"></div>
+      <div class="field"><label>Token (only for private repos)</label><input id="ghToken" type="password" placeholder="github_pat_…"></div>
+    </div>
+    <div class="field"><label class="inline"><input type="checkbox" id="ghAuto"> Sync automatically when the app opens</label></div>
+    <button class="primary" id="ghSync">Save &amp; sync now</button> <span id="ghState" class="hint"></span>
   </div>
 </div></div>
 
 <!-- Viewer -->
 <div class="modal" id="viewModal"><div class="box wide">
-  <header><span class="tag" id="vTag"></span><h3 id="vTitle"></h3><input id="vFind" placeholder="Find in document" style="width:200px"><button class="ghost" data-close>✕</button></header>
+  <header><span class="tag" id="vTag"></span><h3 id="vTitle"></h3><span class="rev" id="vRev"></span><input id="vFind" placeholder="Find in document" style="width:180px"><button id="vCheck">☑ Checklist</button><button id="vHist">⟲ History</button><button class="ghost" data-close>✕</button></header>
   <div class="body" id="vBody"></div>
+</div></div>
+
+<!-- Checklist -->
+<div class="modal" id="ckModal"><div class="box wide">
+  <header><span class="tag" id="ckTag"></span><h3 id="ckTitle"></h3><span id="ckCount" class="hint" style="margin:0"></span><button id="ckPrint">🖨 Print / PDF</button><button id="ckCsv">CSV</button><button id="ckReset">Reset</button><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <div class="ckmeta">
+      <input id="ckOp" placeholder="Performed by">
+      <input id="ckTicket" placeholder="Change / ticket #">
+      <input id="ckStart" placeholder="Window start (e.g. Sat 02:00)">
+    </div>
+    <div class="ckprog"><div id="ckBar" style="width:0"></div></div>
+    <div id="ckBody"></div>
+  </div>
+</div></div>
+
+<!-- History -->
+<div class="modal" id="histModal"><div class="box wide">
+  <header><h3 id="hTitle">Revision history</h3><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <table class="revlist" id="hList"></table>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <span class="hint" style="margin:0">Compare</span><select id="hA"></select><span class="hint" style="margin:0">→</span><select id="hB"></select>
+      <label class="hint" style="display:flex;gap:4px;align-items:center;margin:0"><input type="checkbox" id="hAll"> show unchanged</label>
+      <span id="hSum" class="hint" style="margin:0 0 0 auto"></span>
+    </div>
+    <div id="hDiff"></div>
+  </div>
+</div></div>
+
+<!-- Audit -->
+<div class="modal" id="auditModal"><div class="box wide">
+  <header><h3>Procedure audit — missing sections</h3><select id="auFilter"><option value="ALL">All</option><option value="SOP">SOPs</option><option value="MOP">MOPs</option><option value="GAPS">Only with required gaps</option></select><button id="auCsv">CSV</button><button class="ghost" data-close>✕</button></header>
+  <div class="body">
+    <div class="hint" style="margin:0 0 10px"><span class="audit"><span class="miss">required</span><span class="miss rec">recommended</span></span> — checks look for the section or its usual wording anywhere in the document. Click a row to open it.</div>
+    <table class="audit" id="auTable"></table>
+  </div>
 </div></div>
 
 <!-- Paste -->
@@ -198,421 +349,901 @@ mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
 
 <script>
 "use strict";
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const REPO = "kefirman9000/procedure";
+const DESKTOP = window.procedureDesktop || null;
 const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 $("#ver").textContent = VERSION;
+if (DESKTOP) { $("#desktopLink").style.display = "none"; $("#dataBtn").style.display = ""; }
 
-function toast(msg, ms=2600){const t=$("#toast");t.textContent=msg;t.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>t.style.display="none",ms);}
+function toast(msg, ms = 2600) { const t = $("#toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast._t); if (ms) toast._t = setTimeout(() => t.style.display = "none", ms); }
+function setStatus(msg) { $("#status").innerHTML = msg ? '<span class="spin"></span>' + esc(msg) : ""; }
+function lsGet(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
-/* ---------------- Storage (IndexedDB) ---------------- */
+/* ================= Storage (IndexedDB) ================= */
 const DB = {
-  db:null,
-  open(){return new Promise((res,rej)=>{const r=indexedDB.open("procedure",1);r.onupgradeneeded=()=>r.result.createObjectStore("docs",{keyPath:"id"});r.onsuccess=()=>{this.db=r.result;res()};r.onerror=()=>rej(r.error);});},
-  tx(mode){return this.db.transaction("docs",mode).objectStore("docs");},
-  all(){return new Promise((res,rej)=>{const r=this.tx("readonly").getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});},
-  put(d){return new Promise((res,rej)=>{const r=this.tx("readwrite").put(d);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});},
-  del(id){return new Promise((res,rej)=>{const r=this.tx("readwrite").delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
+  db: null,
+  open() { return new Promise((res, rej) => { const r = indexedDB.open("procedure", 2);
+    r.onupgradeneeded = () => { const db = r.result; if (!db.objectStoreNames.contains("docs")) db.createObjectStore("docs", { keyPath: "id" }); if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta"); };
+    r.onsuccess = () => { this.db = r.result; res(); }; r.onerror = () => rej(r.error); }); },
+  req(store, mode, fn) { return new Promise((res, rej) => { const r = fn(this.db.transaction(store, mode).objectStore(store)); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 };
-const memStore = new Map(); let useMem = false; // fallback if IndexedDB is blocked
-async function storeAll(){return useMem?[...memStore.values()]:DB.all();}
-async function storePut(d){if(useMem)memStore.set(d.id,d);else await DB.put(d);}
-async function storeDel(id){if(useMem)memStore.delete(id);else await DB.del(id);}
+let useMem = false; const memDocs = new Map(), memMeta = new Map();
+const storeAll = () => useMem ? Promise.resolve([...memDocs.values()]) : DB.req("docs", "readonly", s => s.getAll());
+const storePut = d => useMem ? (memDocs.set(d.id, d), Promise.resolve()) : DB.req("docs", "readwrite", s => s.put(d));
+const storeDel = id => useMem ? (memDocs.delete(id), Promise.resolve()) : DB.req("docs", "readwrite", s => s.delete(id));
+const metaGet = k => useMem ? Promise.resolve(memMeta.get(k)) : DB.req("meta", "readonly", s => s.get(k));
+const metaPut = (k, v) => useMem ? (memMeta.set(k, v), Promise.resolve()) : DB.req("meta", "readwrite", s => s.put(v, k));
+const metaDel = k => useMem ? (memMeta.delete(k), Promise.resolve()) : DB.req("meta", "readwrite", s => s.delete(k));
 
-/* ---------------- Settings ---------------- */
-const defaults = {engine:"search",ollamaUrl:"http://localhost:11434",ollamaModel:"llama3.1",oaUrl:"http://localhost:1234/v1",oaModel:"local-model",oaKey:"",anKey:"",anModel:"claude-sonnet-5-5",topK:8};
-let S = {...defaults};
-try{Object.assign(S, JSON.parse(localStorage.getItem("procedure.settings")||"{}"));}catch(e){}
-function saveS(){try{localStorage.setItem("procedure.settings",JSON.stringify(S));}catch(e){}}
+/* ================= Settings ================= */
+const defaults = { engine: "search", ollamaUrl: "http://localhost:11434", ollamaModel: "llama3.1", oaUrl: "http://localhost:1234/v1", oaModel: "local-model", oaKey: "", anKey: "", anModel: "claude-sonnet-5-5", topK: 8,
+  smart: false, glossary: "", ghRepo: "", ghBranch: "main", ghPath: "", ghToken: "", ghAuto: false };
+let S = { ...defaults, ...lsGet("procedure.settings", {}) };
+const saveS = () => lsSet("procedure.settings", S);
+let PINS = lsGet("procedure.pins", []);
+let FB = lsGet("procedure.fb", []);
 
-/* ---------------- Text processing ---------------- */
+/* ================= Text processing ================= */
 const STOP = new Set("a an and are as at be been but by can could do does did for from has have how i if in into is it its may must not of on or our shall should so such than that the their then there these they this to was we were what when where which who why will with would you your".split(" "));
-function stem(w){
-  if(w.length<=3) return w;
-  return w.replace(/(ization|isation)$/,"ize").replace(/(ational)$/,"ate").replace(/(iveness|fulness|ousness)$/,"")
-          .replace(/(ies)$/,"y").replace(/(sses)$/,"ss").replace(/([^s])s$/,"$1")
-          .replace(/(ing|edly|ed|ly|ment)$/,m=>w.length-m.length>=3?"":m);
+function stem(w) {
+  if (w.length <= 3) return w;
+  return w.replace(/(ization|isation)$/, "ize").replace(/(ational)$/, "ate").replace(/(iveness|fulness|ousness)$/, "")
+    .replace(/(ies)$/, "y").replace(/(sses)$/, "ss").replace(/([^s])s$/, "$1")
+    .replace(/(ing|edly|ed|ly|ment)$/, m => w.length - m.length >= 3 ? "" : m)
+    .replace(/(.{4,})e$/, "$1");
 }
-function tokens(text){
-  const out=[]; const re=/[a-z0-9][a-z0-9\-_.\/]*[a-z0-9]|[a-z0-9]/gi; let m;
-  while((m=re.exec(text.toLowerCase()))){
-    const raw=m[0];
+function tokens(text) {
+  const out = []; const re = /[a-z0-9][a-z0-9\-_.\/]*[a-z0-9]|[a-z0-9]/gi; let m;
+  const s = String(text).toLowerCase();
+  while ((m = re.exec(s))) {
+    const raw = m[0];
     const parts = /[\-_.\/]/.test(raw) ? [raw, ...raw.split(/[\-_.\/]+/)] : [raw];
-    for(const p of parts){ if(!p||STOP.has(p)) continue; out.push(/\d/.test(p)?p:stem(p)); }
+    for (const p of parts) { if (!p || STOP.has(p)) continue; out.push(/\d/.test(p) ? p : stem(p)); }
   }
   return out;
 }
-const HEADING_RE = /^(#{1,6}\s+.+|(step\s+\d+[\.:)]?|section\s+\d+|phase\s+\d+|appendix\s+[a-z0-9]+)\b.*|\d+(\.\d+){0,4}[\.)]?\s+[A-Z][^.!?]{0,80}|[A-Z][A-Z0-9 \-&\/,()]{3,70})$/i;
-function isHeading(line){
-  const l=line.trim(); if(!l||l.length>90) return false;
-  if(/^#{1,6}\s/.test(l)) return true;
-  if(/^(step|section|phase|appendix|procedure|purpose|scope|prerequisites?|rollback|back-?out|verification|responsibilit(y|ies)|definitions|references|safety|warnings?|precautions?)\b/i.test(l) && l.length<70 && !/[.;]$/.test(l)) return true;
-  if(/^\d+(\.\d+){0,4}[\.)]?\s+\S/.test(l) && l.length<70 && !/[.;:,]$/.test(l)) return true;
-  if(l===l.toUpperCase() && /[A-Z]{3}/.test(l) && l.length<70) return true;
+const MINOR = new Set("a an and of the to for in on or with by at vs".split(" "));
+const SECWORDS = /^(purpose|scope|objectives?|overview|background|introduction|summary|responsibilit(y|ies)|roles( and responsibilities)?|definitions|glossary|references|related documents|safety|safety precautions|precautions?|prerequisites?|pre-?checks?|pre-?implementation( checks)?|requirements|preparation|procedures?|implementation( plan| steps)?|steps|instructions|verification|validation|post-?checks?|post-?implementation( checks)?|testing|test plan|roll ?back( plan| procedure)?|back-?out( plan| procedure)?|fallback( plan)?|approvals?|sign-?off|impact( assessment)?|risks?( assessment)?|contacts?|escalation|schedule|timeline|maintenance window|revision history|document control|change history|notes?|appendix\b.*)$/i;
+function isHeading(line) {
+  const l = line.trim(); if (!l || l.length > 90) return false;
+  if (/^#{1,6}\s/.test(l)) return true;
+  if (/^(warning|caution|note|danger|important)\b/i.test(l)) return false;
+  const core = l.replace(/^(section|phase|part|appendix)\s+[a-z0-9.]+\s*[:.\-–]?\s*/i, "").replace(/^\d+(\.\d+){0,4}[.)]?\s*/, "").replace(/[:\s]+$/, "");
+  if (core && SECWORDS.test(core)) return true;
+  if (/^(section|phase|part|appendix)\s+[a-z0-9.]+\b/i.test(l) && l.length < 70) return true;
+  if (/[.;,]$/.test(l)) return false;
+  if (/^\d+(\.\d+){0,4}[.)]?\s+\S/.test(l) && l.length < 70) {
+    const w = core.split(/\s+/).filter(Boolean);
+    return w.length > 0 && w.length <= 5 && w.every(x => !/^[a-z]/.test(x) || MINOR.has(x));
+  }
+  if (l === l.toUpperCase() && /[A-Z]{3}/.test(l) && l.length < 70 && l.split(/\s+/).length <= 8) return true;
   return false;
 }
-// blocks: [{text, heading?, page?}] -> chunks with section path
-function chunkBlocks(blocks){
-  const chunks=[]; let sec=""; let buf=[]; let bufLen=0; let page=null; const MAX=900;
-  const flush=()=>{ if(!buf.length) return; const text=buf.join("\n").trim(); if(text) chunks.push({sec, page, text}); buf=[]; bufLen=0; };
-  for(const b of blocks){
-    const t=(b.text||"").replace(/\s+\n/g,"\n").trim(); if(!t) continue;
-    if(b.heading || isHeading(t)){ flush(); sec=t.replace(/^#+\s*/,""); page=b.page??page; continue; }
-    if(bufLen && bufLen+t.length>MAX) flush();
-    if(!buf.length) page=b.page??page;
-    if(t.length>MAX*1.6){ // split long paragraph by sentences
-      const sents=t.match(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g)||[t]; let cur="";
-      for(const s of sents){ if(cur.length+s.length>MAX){ buf.push(cur); flush(); cur=""; page=b.page??page;} cur+=s; }
-      if(cur){buf.push(cur); bufLen+=cur.length;}
-    } else { buf.push(t); bufLen+=t.length; }
+function chunkBlocks(blocks) {
+  const chunks = []; let sec = ""; let buf = []; let bufLen = 0; let page = null; const MAX = 900;
+  const flush = () => { if (!buf.length) return; const text = buf.join("\n").trim(); if (text) chunks.push({ sec, page, text }); buf = []; bufLen = 0; };
+  for (const b of blocks) {
+    const t = (b.text || "").replace(/[ \t]+\n/g, "\n").trim(); if (!t) continue;
+    if (b.heading || isHeading(t)) { flush(); sec = t.replace(/^#+\s*/, ""); page = b.page ?? page; continue; }
+    if (bufLen && bufLen + t.length > MAX) flush();
+    if (!buf.length) page = b.page ?? page;
+    if (t.length > MAX * 1.6) {
+      const sents = t.match(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g) || [t]; let cur = "";
+      for (const s of sents) { if (cur.length + s.length > MAX) { buf.push(cur); flush(); cur = ""; page = b.page ?? page; } cur += s; }
+      if (cur) { buf.push(cur); bufLen += cur.length; }
+    } else { buf.push(t); bufLen += t.length; }
   }
   flush();
   return chunks;
 }
-function textToBlocks(text, page){
-  // Split into lines; merge wrapped lines into paragraphs, keep list items/steps separate
-  const lines=text.replace(/\r/g,"").split("\n"); const blocks=[]; let para="";
-  const push=()=>{ if(para.trim()) blocks.push({text:para.trim(), page}); para=""; };
-  for(const raw of lines){
-    const l=raw.trim();
-    if(!l){ push(); continue; }
-    if(isHeading(l)){ push(); blocks.push({text:l, heading:true, page}); continue; }
-    if(/^([-*•▪◦●]|\(?[a-z0-9]{1,3}[\.)])\s+/i.test(l)){ push(); para=l; continue; }
-    para += (para?" ":"") + l;
+const LIST_RE = /^([-*•▪◦●]|\(?\d+(\.\d+)*[.)]|\(?[a-z][.)]|step\s+\d+[a-z]?\b)\s*/i;
+function textToBlocks(text, page) {
+  const lines = String(text).replace(/\r/g, "").split("\n"); const blocks = []; let para = "";
+  const push = () => { if (para.trim()) blocks.push({ text: para.trim(), page }); para = ""; };
+  for (const raw of lines) {
+    const l = raw.trim();
+    if (!l) { push(); continue; }
+    if (isHeading(l)) { push(); blocks.push({ text: l, heading: true, page }); continue; }
+    if (LIST_RE.test(l) || /^(warning|caution|note|danger|important)\b/i.test(l)) { push(); para = l; continue; }
+    para += (para ? " " : "") + l;
   }
   push(); return blocks;
 }
+function hashStr(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
 
-/* ---------------- File parsing ---------------- */
-const libCache={};
-function loadScript(src){ if(libCache[src]) return libCache[src];
-  return libCache[src]=new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>{delete libCache[src];rej(new Error("Couldn't load "+src.split("/").pop()+" — reading PDF/DOCX needs an internet connection the first time."));};document.head.appendChild(s);});
+/* ================= File parsing (incl. OCR) ================= */
+const SUPPORTED = /\.(pdf|docx|txt|md|markdown|html?|csv|log|json|xml|rtf|png|jpe?g|bmp|webp)$/i;
+const libCache = {};
+function loadScript(src) {
+  if (libCache[src]) return libCache[src];
+  return libCache[src] = new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res;
+    s.onerror = () => { delete libCache[src]; rej(new Error("couldn't load " + src.split("/").pop() + " — reading PDF, Word and scanned files needs internet the first time")); }; document.head.appendChild(s); });
 }
-async function parsePDF(buf){
+let ocrWorker = null;
+async function getOCR() {
+  if (ocrWorker) return ocrWorker;
+  await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+  ocrWorker = await window.Tesseract.createWorker("eng");
+  return ocrWorker;
+}
+async function ocr(src) { const w = await getOCR(); const r = await w.recognize(src); return r.data.text || ""; }
+async function parsePDF(buf, name) {
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
-  const pdfjs=window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-  const pdf=await pdfjs.getDocument({data:buf}).promise; const blocks=[];
-  for(let p=1;p<=pdf.numPages;p++){
-    const page=await pdf.getPage(p); const tc=await page.getTextContent(); let text=""; let lastY=null;
-    for(const it of tc.items){
-      const y=it.transform?it.transform[5]:null;
-      if(lastY!==null && y!==null && Math.abs(y-lastY)>2 && !text.endsWith("\n")) text+="\n";
-      text+=it.str; if(it.hasEOL) text+="\n"; lastY=y;
+  const pdfjs = window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const pdf = await pdfjs.getDocument({ data: buf }).promise; const blocks = []; let ocrPages = 0;
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p); const tc = await page.getTextContent(); let text = ""; let lastY = null;
+    for (const it of tc.items) {
+      const y = it.transform ? it.transform[5] : null;
+      if (lastY !== null && y !== null && Math.abs(y - lastY) > 2 && !text.endsWith("\n")) text += "\n";
+      text += it.str; if (it.hasEOL) text += "\n"; lastY = y;
     }
-    blocks.push(...textToBlocks(text,p));
+    if (text.replace(/\s/g, "").length < 25) { // scanned page → OCR
+      toast(`Reading scanned page ${p}/${pdf.numPages} of ${name}…`, 0);
+      const vp = page.getViewport({ scale: 2 }); const cv = document.createElement("canvas"); cv.width = vp.width; cv.height = vp.height;
+      await page.render({ canvasContext: cv.getContext("2d"), viewport: vp }).promise;
+      text = await ocr(cv); ocrPages++;
+    }
+    blocks.push(...textToBlocks(text, p));
   }
-  return {blocks, pages:pdf.numPages};
+  return { blocks, pages: pdf.numPages, ocr: ocrPages };
 }
-async function parseDOCX(buf){
+async function parseDOCX(buf) {
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js");
-  const r=await window.mammoth.convertToHtml({arrayBuffer:buf});
-  return {blocks: htmlToBlocks(r.value)};
+  const r = await window.mammoth.convertToHtml({ arrayBuffer: buf });
+  return { blocks: htmlToBlocks(r.value) };
 }
-function htmlToBlocks(html){
-  const doc=new DOMParser().parseFromString(html,"text/html"); doc.querySelectorAll("script,style").forEach(e=>e.remove());
-  const blocks=[];
-  doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,pre,td,th,dt,dd,blockquote").forEach(el=>{
-    if(el.closest("li")&&el.tagName!=="LI"&&el.closest("li")!==el) return;
-    if(el.tagName==="LI" && el.querySelector("li")) { const own=[...el.childNodes].filter(n=>!(n.nodeType===1&&/^(UL|OL)$/.test(n.tagName))).map(n=>n.textContent).join(" ").trim(); if(own) blocks.push({text:"• "+own}); return; }
-    if((el.tagName==="TD"||el.tagName==="TH") && el.querySelector("p")) return;
-    if(el.tagName==="P" && el.closest("li")) return;
-    const t=el.textContent.replace(/\s+/g," ").trim(); if(!t) return;
-    const isH=/^H\d$/.test(el.tagName);
-    blocks.push({text: el.tagName==="LI"?"• "+t:t, heading:isH});
+function htmlToBlocks(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html"); doc.querySelectorAll("script,style").forEach(e => e.remove());
+  const blocks = [];
+  doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,pre,td,th,dt,dd,blockquote").forEach(el => {
+    if (el.tagName !== "LI" && el.closest("li")) return;
+    if ((el.tagName === "TD" || el.tagName === "TH") && el.querySelector("p")) return;
+    if (el.tagName === "LI") {
+      const own = [...el.childNodes].filter(n => !(n.nodeType === 1 && /^(UL|OL)$/.test(n.tagName))).map(n => n.textContent).join(" ").replace(/\s+/g, " ").trim();
+      if (own) { const ol = el.parentElement && el.parentElement.tagName === "OL"; const idx = ol ? [...el.parentElement.children].indexOf(el) + 1 : 0; blocks.push({ text: (ol ? idx + ". " : "• ") + own }); }
+      return;
+    }
+    const t = el.textContent.replace(/\s+/g, " ").trim(); if (!t) return;
+    blocks.push({ text: t, heading: /^H\d$/.test(el.tagName) });
   });
-  if(!blocks.length) return textToBlocks(doc.body.textContent||"");
+  if (!blocks.length) return textToBlocks(doc.body.textContent || "");
   return blocks;
 }
-function guessType(name,text){
-  const s=(name+" "+text.slice(0,3000)).toLowerCase();
-  if(/\bmop\b|method of procedure|maintenance window|back-?out plan|rollback plan|change request/.test(s)) return "MOP";
-  if(/\bsop\b|standard operating procedure/.test(s)) return "SOP";
+async function parseFile(f) {
+  const ext = (f.name.split(".").pop() || "").toLowerCase();
+  if (ext === "pdf") return parsePDF(await f.arrayBuffer(), f.name);
+  if (ext === "docx") return parseDOCX(await f.arrayBuffer());
+  if (ext === "html" || ext === "htm") return { blocks: htmlToBlocks(await f.text()) };
+  if (/^(png|jpe?g|bmp|webp)$/.test(ext)) { toast("Reading text from image " + f.name + "…", 0); return { blocks: textToBlocks(await ocr(f)), ocr: 1 }; }
+  if (ext === "rtf") return { blocks: textToBlocks((await f.text()).replace(/\\par[d]?/g, "\n").replace(/\{\*?\\[^{}]+}|[{}]|\\[a-z]+-?\d* ?/gi, "")) };
+  return { blocks: textToBlocks(await f.text()) };
+}
+function guessType(name, text) {
+  const s = (name + " " + text.slice(0, 3000)).toLowerCase();
+  if (/\bmop\b|method of procedure|maintenance window|back-?out plan|rollback plan|change request/.test(s)) return "MOP";
+  if (/\bsop\b|standard operating procedure/.test(s)) return "SOP";
   return "SOP";
 }
-async function addFiles(files){
-  const pick=document.querySelector('input[name=dtype]:checked').value;
-  for(const f of files){
-    const ext=(f.name.split(".").pop()||"").toLowerCase();
-    toast("Reading "+f.name+"…",60000);
-    try{
-      let parsed;
-      if(ext==="pdf") parsed=await parsePDF(await f.arrayBuffer());
-      else if(ext==="docx") parsed=await parseDOCX(await f.arrayBuffer());
-      else if(ext==="html"||ext==="htm") parsed={blocks:htmlToBlocks(await f.text())};
-      else if(ext==="rtf") parsed={blocks:textToBlocks((await f.text()).replace(/\\par[d]?/g,"\n").replace(/\{\*?\\[^{}]+}|[{}]|\\[a-z]+-?\d* ?/gi,""))};
-      else parsed={blocks:textToBlocks(await f.text())};
-      const chunks=chunkBlocks(parsed.blocks);
-      if(!chunks.length){ toast("No readable text in "+f.name+" (scanned PDFs need OCR first)",5000); continue; }
-      const full=chunks.map(c=>c.text).join("\n");
-      const doc={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()), name:f.name.replace(/\.[^.]+$/,""), file:f.name,
-        type: pick==="AUTO"?guessType(f.name,full):pick, added:Date.now(), pages:parsed.pages||null, chunks};
-      await storePut(doc);
-    }catch(e){ console.error(e); toast("Couldn't read "+f.name+": "+e.message,6000); }
+
+/* ================= Library & revisions ================= */
+let ALL = [];            // every document, including old revisions
+let DOCS = [];           // current revisions only
+const active = () => ALL.filter(d => !d.archived);
+function familyKey(name) {
+  return String(name).toLowerCase().replace(/\.[a-z0-9]{2,5}$/, "").replace(/\(\d+\)/g, " ")
+    .replace(/\b(rev(ision)?|ver(sion)?|v|r)[\s._-]*\d+(\.\d+)?[a-z]?\b/g, " ")
+    .replace(/\b(draft|final|copy|updated|latest)\b/g, " ").replace(/\b(19|20)\d{2}[-_.]?\d{2}[-_.]?\d{2}\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ").trim();
+}
+function revLabel(name, text) {
+  const re = /\b(?:rev(?:ision)?|version|ver)\.?\s*[:#]?\s*(\d+(?:\.\d+)?|[A-Z]{1,2})\b/i;
+  const m = String(name).match(re) || String(name).match(/\bv(\d+(?:\.\d+)?)\b/i) || String(text).slice(0, 2500).match(re);
+  return m ? m[1] : null;
+}
+const revName = d => "Rev " + (d.revLabel || d.revSeq || 1);
+async function ingest(f, { type, srcKey, srcModified, quiet } = {}) {
+  const parsed = await parseFile(f);
+  const chunks = chunkBlocks(parsed.blocks);
+  if (!chunks.length) { if (!quiet) toast("No readable text in " + f.name, 5000); return null; }
+  const full = chunks.map(c => c.text).join("\n");
+  const doc = { id: uid(), name: f.name.replace(/\.[^.]+$/, ""), file: f.name, type: type && type !== "AUTO" ? type : guessType(f.name, full),
+    added: Date.now(), pages: parsed.pages || null, ocr: parsed.ocr || 0, chunks, hash: hashStr(full), srcKey: srcKey || null, srcModified: srcModified ?? null };
+  return addDoc(doc, { quiet, typeGiven: type && type !== "AUTO" });
+}
+async function addDoc(doc, { quiet, typeGiven } = {}) {
+  const fam = familyKey(doc.name);
+  const prev = active().find(d => (doc.srcKey && d.srcKey === doc.srcKey) || (fam && d.family === fam));
+  doc.family = prev ? prev.family : (fam || doc.id);
+  doc.revLabel = revLabel(doc.file || doc.name, doc.chunks.map(c => c.text).join("\n"));
+  if (prev) {
+    if (prev.hash === doc.hash) {
+      if (doc.srcModified != null || doc.srcKey) { prev.srcModified = doc.srcModified; prev.srcKey = prev.srcKey || doc.srcKey; await storePut(prev); }
+      if (!quiet) toast(`"${doc.name}" is already in the library`);
+      return prev;
+    }
+    doc.revSeq = Math.max(...ALL.filter(d => d.family === prev.family).map(d => d.revSeq || 1)) + 1;
+    if (!typeGiven) { doc.type = prev.type; doc.typeLocked = prev.typeLocked; }
+    if (doc.revLabel && doc.revLabel === prev.revLabel) doc.revLabel = null;
+    prev.archived = true; await storePut(prev);
+    if (!quiet) toast(`Added as a new revision of "${prev.name}" — the old one is in History`, 4500);
+  } else doc.revSeq = 1;
+  await storePut(doc); ALL.push(doc);
+  return doc;
+}
+async function removeFamily(d) {
+  for (const x of ALL.filter(x => x.family === d.family)) { await storeDel(x.id); localStorage.removeItem("procedure.run." + x.id); }
+  ALL = ALL.filter(x => x.family !== d.family);
+}
+async function addFiles(files) {
+  const pick = document.querySelector('input[name=dtype]:checked').value; let n = 0;
+  for (const f of files) {
+    if (!SUPPORTED.test(f.name)) { toast("Skipped " + f.name + " (unsupported type)", 3500); continue; }
+    toast("Reading " + f.name + "…", 0);
+    try { if (await ingest(f, { type: pick })) n++; } catch (e) { console.error(e); toast("Couldn't read " + f.name + ": " + e.message, 6000); }
   }
-  toast("Library updated");
   await refresh();
+  if (n && $("#toast").textContent.startsWith("Reading")) toast("Library updated");
+  ensureEmbeddings();
 }
-
-/* ---------------- Index (BM25) ---------------- */
-let DOCS=[]; let IDX=null;
-function buildIndex(){
-  const items=[]; const df=new Map();
-  for(const d of DOCS) d.chunks.forEach((c,i)=>{
-    const toks=tokens((c.sec?c.sec+" ":"")+c.text+" "+d.name);
-    const tf=new Map(); for(const t of toks) tf.set(t,(tf.get(t)||0)+1);
-    for(const t of tf.keys()) df.set(t,(df.get(t)||0)+1);
-    items.push({doc:d, i, c, tf, len:toks.length});
-  });
-  const avg=items.reduce((a,b)=>a+b.len,0)/(items.length||1);
-  IDX={items, df, avg, N:items.length};
-}
-function search(q, scope, k=10){
-  if(!IDX||!IDX.N) return [];
-  const qt=[...new Set(tokens(q))]; if(!qt.length) return [];
-  const {items,df,avg,N}=IDX; const k1=1.4,b=0.7; const res=[];
-  const phrase=q.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
-  for(const it of items){
-    if(scope!=="ALL"){ if(scope==="SOP"||scope==="MOP"){ if(it.doc.type!==scope) continue; } else if(it.doc.id!==scope) continue; }
-    let s=0, hit=0;
-    for(const t of qt){ const f=it.tf.get(t); if(!f) continue; hit++; const n=df.get(t)||0; const idf=Math.log(1+(N-n+.5)/(n+.5)); s+=idf*(f*(k1+1))/(f+k1*(1-b+b*it.len/avg)); }
-    if(!s) continue;
-    s*= 1 + 0.5*(hit/qt.length);                       // reward covering more of the question
-    if(phrase.length>8 && it.c.text.toLowerCase().includes(phrase)) s*=1.5;
-    if(it.c.sec){ const st=tokens(it.c.sec); if(qt.some(t=>st.includes(t))) s*=1.15; }
-    res.push({...it, score:s});
+async function refresh() {
+  ALL = await storeAll();
+  for (const d of ALL) { // upgrade v1.0 records
+    if (!d.family) d.family = familyKey(d.name) || d.id;
+    if (!d.revSeq) d.revSeq = 1;
+    if (!d.hash) d.hash = hashStr(d.chunks.map(c => c.text).join("\n"));
   }
-  res.sort((a,b)=>b.score-a.score);
-  return res.slice(0,k);
-}
-function highlight(text, q){
-  const qt=new Set(tokens(q)); if(!qt.size) return esc(text);
-  return esc(text).replace(/[A-Za-z0-9][A-Za-z0-9\-_]*/g, w=>{ const lw=w.toLowerCase(); return (qt.has(lw)||qt.has(stem(lw)))?"<mark>"+w+"</mark>":w; });
-}
-function bestSentences(hits,q,n=3){
-  const qt=new Set(tokens(q)); const cand=[];
-  hits.slice(0,4).forEach((h,hi)=>{
-    const sents=h.c.text.split(/(?<=[.!?])\s+|\n+/).map(s=>s.trim()).filter(s=>s.length>12);
-    sents.forEach((s,si)=>{ const st=tokens(s); let m=0; const seen=new Set(); for(const t of st) if(qt.has(t)&&!seen.has(t)){m++;seen.add(t);} if(m) cand.push({s, score:m/Math.sqrt(qt.size)+(4-hi)*0.15-si*0.01, ref:hi+1}); });
-  });
-  cand.sort((a,b)=>b.score-a.score);
-  return cand.slice(0,n);
+  DOCS = active().sort((a, b) => a.name.localeCompare(b.name));
+  buildIndex(); renderLib();
 }
 
-/* ---------------- AI engines ---------------- */
+/* ================= Search (BM25 + synonyms + glossary + meaning + feedback) ================= */
+let IDX = null;
+function buildIndex() {
+  const items = []; const df = new Map();
+  for (const d of ALL) d.chunks.forEach((c, i) => {
+    const toks = tokens((c.sec ? c.sec + " " : "") + c.text + " " + d.name);
+    const tf = new Map(); for (const t of toks) tf.set(t, (tf.get(t) || 0) + 1);
+    for (const t of tf.keys()) df.set(t, (df.get(t) || 0) + 1);
+    items.push({ doc: d, i, c, tf, len: toks.length, key: d.family + "|" + hashStr(c.text) });
+  });
+  const avg = items.reduce((a, b) => a + b.len, 0) / (items.length || 1);
+  IDX = { items, df, avg, N: items.length };
+}
+const SYN = [
+  ["rollback", "roll back", "back out", "backout", "back-out", "revert", "fallback", "restore"],
+  ["verify", "verification", "validate", "validation", "post-check", "postcheck", "post check", "confirm", "sanity check", "smoke test"],
+  ["prerequisite", "prerequisites", "pre-check", "precheck", "pre check", "pre-requisite", "before you begin", "requirements", "preparation"],
+  ["approval", "approve", "sign-off", "signoff", "authorization", "authorisation", "cab", "change advisory board"],
+  ["outage", "downtime", "service impact", "impact"],
+  ["ppe", "personal protective equipment", "safety gear"],
+  ["loto", "lockout", "tagout", "lock out tag out", "lockout tagout"],
+  ["escalate", "escalation", "on-call", "oncall", "contact"],
+  ["reboot", "restart", "power cycle"],
+  ["shutdown", "shut down", "power off", "power down"],
+  ["upgrade", "update", "patch"],
+  ["backup", "back up", "snapshot"],
+  ["maintenance window", "change window"],
+  ["who", "responsible", "responsibility", "owner", "role"]
+];
+function glossaryPairs() {
+  return (S.glossary || "").split("\n").map(l => l.split(/\s*[=:]\s*/)).filter(p => p.length >= 2 && p[0].trim() && p.slice(1).join(" ").trim())
+    .map(p => [p[0].trim(), p.slice(1).join(" ").trim()]);
+}
+function queryTerms(q) {
+  const w = new Map(); for (const t of tokens(q)) w.set(t, 1);
+  const ql = " " + q.toLowerCase().replace(/[^a-z0-9]+/g, " ") + " ";
+  const has = p => { const n = p.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); return n && ql.includes(" " + n + " "); };
+  const add = (p, wt) => { for (const t of tokens(p)) if (!w.has(t)) w.set(t, wt); };
+  for (const g of SYN) if (g.some(has)) g.forEach(p => add(p, 0.6));
+  for (const [a, b] of glossaryPairs()) { if (has(a)) add(b, 0.8); if (has(b)) add(a, 0.8); }
+  return w;
+}
+function inScope(d, scope) {
+  if (scope === "HIST") return true;
+  if (d.archived) return d.id === scope;
+  if (scope === "ALL") return true;
+  if (scope === "SOP" || scope === "MOP") return d.type === scope;
+  return d.id === scope;
+}
+function fbBoost(qw, key) {
+  let s = 0;
+  for (const f of FB) { if (f.k !== key) continue; let o = 0; for (const t of f.t) if (qw.get(t) === 1) o++; const ov = o / Math.max(f.t.length, 1); if (ov >= 0.34) s += f.v * ov; }
+  return Math.min(2, Math.max(0.4, 1 + 0.3 * s));
+}
+const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
+async function search(q, scope, k = 10) {
+  if (!IDX || !IDX.N) return [];
+  const qw = queryTerms(q); if (!qw.size) return [];
+  let qv = null;
+  if (S.smart && embedder) { try { qv = (await embed([q]))[0]; } catch (e) {} }
+  const { items, df, avg, N } = IDX; const k1 = 1.4, b = 0.7;
+  const base = [...qw.values()].filter(v => v === 1).length || 1;
+  const phrase = q.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const res = []; let maxB = 0;
+  for (const it of items) {
+    if (!inScope(it.doc, scope)) continue;
+    let s = 0, hit = 0;
+    for (const [t, wt] of qw) { const f = it.tf.get(t); if (!f) continue; if (wt === 1) hit++; const n = df.get(t) || 0; const idf = Math.log(1 + (N - n + .5) / (n + .5)); s += wt * idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * it.len / avg)); }
+    if (s) {
+      s *= 1 + 0.5 * (hit / base);
+      if (phrase.length > 8 && it.c.text.toLowerCase().includes(phrase)) s *= 1.5;
+      if (it.c.sec) { const st = tokens(it.c.sec); if ([...qw.keys()].some(t => st.includes(t))) s *= 1.15; }
+    }
+    const cos = qv && it.c.emb ? dot(qv, it.c.emb) : 0;
+    if (!s && cos < 0.45) continue;
+    res.push({ ...it, bm: s, cos }); if (s > maxB) maxB = s;
+  }
+  for (const r of res) {
+    const bn = maxB ? r.bm / maxB : 0;
+    r.score = (qv ? 0.55 * bn + 0.45 * Math.max(0, (r.cos - 0.2) / 0.8) : bn) * fbBoost(qw, r.key);
+  }
+  res.sort((a, b) => b.score - a.score);
+  return res.slice(0, k);
+}
+function highlight(text, q) {
+  const qt = new Set(queryTerms(q).keys()); if (!qt.size) return esc(text);
+  return esc(text).replace(/[A-Za-z0-9][A-Za-z0-9\-_]*/g, w => { const lw = w.toLowerCase(); return (qt.has(lw) || qt.has(stem(lw))) ? "<mark>" + w + "</mark>" : w; });
+}
+function bestSentences(hits, q, n = 3) {
+  const qw = queryTerms(q); const cand = [];
+  hits.slice(0, 4).forEach((h, hi) => {
+    const sents = h.c.text.split(/(?<=[.!?])\s+|\n+/).map(s => s.trim()).filter(s => s.length > 12);
+    sents.forEach((s, si) => { let m = 0; const seen = new Set(); for (const t of tokens(s)) if (qw.has(t) && !seen.has(t)) { m += qw.get(t); seen.add(t); } if (m) cand.push({ s, score: m / Math.sqrt(qw.size) + (4 - hi) * 0.15 - si * 0.01, ref: hi + 1 }); });
+  });
+  cand.sort((a, b) => b.score - a.score);
+  return cand.slice(0, n);
+}
+
+/* ---- Smart search (local embeddings) ---- */
+let embedder = null, embedding = false, embedLoading = null;
+function getEmbedder() {
+  if (embedder) return Promise.resolve(embedder);
+  if (!embedLoading) embedLoading = (async () => {
+    const T = await import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.1.2");
+    embedder = await T.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+    return embedder;
+  })().catch(e => { embedLoading = null; throw e; });
+  return embedLoading;
+}
+async function embed(texts) {
+  const e = await getEmbedder(); const o = await e(texts, { pooling: "mean", normalize: true });
+  const dim = o.dims[o.dims.length - 1]; return texts.map((_, i) => o.data.slice(i * dim, (i + 1) * dim));
+}
+async function ensureEmbeddings() {
+  if (!S.smart || embedding) return; embedding = true;
+  try {
+    const todo = ALL.filter(d => d.chunks.some(c => !c.emb));
+    const total = todo.reduce((a, d) => a + d.chunks.filter(c => !c.emb).length, 0);
+    if (!embedder) setStatus("Loading smart search model (one-time download)…");
+    await getEmbedder();
+    let done = 0;
+    for (const d of todo) {
+      const need = d.chunks.filter(c => !c.emb);
+      for (let i = 0; i < need.length; i += 16) {
+        const batch = need.slice(i, i + 16);
+        const vs = await embed(batch.map(c => (c.sec ? c.sec + ": " : "") + c.text.slice(0, 1200)));
+        batch.forEach((c, j) => c.emb = vs[j]); done += batch.length;
+        setStatus(`Smart search: indexing ${done}/${total}…`);
+      }
+      await storePut(d);
+    }
+    setStatus("");
+  } catch (e) { setStatus(""); toast("Smart search couldn't load (needs internet once): " + e.message, 7000); }
+  embedding = false;
+}
+
+/* ================= AI engines ================= */
 const SYS = `You answer questions about an organization's Standard Operating Procedures (SOPs) and Methods of Procedure (MOPs).
 Rules:
 - Use ONLY the numbered source passages provided. Do not use outside knowledge for procedure details.
 - Cite sources inline like [1] or [2][4] after each claim.
 - When the answer is a procedure, give the steps in order, keeping the original step numbers, values, commands and warnings exactly.
 - Always mention any safety warnings, prerequisites, approvals, or rollback/back-out steps that the passages attach to the steps you give.
+- If passages come from different revisions of the same document, prefer the current one and say if an older revision differs.
 - If the passages don't contain the answer, say plainly that the documents don't cover it, and mention the closest related passage if any.
 - Be concise.`;
-function buildPrompt(q,hits){
-  const ctx=hits.map((h,i)=>`[${i+1}] ${h.doc.type} "${h.doc.name}"${h.c.sec?" — "+h.c.sec:""}${h.c.page?" (p."+h.c.page+")":""}\n${h.c.text}`).join("\n\n");
-  return `Source passages:\n\n${ctx}\n\nQuestion: ${q}`;
+function buildPrompt(q, hits) {
+  const ctx = hits.map((h, i) => `[${i + 1}] ${h.doc.type} "${h.doc.name}" ${revName(h.doc)}${h.doc.archived ? " (OLD revision)" : ""}${h.c.sec ? " — " + h.c.sec : ""}${h.c.page ? " (p." + h.c.page + ")" : ""}\n${h.c.text}`).join("\n\n");
+  const gl = glossaryPairs(); const glTxt = gl.length ? "Team glossary:\n" + gl.map(([a, b]) => `${a} = ${b}`).join("\n") + "\n\n" : "";
+  return `${glTxt}Source passages:\n\n${ctx}\n\nQuestion: ${q}`;
 }
-async function aiAnswer(q,hits,history){
-  const user=buildPrompt(q,hits);
-  const hist=history.slice(-4).flatMap(h=>[{role:"user",content:h.q},{role:"assistant",content:h.a||"(no answer)"}]);
-  if(S.engine==="ollama"){
-    const r=await fetch(S.ollamaUrl.replace(/\/$/,"")+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:S.ollamaModel,stream:false,options:{temperature:0.1},messages:[{role:"system",content:SYS},...hist,{role:"user",content:user}]})});
-    if(!r.ok) throw new Error("Ollama: "+r.status+" "+(await r.text()).slice(0,200));
+async function aiAnswer(q, hits, history) {
+  const user = buildPrompt(q, hits);
+  const hist = history.slice(-4).flatMap(h => [{ role: "user", content: h.q }, { role: "assistant", content: h.a || "(no answer)" }]);
+  if (S.engine === "ollama") {
+    const r = await fetch(S.ollamaUrl.replace(/\/$/, "") + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: S.ollamaModel, stream: false, options: { temperature: 0.1 }, messages: [{ role: "system", content: SYS }, ...hist, { role: "user", content: user }] }) });
+    if (!r.ok) throw new Error("Ollama: " + r.status + " " + (await r.text()).slice(0, 200));
     return (await r.json()).message.content;
   }
-  if(S.engine==="openai"){
-    const h={"Content-Type":"application/json"}; if(S.oaKey) h.Authorization="Bearer "+S.oaKey;
-    const r=await fetch(S.oaUrl.replace(/\/$/,"")+"/chat/completions",{method:"POST",headers:h,body:JSON.stringify({model:S.oaModel,temperature:0.1,messages:[{role:"system",content:SYS},...hist,{role:"user",content:user}]})});
-    if(!r.ok) throw new Error("Server: "+r.status+" "+(await r.text()).slice(0,200));
+  if (S.engine === "openai") {
+    const h = { "Content-Type": "application/json" }; if (S.oaKey) h.Authorization = "Bearer " + S.oaKey;
+    const r = await fetch(S.oaUrl.replace(/\/$/, "") + "/chat/completions", { method: "POST", headers: h, body: JSON.stringify({ model: S.oaModel, temperature: 0.1, messages: [{ role: "system", content: SYS }, ...hist, { role: "user", content: user }] }) });
+    if (!r.ok) throw new Error("Server: " + r.status + " " + (await r.text()).slice(0, 200));
     return (await r.json()).choices[0].message.content;
   }
-  if(S.engine==="anthropic"){
-    if(!S.anKey) throw new Error("Add your Anthropic API key in Answer engine settings.");
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":S.anKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-      body:JSON.stringify({model:S.anModel,max_tokens:1500,system:SYS,messages:[...hist,{role:"user",content:user}]})});
-    if(!r.ok) throw new Error("Claude API: "+r.status+" "+(await r.text()).slice(0,300));
-    return (await r.json()).content.map(b=>b.text||"").join("");
+  if (S.engine === "anthropic") {
+    if (!S.anKey) throw new Error("Add your Anthropic API key in Answer engine settings.");
+    const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": S.anKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+      body: JSON.stringify({ model: S.anModel, max_tokens: 1500, system: SYS, messages: [...hist, { role: "user", content: user }] }) });
+    if (!r.ok) throw new Error("Claude API: " + r.status + " " + (await r.text()).slice(0, 300));
+    return (await r.json()).content.map(b => b.text || "").join("");
   }
   return null;
 }
 
-/* ---------------- UI ---------------- */
-let HISTORY=[];
-function renderLib(){
-  const lib=$("#lib"); const n=DOCS.length;
-  $("#libcount").textContent=`Library · ${n} doc${n===1?"":"s"}`;
-  if(!n){ lib.innerHTML='<div class="hint" style="padding:8px">No documents yet. Add your SOPs and MOPs above — everything stays on this computer.</div>'; }
-  else lib.innerHTML=DOCS.map(d=>`<div class="doc" data-id="${d.id}"><span class="tag ${d.type}" data-flip title="Click to change type">${d.type}</span><span class="name" title="${esc(d.file||d.name)}">${esc(d.name)}</span><span class="meta">${d.pages?d.pages+"p":d.chunks.length+"§"}</span><button class="ghost x" data-del title="Remove">✕</button></div>`).join("");
-  const sc=$("#scope"); const cur=sc.value||"ALL";
-  sc.innerHTML=`<option value="ALL">All documents</option><option value="SOP">SOPs only</option><option value="MOP">MOPs only</option>`+DOCS.map(d=>`<option value="${d.id}">${esc(d.name.slice(0,40))}</option>`).join("");
-  sc.value=[...sc.options].some(o=>o.value===cur)?cur:"ALL";
-  const names={search:"Search only (offline)",ollama:"Ollama · "+S.ollamaModel,openai:"Local server · "+S.oaModel,anthropic:"Claude API · "+S.anModel};
-  $("#modeLabel").innerHTML="Answer engine: <b>"+esc(names[S.engine])+"</b>";
-  if(!HISTORY.length) renderEmpty();
+/* ================= UI: library ================= */
+let HISTORY = [];
+function renderLib() {
+  const lib = $("#lib"); const n = DOCS.length; const f = $("#libFilter").value.trim().toLowerCase();
+  $("#libcount").textContent = `Library · ${n} doc${n === 1 ? "" : "s"}`;
+  const famCount = {}; for (const d of ALL) famCount[d.family] = (famCount[d.family] || 0) + 1;
+  const list = f ? DOCS.filter(d => (d.name + " " + d.type).toLowerCase().includes(f)) : DOCS;
+  if (!n) lib.innerHTML = '<div class="hint" style="padding:8px">No documents yet. Add your SOPs and MOPs above, or connect a 👥 Team library — everything stays on this computer.</div>';
+  else lib.innerHTML = list.map(d => {
+    const multi = famCount[d.family] > 1;
+    const sic = d.srcKey ? (d.srcKey.startsWith("gh:") ? '<span class="srcic" title="Synced from GitHub">🐙</span>' : '<span class="srcic" title="Synced from folder">📁</span>') : "";
+    return `<div class="doc" data-id="${d.id}"><span class="tag ${d.type}" data-act="flip" title="Click to change type">${d.type}</span>${sic}<span class="name" title="${esc(d.file || d.name)}">${esc(d.name)}</span>${multi ? `<span class="rev" title="${famCount[d.family]} revisions">${esc(revName(d))}</span>` : ""}<span class="meta">${d.pages ? d.pages + "p" : d.chunks.length + "§"}${d.ocr ? " · OCR" : ""}</span><span class="acts"><button class="ghost" data-act="check" title="Run as checklist">☑</button><button class="ghost" data-act="hist" title="Revision history${multi ? "" : " (add a newer version to compare)"}">⟲</button><button class="ghost" data-act="del" title="Remove">✕</button></span></div>`;
+  }).join("") || '<div class="hint" style="padding:8px">No matches.</div>';
+  const sc = $("#scope"); const cur = sc.value || "ALL";
+  sc.innerHTML = `<option value="ALL">All documents</option><option value="SOP">SOPs only</option><option value="MOP">MOPs only</option><option value="HIST">All incl. old revisions</option>` + DOCS.map(d => `<option value="${d.id}">${esc(d.name.slice(0, 40))}</option>`).join("");
+  sc.value = [...sc.options].some(o => o.value === cur) ? cur : "ALL";
+  const names = { search: "Search only (offline)", ollama: "Ollama · " + S.ollamaModel, openai: "Local server · " + S.oaModel, anthropic: "Claude API · " + S.anModel };
+  $("#modeLabel").innerHTML = "Answer engine: <b>" + esc(names[S.engine]) + "</b>" + (S.smart ? " · <b>smart search</b>" : "");
+  renderPins();
+  if (!HISTORY.length) renderEmpty();
 }
-function renderEmpty(){
-  const sugs = DOCS.length ? ["What are the prerequisites?","What is the rollback procedure?","Who needs to approve this change?","What safety precautions are required?"] : [];
-  $("#chatInner").innerHTML=`<div class="empty"><h2>${DOCS.length?"Ask anything about your procedures":"Add SOPs and MOPs to get started"}</h2>
-  <div>${DOCS.length?"Answers come straight from your documents, with links to the exact section.":"Drop PDF, Word or text files on the left. Nothing is uploaded — it all stays in this browser."}</div>
-  <div class="sugs">${sugs.map(s=>`<button data-sug>${s}</button>`).join("")}</div></div>`;
+function renderEmpty() {
+  const sugs = DOCS.length ? ["What are the prerequisites?", "What is the rollback procedure?", "Who needs to approve this change?", "What safety precautions are required?"] : [];
+  $("#chatInner").innerHTML = `<div class="empty"><h2>${DOCS.length ? "Ask anything about your procedures" : "Add SOPs and MOPs to get started"}</h2>
+  <div>${DOCS.length ? "Answers come straight from your documents, with links to the exact section." : "Drop PDF, Word, scanned or text files on the left. Nothing is uploaded — it all stays on this computer."}</div>
+  <div class="sugs">${sugs.map(s => `<button data-sug>${esc(s)}</button>`).join("")}</div></div>`;
 }
-async function refresh(){ DOCS=(await storeAll()).sort((a,b)=>a.name.localeCompare(b.name)); buildIndex(); renderLib(); }
+function renderPins() {
+  $("#pins").innerHTML = PINS.map((p, i) => `<span class="chip" data-pin="${i}" title="Ask again">★ ${esc(p.length > 60 ? p.slice(0, 57) + "…" : p)}<span class="x" data-unpin="${i}" title="Unpin">✕</span></span>`).join("");
+}
+function togglePin(q) { const i = PINS.indexOf(q); if (i >= 0) PINS.splice(i, 1); else PINS.unshift(q); PINS = PINS.slice(0, 20); lsSet("procedure.pins", PINS); renderPins(); document.querySelectorAll(".pinbtn").forEach(b => { if (b.dataset.q === q) b.classList.toggle("on", PINS.includes(q)); }); }
 
-function srcHTML(hits,q){
-  return hits.map((h,i)=>`<div class="src" data-doc="${h.doc.id}" data-chunk="${h.i}"><div class="h"><span class="n">[${i+1}]</span><span class="tag ${h.doc.type}">${h.doc.type}</span><span class="d">${esc(h.doc.name)}</span>${h.c.sec?"<span>› "+esc(h.c.sec)+"</span>":""}${h.c.page?"<span>· p."+h.c.page+"</span>":""}</div><div class="t">${highlight(h.c.text,q)}</div></div>`).join("");
+/* ================= UI: asking ================= */
+function srcHTML(hits, q) {
+  return hits.map((h, i) => `<div class="src" data-doc="${h.doc.id}" data-chunk="${h.i}"><div class="h"><span class="n">[${i + 1}]</span><span class="tag ${h.doc.type}">${h.doc.type}</span><span class="d">${esc(h.doc.name)}</span>${h.doc.archived ? '<span class="rev">old ' + esc(revName(h.doc)) + "</span>" : ""}${h.c.sec ? "<span>› " + esc(h.c.sec) + "</span>" : ""}${h.c.page ? "<span>· p." + h.c.page + "</span>" : ""}</div><div class="t">${highlight(h.c.text, q)}</div></div>`).join("");
 }
-function linkCites(text,hits){
-  return esc(text).replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g,(m,g)=>g.split(/\s*,\s*/).map(n=>{const h=hits[+n-1]; return h?`<span class="cite" data-doc="${h.doc.id}" data-chunk="${h.i}" title="${esc(h.doc.name)}">${n}</span>`:"["+n+"]";}).join(""))
-    .replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+function linkCites(text, hits) {
+  return esc(text).replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g, (m, g) => g.split(/\s*,\s*/).map(n => { const h = hits[+n - 1]; return h ? `<span class="cite" data-doc="${h.doc.id}" data-chunk="${h.i}" title="${esc(h.doc.name)}">${n}</span>` : "[" + n + "]"; }).join(""))
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
 }
-async function ask(qText){
-  const q=(qText??$("#q").value).trim(); if(!q) return;
-  if(!DOCS.length){ toast("Add some documents first"); return; }
-  $("#q").value=""; autoGrow();
-  if(!HISTORY.length) $("#chatInner").innerHTML="";
-  const scope=$("#scope").value;
-  // include the previous question's words for short follow-ups ("and the rollback?")
-  const prev=HISTORY.length?HISTORY[HISTORY.length-1].q:"";
-  let hits=search(q,scope,Math.max(S.topK,6));
-  if(prev && tokens(q).length<=3){ const more=search(q+" "+prev,scope,Math.max(S.topK,6)); if(more.length) hits=more; }
-  const wrap=document.createElement("div");
-  wrap.innerHTML=`<div class="q">${esc(q)}</div>`;
-  const ansBox=document.createElement("div"); ansBox.className="a";
-  const srcBox=document.createElement("div"); srcBox.className="a";
-  wrap.append(ansBox,srcBox); $("#chatInner").append(wrap);
-  const entry={q,a:""}; HISTORY.push(entry);
-  if(!hits.length){
-    ansBox.innerHTML=`<h4>Answer</h4><div class="ans">Nothing in ${scope==="ALL"?"your library":"this scope"} matches that. Try different wording, a step name, or a system/equipment name.</div>`;
+function feedbackHTML(id) { return `<div class="fb" data-fb="${id}">Was this helpful? <button data-v="1" title="Yes — rank these sources higher for questions like this">👍</button><button data-v="-1" title="No — rank these sources lower">👎</button></div>`; }
+async function ask(qText) {
+  const q = (qText ?? $("#q").value).trim(); if (!q) return;
+  if (!DOCS.length) { toast("Add some documents first"); return; }
+  $("#q").value = ""; autoGrow();
+  if (!HISTORY.length) $("#chatInner").innerHTML = "";
+  const scope = $("#scope").value;
+  const prev = HISTORY.length ? HISTORY[HISTORY.length - 1].q : "";
+  let hits = await search(q, scope, Math.max(S.topK, 8));
+  if (prev && tokens(q).length <= 3) { const more = await search(q + " " + prev, scope, Math.max(S.topK, 8)); if (more.length) hits = more; }
+  const entry = { id: HISTORY.length, q, a: "", hits, refs: [] }; HISTORY.push(entry);
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<div class="qrow"><div class="q">${esc(q)}</div><button class="ghost pinbtn${PINS.includes(q) ? " on" : ""}" data-q="${esc(q)}" title="Save this question">★</button></div>`;
+  const ansBox = document.createElement("div"); ansBox.className = "a";
+  const srcBox = document.createElement("div"); srcBox.className = "a";
+  wrap.append(ansBox, srcBox); $("#chatInner").append(wrap);
+  if (!hits.length) {
+    ansBox.innerHTML = `<h4>Answer</h4><div class="ans">Nothing in ${scope === "ALL" ? "your library" : "this scope"} matches that. Try different wording, a step name, or a system/equipment name${S.smart ? "" : " — or turn on Smart search in ⚙ Answer engine"}.</div>`;
     srcBox.remove(); scrollEnd(); return;
   }
-  srcBox.innerHTML=`<h4>Sources — click to open in document</h4>`+srcHTML(hits.slice(0,S.engine==="search"?8:S.topK),q);
-  if(S.engine==="search"){
-    const bs=bestSentences(hits,q);
-    entry.a=bs.map(b=>b.s).join(" ");
-    ansBox.innerHTML=`<h4>Best matching lines</h4><div class="ans">${bs.length?bs.map(b=>`• ${highlight(b.s,q)} ${linkCites("["+b.ref+"]",hits)}`).join("\n"):"See the matching sections below."}</div>`;
+  const shown = hits.slice(0, S.engine === "search" ? 8 : S.topK);
+  srcBox.innerHTML = `<h4>Sources — click to open in document</h4>` + srcHTML(shown, q);
+  const extractive = () => { const bs = bestSentences(hits, q); entry.refs = [...new Set(bs.map(b => b.ref - 1))]; return bs.map(b => `• ${highlight(b.s, q)} ${linkCites("[" + b.ref + "]", hits)}`).join("\n"); };
+  if (S.engine === "search") {
+    const html = extractive(); entry.a = bestSentences(hits, q).map(b => b.s).join(" ");
+    ansBox.innerHTML = `<h4>Best matching lines</h4><div class="ans">${html || "See the matching sections below."}</div>` + feedbackHTML(entry.id);
   } else {
-    ansBox.innerHTML=`<h4>Answer</h4><div class="ans"><span class="spin"></span>Reading the procedures…</div>`;
+    ansBox.innerHTML = `<h4>Answer</h4><div class="ans"><span class="spin"></span>Reading the procedures…</div>`;
     scrollEnd();
-    try{
-      const a=await aiAnswer(q,hits.slice(0,S.topK),HISTORY.slice(0,-1));
-      entry.a=a; ansBox.innerHTML=`<h4>Answer</h4><div class="ans">${linkCites(a.trim(),hits)}</div>`;
-    }catch(e){
-      const bs=bestSentences(hits,q);
-      ansBox.innerHTML=`<h4>Answer</h4><div class="ans err">${esc(e.message.includes("Failed to fetch")?"Couldn't reach the AI engine. Is it running? (For Ollama, set OLLAMA_ORIGINS=* and restart it.)":e.message)}</div><div class="ans" style="margin-top:8px">${bs.map(b=>`• ${highlight(b.s,q)} ${linkCites("["+b.ref+"]",hits)}`).join("\n")}</div>`;
+    try {
+      const a = await aiAnswer(q, shown, HISTORY.slice(0, -1));
+      entry.a = a; entry.refs = [...new Set([...a.matchAll(/\[(\d+(?:\s*,\s*\d+)*)\]/g)].flatMap(m => m[1].split(/\s*,\s*/).map(n => +n - 1)))].filter(i => i >= 0 && i < shown.length);
+      ansBox.innerHTML = `<h4>Answer</h4><div class="ans">${linkCites(a.trim(), hits)}</div>` + feedbackHTML(entry.id);
+    } catch (e) {
+      ansBox.innerHTML = `<h4>Answer</h4><div class="ans err">${esc(e.message.includes("Failed to fetch") ? "Couldn't reach the AI engine. Is it running? (For Ollama, set OLLAMA_ORIGINS=* and restart it.)" : e.message)}</div><div class="ans" style="margin-top:8px">${extractive()}</div>` + feedbackHTML(entry.id);
     }
   }
   scrollEnd();
 }
-function scrollEnd(){ const c=$("#chat"); c.scrollTop=c.scrollHeight; }
-function autoGrow(){ const t=$("#q"); t.style.height="auto"; t.style.height=Math.min(160,t.scrollHeight)+"px"; }
-
-function openDoc(id, chunk, q){
-  const d=DOCS.find(x=>x.id===id); if(!d) return;
-  $("#vTag").className="tag "+d.type; $("#vTag").textContent=d.type; $("#vTitle").textContent=d.name;
-  let lastSec=null;
-  $("#vBody").innerHTML=d.chunks.map((c,i)=>{ const showSec=c.sec&&c.sec!==lastSec; lastSec=c.sec;
-    return `<div class="chunk${i===chunk?" focus":""}" id="ch${i}">${showSec?`<div class="sec">${esc(c.sec)}${c.page?" · p."+c.page:""}</div>`:""}${i===chunk&&q?highlight(c.text,q):esc(c.text)}</div>`;}).join("");
-  $("#vFind").value=""; show("#viewModal");
-  if(chunk!=null) setTimeout(()=>$("#ch"+chunk)?.scrollIntoView({block:"center"}),30);
+function giveFeedback(entryId, v, btns) {
+  const e = HISTORY[entryId]; if (!e) return;
+  const t = [...queryTerms(e.q)].filter(([, w]) => w === 1).map(([k]) => k);
+  const idxs = e.refs.length ? e.refs : [0, 1, 2];
+  const keys = idxs.map(i => e.hits[i]).filter(Boolean).map(h => h.key);
+  FB = FB.filter(f => !(f.q === e.q && keys.includes(f.k)));
+  for (const k of keys) FB.push({ q: e.q, t, k, v });
+  FB = FB.slice(-600); lsSet("procedure.fb", FB);
+  btns.forEach(b => b.classList.toggle("on", +b.dataset.v === v));
+  toast(v > 0 ? "Thanks — these sources will rank higher for questions like this" : "Got it — these sources will rank lower for questions like this");
 }
-$("#vFind").addEventListener("input",e=>{
-  const v=e.target.value.trim().toLowerCase(); const d=DOCS.find(x=>x.name===$("#vTitle").textContent);
-  document.querySelectorAll("#vBody .chunk").forEach((el,i)=>{
-    const c=d?.chunks[i]; if(!c) return; const sec=el.querySelector(".sec")?.outerHTML||"";
-    if(!v){ el.innerHTML=sec+esc(c.text); el.style.display=""; return; }
-    const hit=c.text.toLowerCase().includes(v)||(c.sec||"").toLowerCase().includes(v);
-    el.style.display=hit?"":"none";
-    if(hit) el.innerHTML=sec+esc(c.text).replace(new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"),"gi"),m=>"<mark>"+m+"</mark>");
-  });
+function scrollEnd() { const c = $("#chat"); c.scrollTop = c.scrollHeight; }
+function autoGrow() { const t = $("#q"); t.style.height = "auto"; t.style.height = Math.min(160, t.scrollHeight) + "px"; }
+
+/* ================= Viewer ================= */
+let VDOC = null;
+function openDoc(id, chunk, q) {
+  const d = ALL.find(x => x.id === id); if (!d) return; VDOC = d;
+  $("#vTag").className = "tag " + d.type; $("#vTag").textContent = d.type; $("#vTitle").textContent = d.name + (d.archived ? " (old revision)" : "");
+  $("#vRev").textContent = revName(d);
+  renderViewer(chunk, q, "");
+  $("#vFind").value = ""; show("#viewModal");
+  if (chunk != null) setTimeout(() => $("#ch" + chunk)?.scrollIntoView({ block: "center" }), 30);
+}
+function renderViewer(chunk, q, find) {
+  const d = VDOC; let lastSec = null; const v = (find || "").toLowerCase();
+  const re = v ? new RegExp(esc(v).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi") : null;
+  $("#vBody").innerHTML = d.chunks.map((c, i) => {
+    if (v && !(c.text.toLowerCase().includes(v) || (c.sec || "").toLowerCase().includes(v))) return "";
+    const showSec = c.sec && c.sec !== lastSec; lastSec = c.sec;
+    let body = i === chunk && q ? highlight(c.text, q) : esc(c.text); if (re) body = body.replace(re, m => "<mark>" + m + "</mark>");
+    return `<div class="chunk${i === chunk ? " focus" : ""}" id="ch${i}">${showSec ? `<div class="sec">${esc(c.sec)}${c.page ? " · p." + c.page : ""}</div>` : ""}${body}</div>`;
+  }).join("") || '<div class="hint">No matches in this document.</div>';
+}
+$("#vFind").addEventListener("input", e => renderViewer(null, null, e.target.value.trim()));
+$("#vCheck").addEventListener("click", () => { $("#viewModal").classList.remove("on"); openChecklist(VDOC); });
+$("#vHist").addEventListener("click", () => { $("#viewModal").classList.remove("on"); openHistory(VDOC); });
+
+/* ================= Checklist mode ================= */
+const STEP_RE = /^(\(?\d+(\.\d+)*[.)]|step\s+\d+[a-z]?\s*[:.)\-–]?|[•▪◦●\-*]|\(?[a-z][.)])\s+/i;
+const WARN_RE = /^(warning|caution|danger|important|note)\b\s*[:!\-–]?/i;
+function extractSteps(doc) {
+  const out = []; let lastSec = null; let any = false;
+  const addSec = s => { if (s !== lastSec) { if (s) out.push({ kind: "sec", text: s }); lastSec = s; } };
+  for (const c of doc.chunks) for (const line of c.text.split("\n")) {
+    const l = line.trim(); if (!l) continue;
+    const isStep = STEP_RE.test(l), isWarn = WARN_RE.test(l);
+    if (!isStep && !isWarn) continue;
+    addSec(c.sec); out.push({ kind: isStep ? "step" : "warn", text: l }); if (isStep) any = true;
+  }
+  if (!any) { out.length = 0; lastSec = null;
+    for (const c of doc.chunks) { addSec(c.sec); for (const p of c.text.split("\n")) { const l = p.trim(); if (l) out.push({ kind: WARN_RE.test(l) ? "warn" : "step", text: l }); } } }
+  let n = 0; for (const x of out) if (x.kind === "step") x.n = n++;
+  return out;
+}
+let CK = null;
+function ckKey(d) { return "procedure.run." + d.id; }
+function openChecklist(d) {
+  const items = extractSteps(d);
+  const st = lsGet(ckKey(d), { meta: {}, items: {} });
+  CK = { d, items, st };
+  $("#ckTag").className = "tag " + d.type; $("#ckTag").textContent = d.type; $("#ckTitle").textContent = d.name + " · " + revName(d);
+  $("#ckOp").value = st.meta.op || ""; $("#ckTicket").value = st.meta.ticket || ""; $("#ckStart").value = st.meta.start || "";
+  renderChecklist(); show("#ckModal");
+}
+function renderChecklist() {
+  const { items, st } = CK;
+  $("#ckBody").innerHTML = items.map(x => {
+    if (x.kind === "sec") return `<div class="cksec">${esc(x.text)}</div>`;
+    if (x.kind === "warn") return `<div class="ckwarn">${esc(x.text)}</div>`;
+    const s = st.items[x.n] || {}; const w = /\b(warning|caution|danger|do not|must not|never)\b/i.test(x.text);
+    return `<div class="ck${s.done ? " done" : ""}${w ? " warn" : ""}" data-n="${x.n}"><input type="checkbox" ${s.done ? "checked" : ""}><div class="txt">${esc(x.text)}</div><div><span class="time">${s.time ? new Date(s.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}</span> <button class="ghost" data-note title="Add a note">✎</button></div>${s.note != null ? `<input class="note" placeholder="Note / output / deviation" value="${esc(s.note)}">` : ""}</div>`;
+  }).join("") || '<div class="hint">No steps found in this document.</div>';
+  updateCkProgress();
+}
+function updateCkProgress() {
+  const total = CK.items.filter(x => x.kind === "step").length; const done = Object.values(CK.st.items).filter(s => s.done).length;
+  $("#ckCount").textContent = `${done} / ${total} done`; $("#ckBar").style.width = (total ? done / total * 100 : 0) + "%";
+}
+const saveCk = () => lsSet(ckKey(CK.d), CK.st);
+$("#ckBody").addEventListener("change", e => {
+  const row = e.target.closest(".ck"); if (!row || e.target.type !== "checkbox") return;
+  const n = row.dataset.n; const s = CK.st.items[n] = CK.st.items[n] || {};
+  s.done = e.target.checked; s.time = s.done ? Date.now() : null; row.classList.toggle("done", s.done);
+  row.querySelector(".time").textContent = s.time ? new Date(s.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+  saveCk(); updateCkProgress();
+});
+$("#ckBody").addEventListener("click", e => {
+  if (!e.target.hasAttribute("data-note")) return; const row = e.target.closest(".ck"); const n = row.dataset.n;
+  const s = CK.st.items[n] = CK.st.items[n] || {}; if (s.note == null) { s.note = ""; saveCk(); renderChecklist(); } document.querySelector(`.ck[data-n="${n}"] .note`)?.focus();
+});
+$("#ckBody").addEventListener("input", e => { if (!e.target.classList.contains("note")) return; const n = e.target.closest(".ck").dataset.n; CK.st.items[n].note = e.target.value; saveCk(); });
+["ckOp", "ckTicket", "ckStart"].forEach(id => $("#" + id).addEventListener("input", () => { CK.st.meta = { op: $("#ckOp").value, ticket: $("#ckTicket").value, start: $("#ckStart").value }; saveCk(); }));
+$("#ckReset").addEventListener("click", () => { if (!confirm("Clear all ticks, times and notes for this checklist?")) return; CK.st = { meta: CK.st.meta, items: {} }; saveCk(); renderChecklist(); });
+function ckRows() { return CK.items.filter(x => x.kind === "step").map(x => { const s = CK.st.items[x.n] || {}; return { n: x.n + 1, text: x.text, done: !!s.done, time: s.time ? new Date(s.time).toLocaleString() : "", note: s.note || "" }; }); }
+$("#ckCsv").addEventListener("click", () => {
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"'; const m = CK.st.meta;
+  const lines = [["Document", CK.d.name], ["Revision", revName(CK.d)], ["Performed by", m.op || ""], ["Ticket", m.ticket || ""], ["Window start", m.start || ""], [], ["#", "Step", "Done", "Time", "Note"], ...ckRows().map(r => [r.n, r.text, r.done ? "Yes" : "No", r.time, r.note])];
+  download(lines.map(l => l.map(q).join(",")).join("\r\n"), (CK.d.name + " checklist.csv").replace(/[\\/:*?"<>|]/g, "_"), "text/csv");
+});
+$("#ckPrint").addEventListener("click", () => {
+  const m = CK.st.meta; const w = window.open("", "_blank"); if (!w) { toast("Allow pop-ups to print"); return; }
+  const body = CK.items.map(x => { if (x.kind === "sec") return `<tr><th colspan="4" class="s">${esc(x.text)}</th></tr>`; if (x.kind === "warn") return `<tr><td></td><td colspan="3" class="w">⚠ ${esc(x.text)}</td></tr>`;
+    const s = CK.st.items[x.n] || {}; return `<tr><td class="c">${s.done ? "☑" : "☐"}</td><td>${esc(x.text)}</td><td class="t">${s.time ? new Date(s.time).toLocaleTimeString() : ""}</td><td>${esc(s.note || "")}</td></tr>`; }).join("");
+  w.document.write(`<!DOCTYPE html><html><head><title>${esc(CK.d.name)} — checklist</title><style>body{font:12px Segoe UI,Arial,sans-serif;margin:24px}h1{font-size:17px;margin:0}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}.c{width:22px;font-size:15px;text-align:center}.t{width:90px}.s{background:#eee}.w{background:#fde8e8}.meta td{border:none;padding:2px 12px 2px 0}</style></head><body><h1>${esc(CK.d.name)}</h1><div>${esc(CK.d.type)} · ${esc(revName(CK.d))} · printed ${new Date().toLocaleString()}</div><table class="meta"><tr><td>Performed by: <b>${esc(m.op || "________________")}</b></td><td>Ticket: <b>${esc(m.ticket || "__________")}</b></td><td>Window start: <b>${esc(m.start || "__________")}</b></td></tr></table><table><tr><th></th><th>Step</th><th>Time</th><th>Notes</th></tr>${body}</table><p style="margin-top:28px">Signature: ______________________ &nbsp; Date: ____________</p><script>onload=()=>print()<\/script></body></html>`);
+  w.document.close();
 });
 
-function show(sel){ $(sel).classList.add("on"); }
-document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m||e.target.hasAttribute("data-close")) m.classList.remove("on"); }));
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".modal.on").forEach(m=>m.classList.remove("on")); });
-
-/* events */
-const drop=$("#drop");
-drop.addEventListener("click",()=>$("#file").click());
-$("#file").addEventListener("change",e=>{ addFiles([...e.target.files]); e.target.value=""; });
-["dragenter","dragover"].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
-["dragleave","drop"].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();if(ev==="drop"||e.target===document.documentElement)drop.classList.remove("over");}));
-document.addEventListener("drop",e=>{ if(e.dataTransfer?.files?.length) addFiles([...e.dataTransfer.files]); });
-
-$("#lib").addEventListener("click",async e=>{
-  const row=e.target.closest(".doc"); if(!row) return; const d=DOCS.find(x=>x.id===row.dataset.id);
-  if(e.target.hasAttribute("data-del")){ if(confirm(`Remove "${d.name}" from the library?`)){ await storeDel(d.id); await refresh(); } return; }
-  if(e.target.hasAttribute("data-flip")){ d.type={SOP:"MOP",MOP:"OTHER",OTHER:"SOP"}[d.type]; await storePut(d); await refresh(); return; }
-  openDoc(d.id,null);
+/* ================= Revision history & compare ================= */
+let HFAM = null;
+function openHistory(d) {
+  HFAM = ALL.filter(x => x.family === d.family).sort((a, b) => b.revSeq - a.revSeq);
+  $("#hTitle").textContent = "Revision history — " + (HFAM.find(x => !x.archived) || d).name;
+  $("#hList").innerHTML = `<tr><th>Revision</th><th>File</th><th>Added</th><th></th></tr>` + HFAM.map(x => `<tr><td><span class="rev">${esc(revName(x))}</span> ${x.archived ? "" : '<b style="color:var(--ok);font-size:12px">current</b>'}</td><td>${esc(x.file || x.name)}</td><td>${new Date(x.added).toLocaleString()}</td><td style="text-align:right"><button class="ghost" data-open="${x.id}">Open</button>${x.archived ? `<button class="ghost" data-cur="${x.id}">Make current</button>` : ""}</td></tr>`).join("");
+  const opts = HFAM.map(x => `<option value="${x.id}">${esc(revName(x))} · ${new Date(x.added).toLocaleDateString()}${x.archived ? "" : " (current)"}</option>`).join("");
+  $("#hA").innerHTML = opts; $("#hB").innerHTML = opts;
+  $("#hB").value = HFAM[0].id; $("#hA").value = (HFAM[1] || HFAM[0]).id;
+  renderDiff(); show("#histModal");
+}
+function docLines(d) { const out = []; let last = null; for (const c of d.chunks) { if (c.sec && c.sec !== last) { out.push("## " + c.sec); last = c.sec; } out.push(...c.text.split("\n").map(s => s.trim()).filter(Boolean)); } return out; }
+function diffLines(a, b) {
+  const n = a.length, m = b.length;
+  if (n * m > 8e6) { const sb = new Set(b), sa = new Set(a); return [...a.filter(x => !sb.has(x)).map(t => ({ op: "-", t })), ...b.map(t => ({ op: sa.has(t) ? " " : "+", t }))]; }
+  const W = m + 1; const dp = new Uint32Array((n + 1) * W);
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i * W + j] = a[i] === b[j] ? dp[(i + 1) * W + j + 1] + 1 : Math.max(dp[(i + 1) * W + j], dp[i * W + j + 1]);
+  const out = []; let i = 0, j = 0;
+  while (i < n && j < m) { if (a[i] === b[j]) { out.push({ op: " ", t: a[i] }); i++; j++; } else if (dp[(i + 1) * W + j] >= dp[i * W + j + 1]) out.push({ op: "-", t: a[i++] }); else out.push({ op: "+", t: b[j++] }); }
+  while (i < n) out.push({ op: "-", t: a[i++] }); while (j < m) out.push({ op: "+", t: b[j++] });
+  return out;
+}
+function renderDiff() {
+  const A = ALL.find(x => x.id === $("#hA").value), B = ALL.find(x => x.id === $("#hB").value);
+  if (!A || !B) return;
+  if (A === B) { $("#hSum").textContent = ""; $("#hDiff").innerHTML = `<div class="hint">${HFAM.length < 2 ? "Only one revision so far. Add a newer version of this file (same name, or with “rev 2”, “v2”…) and it will show up here." : "Pick two different revisions to compare."}</div>`; return; }
+  const d = diffLines(docLines(A), docLines(B)); const showAll = $("#hAll").checked;
+  const add = d.filter(x => x.op === "+").length, del = d.filter(x => x.op === "-").length;
+  $("#hSum").innerHTML = `<span style="color:var(--ok)">+${add} added</span> · <span style="color:var(--err)">−${del} removed</span>`;
+  if (!add && !del) { $("#hDiff").innerHTML = '<div class="hint">These revisions have the same text.</div>'; return; }
+  const html = []; const C = 2;
+  for (let i = 0; i < d.length; i++) {
+    const x = d[i];
+    if (x.op === " " && !showAll) {
+      let j = i; while (j < d.length && d[j].op === " ") j++;
+      const run = j - i; const head = i === 0 ? 0 : C, tail = j === d.length ? 0 : C;
+      if (run > head + tail + 1) {
+        for (let k = i; k < i + head; k++) html.push(`<div class="same">${esc(d[k].t)}</div>`);
+        html.push(`<div class="gap">… ${run - head - tail} unchanged lines …</div>`);
+        for (let k = j - tail; k < j; k++) html.push(`<div class="same">${esc(d[k].t)}</div>`);
+        i = j - 1; continue;
+      }
+    }
+    html.push(`<div class="${x.op === "+" ? "add" : x.op === "-" ? "del" : "same"}">${esc(x.t)}</div>`);
+  }
+  $("#hDiff").innerHTML = `<div class="diff">${html.join("")}</div>`;
+}
+["hA", "hB", "hAll"].forEach(id => $("#" + id).addEventListener("change", renderDiff));
+$("#hList").addEventListener("click", async e => {
+  const o = e.target.dataset.open, c = e.target.dataset.cur;
+  if (o) { $("#histModal").classList.remove("on"); openDoc(o, null); }
+  if (c) { for (const x of HFAM) { x.archived = x.id !== c; await storePut(x); } await refresh(); openHistory(ALL.find(x => x.id === c)); toast("Revision restored as current"); }
 });
-$("#chatInner").addEventListener("click",e=>{
-  const s=e.target.closest("[data-doc]"); if(s){ const q=s.closest(".a")?.parentElement?.querySelector(".q")?.textContent||""; openDoc(s.dataset.doc,+s.dataset.chunk,q); return; }
-  if(e.target.hasAttribute("data-sug")) ask(e.target.textContent);
-});
-$("#askBtn").addEventListener("click",()=>ask());
-$("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); ask(); } });
-$("#q").addEventListener("input",autoGrow);
-$("#clearChat").addEventListener("click",()=>{ HISTORY=[]; renderEmpty(); });
 
-$("#pasteBtn").addEventListener("click",()=>{ $("#pTitle").value=""; $("#pText").value=""; show("#pasteModal"); });
-$("#pSave").addEventListener("click",async()=>{
-  const text=$("#pText").value.trim(); if(!text) return;
-  const name=$("#pTitle").value.trim()||text.split("\n")[0].slice(0,60);
-  await storePut({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()), name, file:"(pasted)", type:$("#pType").value, added:Date.now(), chunks:chunkBlocks(textToBlocks(text))});
-  $("#pasteModal").classList.remove("on"); await refresh(); toast("Added "+name);
+/* ================= Audit ================= */
+const AUDIT = {
+  MOP: [
+    ["Prerequisites / pre-checks", true, /prerequisite|pre-?check|pre-?requisite|before (you )?(begin|start)|pre-?work|preparation|pre-?implementation/],
+    ["Step-by-step procedure", true, /procedure|implementation|\bsteps?\b|instructions/],
+    ["Verification / post-checks", true, /verif|validat|post-?check|post-?implementation|success criteria|test plan|smoke test/],
+    ["Rollback / back-out plan", true, /roll ?-?back|back-?out|revert|fallback/],
+    ["Approvals", true, /approv|sign-?off|authori[sz]|\bcab\b|change advisory/],
+    ["Impact / risk", true, /impact|risk|outage|downtime|service[- ]affect/],
+    ["Contacts / escalation", false, /contact|escalat|on-?call|point of contact|phone/],
+    ["Schedule / window", false, /maintenance window|change window|schedul|start time|duration|timeline/]
+  ],
+  SOP: [
+    ["Purpose", true, /purpose|objective/],
+    ["Scope", true, /\bscope\b|applies to|applicab/],
+    ["Responsibilities", true, /responsib|\broles?\b|raci/],
+    ["Procedure steps", true, /procedure|\bsteps?\b|instructions/],
+    ["Safety / precautions", false, /safety|\bppe\b|hazard|caution|warning|precaution/],
+    ["References", false, /reference|related documents|see also/],
+    ["Revision history / doc control", false, /revision|version history|document control|change history|effective date|approved by/],
+    ["Definitions", false, /definition|glossary|acronym|abbreviation/]
+  ]
+};
+function auditDoc(d) {
+  const rules = AUDIT[d.type === "MOP" ? "MOP" : "SOP"];
+  const heads = d.chunks.map(c => c.sec || "").join("\n").toLowerCase(); const text = d.chunks.map(c => c.text).join("\n").toLowerCase();
+  const res = rules.map(([name, req, re]) => ({ name, req, found: re.test(heads) || re.test(text) }));
+  const reqTotal = res.filter(r => r.req).length, reqOk = res.filter(r => r.req && r.found).length;
+  return { d, res, missing: res.filter(r => !r.found), reqMissing: reqTotal - reqOk, score: Math.round(res.filter(r => r.found).length / res.length * 100) };
+}
+function renderAudit() {
+  const f = $("#auFilter").value;
+  let rows = DOCS.filter(d => d.type !== "OTHER").map(auditDoc);
+  if (f === "SOP" || f === "MOP") rows = rows.filter(r => r.d.type === f);
+  if (f === "GAPS") rows = rows.filter(r => r.reqMissing);
+  rows.sort((a, b) => b.reqMissing - a.reqMissing || a.score - b.score);
+  $("#auTable").innerHTML = `<tr><th>Document</th><th>Type</th><th>Score</th><th>Missing</th></tr>` + (rows.map(r => `<tr class="click" data-id="${r.d.id}"><td>${esc(r.d.name)}</td><td><span class="tag ${r.d.type}">${r.d.type}</span></td><td class="score" style="color:${r.reqMissing ? "var(--err)" : r.missing.length ? "var(--accent2)" : "var(--ok)"}">${r.score}%</td><td>${r.missing.length ? r.missing.map(m => `<span class="miss${m.req ? "" : " rec"}">${esc(m.name)}</span>`).join("") : '<span class="okk">✓ Complete</span>'}</td></tr>`).join("") || `<tr><td colspan="4" class="hint">Nothing to show.</td></tr>`);
+  return rows;
+}
+$("#auditBtn").addEventListener("click", () => { if (!DOCS.length) { toast("Add some documents first"); return; } renderAudit(); show("#auditModal"); });
+$("#auFilter").addEventListener("change", renderAudit);
+$("#auTable").addEventListener("click", e => { const r = e.target.closest("tr[data-id]"); if (r) { $("#auditModal").classList.remove("on"); openDoc(r.dataset.id, null); } });
+$("#auCsv").addEventListener("click", () => {
+  const rows = renderAudit(); const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  download([["Document", "Type", "Score", "Missing (required)", "Missing (recommended)"], ...rows.map(r => [r.d.name, r.d.type, r.score + "%", r.missing.filter(m => m.req).map(m => m.name).join("; "), r.missing.filter(m => !m.req).map(m => m.name).join("; ")])].map(l => l.map(q).join(",")).join("\r\n"), "procedure-audit.csv", "text/csv");
+});
+
+/* ================= Team library: shared folder + GitHub ================= */
+async function* walk(dir, prefix = "") {
+  for await (const [name, h] of dir.entries()) {
+    if (name.startsWith(".") || name.startsWith("~$")) continue;
+    if (h.kind === "directory") yield* walk(h, prefix + name + "/");
+    else if (SUPPORTED.test(name)) yield [prefix + name, h];
+  }
+}
+async function syncFolder(h, interactive) {
+  let p = await h.queryPermission({ mode: "read" });
+  if (p !== "granted" && interactive) p = await h.requestPermission({ mode: "read" });
+  if (p !== "granted") { if (interactive) toast("Folder access wasn't granted"); updateFolderState(); return; }
+  const pre = "folder:" + h.name + "/"; const seen = new Set(); let added = 0, updated = 0, removed = 0, failed = 0;
+  setStatus("Syncing folder " + h.name + "…");
+  for await (const [path, fh] of walk(h)) {
+    const key = pre + path; seen.add(key);
+    const file = await fh.getFile(); const ex = active().find(d => d.srcKey === key);
+    if (ex && ex.srcModified === file.lastModified) continue;
+    setStatus("Syncing " + path + "…");
+    try { const r = await ingest(file, { srcKey: key, srcModified: file.lastModified, quiet: true }); if (r && r !== ex) ex ? updated++ : added++; } catch (e) { console.warn(path, e); failed++; }
+  }
+  for (const d of active().filter(d => d.srcKey && d.srcKey.startsWith(pre) && !seen.has(d.srcKey))) { await removeFamily(d); removed++; }
+  setStatus(""); await refresh(); ensureEmbeddings();
+  lsSet("procedure.folderSynced", Date.now()); updateFolderState();
+  toast(`Folder synced: ${added} added, ${updated} updated, ${removed} removed${failed ? `, ${failed} couldn't be read` : ""}`, 5000);
+}
+async function updateFolderState() {
+  const h = await metaGet("folder").catch(() => null); const t = lsGet("procedure.folderSynced", 0);
+  $("#folderState").innerHTML = h ? `Connected to <b>${esc(h.name)}</b>${t ? " · last synced " + new Date(t).toLocaleString() : ""}` : "No folder connected.";
+  $("#folderSync").disabled = !h; $("#folderForget").disabled = !h;
+}
+$("#teamBtn").addEventListener("click", () => { ["ghRepo", "ghBranch", "ghPath", "ghToken"].forEach(k => $("#" + k).value = S[k] || ""); $("#ghAuto").checked = !!S.ghAuto; $("#ghState").textContent = ""; updateFolderState(); show("#teamModal"); });
+$("#folderPick").addEventListener("click", async () => {
+  if (!window.showDirectoryPicker) { toast("Folder sync needs Edge, Chrome or the desktop app", 4000); return; }
+  try { const h = await window.showDirectoryPicker({ id: "procedure", mode: "read" }); await metaPut("folder", h); await syncFolder(h, true); } catch (e) { if (e.name !== "AbortError") toast("Couldn't open folder: " + e.message, 5000); }
+});
+$("#folderSync").addEventListener("click", async () => { const h = await metaGet("folder"); if (h) syncFolder(h, true); });
+$("#folderForget").addEventListener("click", async () => { await metaDel("folder"); updateFolderState(); toast("Folder disconnected — its documents stay in the library"); });
+async function syncGitHub(interactive) {
+  const repo = (S.ghRepo || "").trim().replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "").replace(/\/$/, "");
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { if (interactive) toast("Enter the repository as owner/name"); return; }
+  const br = S.ghBranch || "main", base = (S.ghPath || "").replace(/^\/+|\/+$/g, "");
+  const H = S.ghToken ? { Authorization: "Bearer " + S.ghToken } : {};
+  const pre = `gh:${repo}/`; let added = 0, updated = 0, removed = 0, failed = 0;
+  setStatus("Syncing from GitHub…"); $("#ghState").textContent = "Syncing…";
+  try {
+    const r = await fetch(`https://api.github.com/repos/${repo}/git/trees/${encodeURIComponent(br)}?recursive=1`, { headers: H });
+    if (!r.ok) throw new Error(r.status === 404 ? "repository or branch not found (private repos need a token)" : r.status === 403 ? "GitHub rate limit — add a token or try later" : "GitHub error " + r.status);
+    const tree = (await r.json()).tree.filter(t => t.type === "blob" && SUPPORTED.test(t.path) && (!base || t.path.startsWith(base + "/")));
+    const seen = new Set();
+    for (const t of tree) {
+      const key = pre + t.path; seen.add(key); const ex = active().find(d => d.srcKey === key);
+      if (ex && ex.srcModified === t.sha) continue;
+      setStatus("Syncing " + t.path + "…");
+      try {
+        const p = t.path.split("/").map(encodeURIComponent).join("/");
+        const fr = S.ghToken ? await fetch(`https://api.github.com/repos/${repo}/contents/${p}?ref=${encodeURIComponent(br)}`, { headers: { ...H, Accept: "application/vnd.github.raw" } })
+                             : await fetch(`https://raw.githubusercontent.com/${repo}/${br}/${p}`);
+        if (!fr.ok) throw new Error(fr.status);
+        const file = new File([await fr.blob()], t.path.split("/").pop());
+        const res = await ingest(file, { srcKey: key, srcModified: t.sha, quiet: true }); if (res && res !== ex) ex ? updated++ : added++;
+      } catch (e) { console.warn(t.path, e); failed++; }
+    }
+    for (const d of active().filter(d => d.srcKey && d.srcKey.startsWith(pre) && !seen.has(d.srcKey))) { await removeFamily(d); removed++; }
+    const msg = `GitHub synced: ${added} added, ${updated} updated, ${removed} removed${failed ? `, ${failed} failed` : ""}`;
+    $("#ghState").textContent = msg; if (interactive || added || updated || removed) toast(msg, 5000);
+  } catch (e) { $("#ghState").innerHTML = '<span class="err">' + esc(e.message) + "</span>"; if (interactive) toast("GitHub sync failed: " + e.message, 6000); }
+  setStatus(""); await refresh(); ensureEmbeddings();
+}
+$("#ghSync").addEventListener("click", () => { ["ghRepo", "ghBranch", "ghPath", "ghToken"].forEach(k => S[k] = $("#" + k).value.trim()); S.ghAuto = $("#ghAuto").checked; saveS(); syncGitHub(true); });
+
+/* ================= Wiring ================= */
+function show(sel) { $(sel).classList.add("on"); }
+document.querySelectorAll(".modal").forEach(m => m.addEventListener("click", e => { if (e.target === m || e.target.hasAttribute("data-close")) m.classList.remove("on"); }));
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".modal.on").forEach(m => m.classList.remove("on")); });
+function download(text, name, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); }
+
+const drop = $("#drop");
+drop.addEventListener("click", () => $("#file").click());
+$("#file").addEventListener("change", e => { addFiles([...e.target.files]); e.target.value = ""; });
+["dragenter", "dragover"].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+document.addEventListener("dragleave", e => { if (!e.relatedTarget) drop.classList.remove("over"); });
+document.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); if (e.dataTransfer?.files?.length) addFiles([...e.dataTransfer.files]); });
+$("#libFilter").addEventListener("input", renderLib);
+
+$("#lib").addEventListener("click", async e => {
+  const row = e.target.closest(".doc"); if (!row) return; const d = ALL.find(x => x.id === row.dataset.id); const act = e.target.closest("[data-act]")?.dataset.act;
+  if (act === "del") { const n = ALL.filter(x => x.family === d.family).length; if (confirm(`Remove "${d.name}"${n > 1 ? ` and its ${n - 1} older revision${n > 2 ? "s" : ""}` : ""} from the library?`)) { await removeFamily(d); await refresh(); } return; }
+  if (act === "flip") { const t = { SOP: "MOP", MOP: "OTHER", OTHER: "SOP" }[d.type]; for (const x of ALL.filter(x => x.family === d.family)) { x.type = t; x.typeLocked = true; await storePut(x); } await refresh(); return; }
+  if (act === "check") { openChecklist(d); return; }
+  if (act === "hist") { openHistory(d); return; }
+  openDoc(d.id, null);
+});
+$("#chatInner").addEventListener("click", e => {
+  const s = e.target.closest("[data-doc]"); if (s) { const q = s.closest(".a")?.parentElement?.querySelector(".q")?.textContent || ""; openDoc(s.dataset.doc, +s.dataset.chunk, q); return; }
+  if (e.target.hasAttribute("data-sug")) { ask(e.target.textContent); return; }
+  if (e.target.classList.contains("pinbtn")) { togglePin(e.target.dataset.q); return; }
+  const fb = e.target.closest(".fb button"); if (fb) { const box = fb.closest(".fb"); giveFeedback(+box.dataset.fb, +fb.dataset.v, [...box.querySelectorAll("button")]); }
+});
+$("#pins").addEventListener("click", e => {
+  const un = e.target.dataset.unpin; if (un != null) { e.stopPropagation(); togglePin(PINS[+un]); return; }
+  const c = e.target.closest("[data-pin]"); if (c) ask(PINS[+c.dataset.pin]);
+});
+$("#askBtn").addEventListener("click", () => ask());
+$("#q").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); } });
+$("#q").addEventListener("input", autoGrow);
+$("#clearChat").addEventListener("click", () => { HISTORY = []; renderEmpty(); });
+
+$("#pasteBtn").addEventListener("click", () => { $("#pTitle").value = ""; $("#pText").value = ""; show("#pasteModal"); });
+$("#pSave").addEventListener("click", async () => {
+  const text = $("#pText").value.trim(); if (!text) return;
+  const name = $("#pTitle").value.trim() || text.split("\n")[0].slice(0, 60);
+  const chunks = chunkBlocks(textToBlocks(text));
+  await addDoc({ id: uid(), name, file: name, type: $("#pType").value, typeLocked: true, added: Date.now(), chunks, hash: hashStr(chunks.map(c => c.text).join("\n")) }, { typeGiven: true });
+  $("#pasteModal").classList.remove("on"); await refresh(); ensureEmbeddings();
 });
 
 /* settings */
-const F=["engine","ollamaUrl","ollamaModel","oaUrl","oaModel","oaKey","anKey","anModel","topK"];
-function showCfg(){ document.querySelectorAll(".cfg").forEach(c=>c.style.display=c.id==="cfg-"+$("#engine").value?"":"none"); }
-$("#settingsBtn").addEventListener("click",()=>{ F.forEach(k=>$("#"+k).value=S[k]); showCfg(); $("#testOut").textContent=""; show("#settingsModal"); });
-$("#engine").addEventListener("change",showCfg);
-function readForm(){ F.forEach(k=>S[k]=k==="topK"?Math.max(3,Math.min(20,+$("#topK").value||8)):$("#"+k).value.trim()); }
-$("#saveSettings").addEventListener("click",()=>{ readForm(); saveS(); renderLib(); $("#settingsModal").classList.remove("on"); toast("Saved"); });
-$("#testEngine").addEventListener("click",async()=>{
-  readForm(); const o=$("#testOut");
-  if(S.engine==="search"){ o.textContent="Search-only mode needs no setup."; return; }
-  o.innerHTML='<span class="spin"></span>Testing…';
-  try{ const a=await aiAnswer("What is step 1?",[{doc:{type:"SOP",name:"Test"},c:{sec:"Procedure",text:"Step 1: Put on safety glasses."}}],[]); o.textContent="✓ Works. Reply: "+a.slice(0,140); }
-  catch(e){ o.innerHTML='<span class="err">'+esc(e.message.includes("Failed to fetch")?"Couldn't connect. Check it's running and allows browser requests (Ollama: OLLAMA_ORIGINS=*; LM Studio: enable CORS).":e.message)+"</span>"; }
+const F = ["engine", "ollamaUrl", "ollamaModel", "oaUrl", "oaModel", "oaKey", "anKey", "anModel", "topK", "glossary"];
+function showCfg() { document.querySelectorAll(".cfg").forEach(c => c.style.display = c.id === "cfg-" + $("#engine").value ? "" : "none"); }
+$("#settingsBtn").addEventListener("click", () => { F.forEach(k => $("#" + k).value = S[k]); $("#smart").checked = !!S.smart; showCfg(); $("#testOut").textContent = ""; show("#settingsModal"); });
+$("#engine").addEventListener("change", showCfg);
+function readForm() { F.forEach(k => S[k] = k === "topK" ? Math.max(3, Math.min(20, +$("#topK").value || 8)) : k === "glossary" ? $("#glossary").value : $("#" + k).value.trim()); S.smart = $("#smart").checked; }
+$("#saveSettings").addEventListener("click", () => { readForm(); saveS(); renderLib(); $("#settingsModal").classList.remove("on"); toast("Saved"); ensureEmbeddings(); });
+$("#testEngine").addEventListener("click", async () => {
+  readForm(); const o = $("#testOut");
+  if (S.engine === "search") { o.textContent = "Search-only mode needs no setup."; return; }
+  o.innerHTML = '<span class="spin"></span>Testing…';
+  try { const a = await aiAnswer("What is step 1?", [{ doc: { type: "SOP", name: "Test", revSeq: 1 }, c: { sec: "Procedure", text: "1. Put on safety glasses." } }], []); o.textContent = "✓ Works. Reply: " + a.slice(0, 140); }
+  catch (e) { o.innerHTML = '<span class="err">' + esc(e.message.includes("Failed to fetch") ? "Couldn't connect. Check it's running and allows browser requests (Ollama: OLLAMA_ORIGINS=*; LM Studio: enable CORS)." : e.message) + "</span>"; }
 });
-$("#ollamaList").addEventListener("click",async()=>{
-  try{ const r=await fetch($("#ollamaUrl").value.replace(/\/$/,"")+"/api/tags"); const j=await r.json(); const names=j.models.map(m=>m.name);
-    $("#ollamaModels").innerHTML=names.length?names.map(n=>`<a href="#" data-m="${esc(n)}" style="color:var(--accent)">${esc(n)}</a>`).join(" · "):"No models installed.";
-    $("#ollamaModels").onclick=e=>{ if(e.target.dataset.m){ e.preventDefault(); $("#ollamaModel").value=e.target.dataset.m; } };
-  }catch(e){ $("#ollamaModels").innerHTML='<span class="err">Not reachable — is Ollama running with OLLAMA_ORIGINS=* ?</span>'; }
+$("#ollamaList").addEventListener("click", async () => {
+  try { const r = await fetch($("#ollamaUrl").value.replace(/\/$/, "") + "/api/tags"); const j = await r.json(); const names = j.models.map(m => m.name);
+    $("#ollamaModels").innerHTML = names.length ? names.map(n => `<a href="#" data-m="${esc(n)}">${esc(n)}</a>`).join(" · ") : "No models installed.";
+    $("#ollamaModels").onclick = e => { if (e.target.dataset.m) { e.preventDefault(); $("#ollamaModel").value = e.target.dataset.m; } };
+  } catch (e) { $("#ollamaModels").innerHTML = '<span class="err">Not reachable — is Ollama running with OLLAMA_ORIGINS=* ?</span>'; }
 });
 
 /* export / import */
-$("#exportBtn").addEventListener("click",()=>{
-  const blob=new Blob([JSON.stringify({app:"procedure",version:VERSION,docs:DOCS})],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="procedure-library-"+new Date().toISOString().slice(0,10)+".json"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+$("#exportBtn").addEventListener("click", () => {
+  const json = JSON.stringify({ app: "procedure", version: VERSION, settings: { glossary: S.glossary }, pins: PINS, docs: ALL }, (k, v) => k === "emb" ? undefined : v);
+  download(json, "procedure-library-" + new Date().toISOString().slice(0, 10) + ".json", "application/json");
 });
-$("#importBtn").addEventListener("click",()=>$("#importFile").click());
-$("#importFile").addEventListener("change",async e=>{
-  const f=e.target.files[0]; e.target.value=""; if(!f) return;
-  try{ const j=JSON.parse(await f.text()); const docs=j.docs||[]; let n=0; for(const d of docs){ if(d.id&&d.chunks){ await storePut(d); n++; } } await refresh(); toast("Imported "+n+" document"+(n===1?"":"s")); }
-  catch(err){ toast("That file isn't a Procédure library export",4000); }
+$("#importBtn").addEventListener("click", () => $("#importFile").click());
+$("#importFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text()); let n = 0;
+    for (const d of j.docs || []) if (d.id && d.chunks) { await storePut(d); n++; }
+    if (j.settings?.glossary && !S.glossary) { S.glossary = j.settings.glossary; saveS(); }
+    if (Array.isArray(j.pins)) { PINS = [...new Set([...PINS, ...j.pins])].slice(0, 20); lsSet("procedure.pins", PINS); }
+    await refresh(); ensureEmbeddings(); toast("Imported " + n + " document" + (n === 1 ? "" : "s"));
+  } catch (err) { toast("That file isn't a Procédure library export", 4000); }
 });
+$("#dataBtn").addEventListener("click", () => DESKTOP && DESKTOP.openData());
 
 /* updater — only acts when the user accepts */
-function newer(a,b){ const x=a.split(".").map(Number),y=b.split(".").map(Number); for(let i=0;i<3;i++){ if((x[i]||0)>(y[i]||0)) return true; if((x[i]||0)<(y[i]||0)) return false; } return false; }
-$("#updateBtn").addEventListener("click",async()=>{
-  try{
-    const r=await fetch(`https://raw.githubusercontent.com/${REPO}/main/version.json?t=${Date.now()}`); if(!r.ok) throw new Error(r.status);
-    const v=await r.json();
-    if(!newer(v.version,VERSION)){ toast("You're on the latest version ("+VERSION+")"); return; }
-    if(!confirm(`Version ${v.version} is available (you have ${VERSION}).\n\n${v.notes||""}\n\nUpdate now? Your library is kept.`)) return;
-    if(location.protocol.startsWith("http")){ location.reload(); return; }
-    const html=await (await fetch(`https://raw.githubusercontent.com/${REPO}/main/index.html?t=${Date.now()}`)).text();
-    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([html],{type:"text/html"})); a.download="Procedure.html"; a.click();
-    alert("The new version was downloaded as Procedure.html.\nReplace your old copy with it and open it — your library is kept in this browser.\n(If you renamed the file or moved folders, use Export/Import to carry your library over.)");
-  }catch(e){ toast("Couldn't check for updates (offline?)",4000); }
+function newer(a, b) { const x = String(a).split(".").map(Number), y = String(b).split(".").map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) > (y[i] || 0)) return true; if ((x[i] || 0) < (y[i] || 0)) return false; } return false; }
+$("#updateBtn").addEventListener("click", async () => {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/version.json?t=${Date.now()}`); if (!r.ok) throw new Error(r.status);
+    const v = await r.json();
+    if (!newer(v.version, VERSION)) { toast("You're on the latest version (" + VERSION + ")"); return; }
+    if (!confirm(`Version ${v.version} is available (you have ${VERSION}).\n\n${v.notes || ""}\n\nUpdate now? Your library is kept.`)) return;
+    if (location.protocol.startsWith("http")) { location.reload(); return; }
+    const html = await (await fetch(`https://raw.githubusercontent.com/${REPO}/main/index.html?t=${Date.now()}`)).text();
+    if (!html.includes("const VERSION")) throw new Error("bad download");
+    if (DESKTOP) { await DESKTOP.saveUpdate(html); return; }
+    download(html, "Procedure.html", "text/html");
+    alert("The new version was downloaded as Procedure.html.\nReplace your old copy with it and open it — your library is kept in this browser.\n(If you open it from a different browser, use Export/Import to carry your library over.)");
+  } catch (e) { toast("Couldn't check for updates (offline?)", 4000); }
 });
 
 /* boot */
-(async()=>{
-  try{ await DB.open(); }catch(e){ useMem=true; toast("Browser storage is blocked — documents will be kept only until you close this tab. Use Export to save.",8000); }
+(async () => {
+  try { await DB.open(); } catch (e) { useMem = true; toast("Browser storage is blocked — documents are kept only until you close this tab. Use Export to save.", 8000); }
   await refresh();
+  ensureEmbeddings();
+  try { const h = await metaGet("folder"); if (h && (await h.queryPermission({ mode: "read" })) === "granted") syncFolder(h, false); } catch (e) {}
+  if (S.ghAuto && S.ghRepo) syncGitHub(false);
 })();
 </script>
 </body>
